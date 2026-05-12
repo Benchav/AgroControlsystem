@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" role="img" aria-label="Agro Control">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+  </defs>
+  <rect width="192" height="192" rx="40" fill="url(#bg)"/>
+  <circle cx="96" cy="104" r="30" fill="#0f172a" fill-opacity="0.25"/>
+  <path d="M96 46c-14 18-28 31-28 50 0 15 13 26 28 26s28-11 28-26c0-19-14-32-28-50Z" fill="#d1fae5"/>
+  <path d="M90 126c0 10-4 18-10 23h32c-6-5-10-13-10-23H90Z" fill="#86efac"/>
+  <path d="M96 72c10 0 19 4 25 10-6 6-15 10-25 10s-19-4-25-10c6-6 15-10 25-10Z" fill="#22c55e"/>
+</svg>
