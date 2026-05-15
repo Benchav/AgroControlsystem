@@ -80,9 +80,9 @@ export function LandingPage({ onEnterApp }: LandingPageProps) {
             <div className="grid max-w-2xl grid-cols-2 gap-3 pt-4 sm:grid-cols-4">
               {[
                 ['24', 'Sensores activos'],
-                ['12ha', 'Terreno monitoreado'],
-                ['97%', 'Uptime del sistema'],
-                ['4', 'Módulos integrados'],
+                ['12km', 'Terreno monitoreado'],
+                ['+150h', 'Uptime del sistema'],
+                ['+4', 'Módulos integrados'],
               ].map(([value, label]) => (
                 <div key={label} className="rounded-3xl border border-white/8 bg-white/[0.03] p-4 backdrop-blur">
                   <div className="text-2xl font-black tracking-tight text-white md:text-3xl">{value}</div>
