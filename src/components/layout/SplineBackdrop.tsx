@@ -15,7 +15,7 @@ export function SplineBackdrop() {
     if ('requestIdleCallback' in window) {
       window.requestIdleCallback(load, { timeout: 1200 });
     } else {
-      window.setTimeout(load, 0);
+      setTimeout(load, 0);
     }
 
     return () => {
