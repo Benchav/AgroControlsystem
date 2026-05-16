@@ -65,6 +65,7 @@ function formatTime(timestamp: number) {
 export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, isSending, errorMessage }: ChatPageProps) {
   const [draft, setDraft] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const hasMessages = messages.length > 0;
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
@@ -80,11 +81,24 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
 
   return (
     <div className="space-y-4 md:space-y-5">
-      <p className="text-sm leading-6 text-slate-400">
-        Canal de ayuda contextual conectado a Groq · Llama 3. Respuestas cortas, claras y enfocadas en la plataforma.
-      </p>
+      <div className="flex flex-col gap-3 rounded-[24px] border border-white/8 bg-[#25283d]/70 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:flex-row md:items-center md:justify-between md:p-5">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-emerald-300/80">Mensajería profesional</p>
+          <p className="mt-1 text-sm leading-6 text-slate-300">
+            Canal de ayuda contextual conectado a Groq · Llama 3. Respuestas cortas, claras y enfocadas en la plataforma.
+          </p>
+        </div>
 
-      <div className="grid gap-4 xl:grid-cols-[300px_1fr]">
+        <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-300">
+          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-emerald-300">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.9)]" />
+            Conectado
+          </span>
+          <span className="rounded-full border border-white/8 bg-white/[0.03] px-3 py-2 text-slate-400">Soporte multi-hilo</span>
+        </div>
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-[320px_1fr]">
         <div className="space-y-4">
           <PageSection title="Canales" subtitle="Selecciona el hilo de conversación">
             <div className="space-y-3">
@@ -101,9 +115,9 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
                   type="button"
                   onClick={() => onSelectChat(thread)}
                   disabled={isSending}
-                  className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition ${selectedChat === thread ? 'border-emerald-400/15 bg-emerald-500/5' : 'border-white/6 bg-black/10 hover:border-white/10 hover:bg-white/[0.04]'} ${isSending ? 'cursor-not-allowed opacity-60' : ''}`}
+                  className={`group flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition ${selectedChat === thread ? 'border-emerald-400/20 bg-gradient-to-r from-emerald-500/10 to-white/[0.03] shadow-[0_8px_30px_rgba(16,185,129,0.08)]' : 'border-white/6 bg-black/10 hover:border-white/10 hover:bg-white/[0.04]'} ${isSending ? 'cursor-not-allowed opacity-60' : ''}`}
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/8 bg-white/[0.04] text-xs font-bold text-white">
+                  <div className={`flex h-11 w-11 items-center justify-center rounded-full border text-xs font-bold text-white transition ${selectedChat === thread ? 'border-emerald-400/25 bg-emerald-500/15' : 'border-white/8 bg-white/[0.04] group-hover:bg-white/[0.06]'}`}>
                     {label
                       .split(' ')
                       .map((part) => part[0])
@@ -136,79 +150,127 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
               ))}
             </div>
           </PageSection>
+
+          <div className="rounded-[20px] border border-white/8 bg-[#25283d]/75 p-4">
+            <div className="text-sm font-semibold text-white">Modo conversación</div>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              Cambia de hilo, usa atajos y escribe mensajes cortos para respuestas más rápidas y ordenadas.
+            </p>
+          </div>
         </div>
 
         <div className="space-y-4">
           <PageSection title={selectedChat === 'bot' ? 'Asistente AgroControl' : chatLabels[selectedChat]} subtitle={isSending ? 'Generando respuesta breve...' : 'Groq · Llama 3 · contexto de la plataforma'}>
             <div className="space-y-4">
+              <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-4 py-3">
+                <div className="min-w-0">
+                  <div className="truncate text-sm font-semibold text-white">{chatLabels[selectedChat]}</div>
+                  <div className="truncate text-xs text-slate-400">{chatRoles[selectedChat]}</div>
+                </div>
+
+                <div className="flex items-center gap-2 text-xs font-medium text-slate-300">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_14px_rgba(52,211,153,0.9)]" />
+                  Activo
+                </div>
+              </div>
+
               {errorMessage ? (
                 <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
                   {errorMessage}
                 </div>
               ) : null}
 
-              <div className="max-h-[56vh] space-y-3 overflow-y-auto rounded-2xl border border-white/8 bg-black/20 p-4 text-sm text-slate-300">
-                <div className="mx-auto flex max-w-4xl flex-col gap-3">
-                  {messages.map((message) => {
-                    const isUser = message.role === 'user';
-                    return (
-                      <div key={message.id} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[88%] rounded-2xl px-4 py-3 shadow-[0_8px_20px_rgba(0,0,0,0.12)] md:max-w-[76%] ${isUser ? 'border border-emerald-400/20 bg-emerald-500/10 text-white' : 'border border-white/8 bg-white/[0.03] text-slate-300'}`}>
-                          <div className="whitespace-pre-wrap leading-6">{message.text}</div>
-                          <div className={`mt-2 text-[10px] uppercase tracking-[0.18em] ${isUser ? 'text-emerald-100/70' : 'text-slate-500'}`}>
-                            {isUser ? 'Tú' : selectedChat === 'bot' ? 'AgroControl AI' : chatLabels[selectedChat]} · {formatTime(message.timestamp)}
+              <div className="flex h-[56vh] flex-col rounded-[24px] border border-white/8 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.08),_transparent_35%),#111521] p-3 shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+                <div className="flex-1 space-y-3 overflow-y-auto rounded-[20px] px-1 py-2 text-sm text-slate-300">
+                  {hasMessages ? (
+                    <div className="mx-auto flex max-w-4xl flex-col gap-3">
+                      {messages.map((message) => {
+                        const isUser = message.role === 'user';
+                        return (
+                          <div key={message.id} className={`flex items-end gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
+                            {!isUser ? (
+                              <div className="mb-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/8 bg-white/[0.05] text-[10px] font-bold text-slate-200">
+                                AG
+                              </div>
+                            ) : null}
+
+                            <div className={`max-w-[88%] rounded-[22px] px-4 py-3 shadow-[0_10px_24px_rgba(0,0,0,0.18)] md:max-w-[74%] ${isUser ? 'rounded-br-md border border-emerald-400/20 bg-gradient-to-br from-emerald-500/20 to-emerald-400/10 text-white' : 'rounded-bl-md border border-white/8 bg-white/[0.04] text-slate-200'}`}>
+                              <div className="whitespace-pre-wrap leading-6">{message.text}</div>
+                              <div className={`mt-2 text-[10px] uppercase tracking-[0.18em] ${isUser ? 'text-emerald-100/75' : 'text-slate-500'}`}>
+                                {isUser ? 'Tú' : selectedChat === 'bot' ? 'AgroControl AI' : chatLabels[selectedChat]} · {formatTime(message.timestamp)}
+                              </div>
+                            </div>
+
+                            {isUser ? (
+                              <div className="mb-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-500/15 text-[10px] font-bold text-emerald-100">
+                                JR
+                              </div>
+                            ) : null}
+                          </div>
+                        );
+                      })}
+
+                      {isSending ? (
+                        <div className="flex justify-start">
+                          <div className="inline-flex items-center gap-2 rounded-[18px] border border-white/8 bg-white/[0.04] px-4 py-3 text-slate-300">
+                            <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400" />
+                            Escribiendo respuesta...
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
-
-                  {isSending ? (
-                    <div className="flex justify-start">
-                      <div className="inline-flex items-center gap-2 rounded-2xl border border-white/8 bg-white/[0.03] px-4 py-3 text-slate-300">
-                        <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400" />
-                        Pensando...
+                      ) : null}
+                    </div>
+                  ) : (
+                    <div className="flex h-full items-center justify-center px-6 text-center">
+                      <div className="max-w-md">
+                        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-emerald-400/20 bg-emerald-500/10 text-2xl text-emerald-300">
+                          <i className="fas fa-comment-dots" />
+                        </div>
+                        <h3 className="mt-4 text-lg font-semibold text-white">Empieza una conversación</h3>
+                        <p className="mt-2 text-sm leading-6 text-slate-400">
+                          Elige un canal o usa un atajo para abrir un hilo con una interfaz tipo mensajería, clara y profesional.
+                        </p>
                       </div>
                     </div>
-                  ) : null}
+                  )}
 
                   <div ref={messagesEndRef} />
                 </div>
-              </div>
 
-              <div className="rounded-2xl border border-white/8 bg-black/10 p-3">
-                <div className="flex flex-col gap-3 md:flex-row md:items-end">
-                  <div className="flex-1">
-                    <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Escribir mensaje</label>
-                    <input
-                      className="w-full rounded-2xl border border-white/10 bg-[#0b1020] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/30 focus:ring-2 focus:ring-emerald-400/15 disabled:cursor-not-allowed disabled:opacity-60"
-                      value={draft}
-                      onChange={(event) => setDraft(event.target.value)}
-                      placeholder="Pregunta sobre la plataforma, sensores, reportes o navegación..."
-                      disabled={isSending}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter') {
-                          event.preventDefault();
-                          void handleSend();
-                        }
-                      }}
-                    />
+                <div className="mt-3 rounded-[20px] border border-white/8 bg-black/20 p-3">
+                  <div className="flex flex-col gap-3 md:flex-row md:items-end">
+                    <div className="flex-1">
+                      <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Escribir mensaje</label>
+                      <textarea
+                        className="min-h-[56px] w-full resize-none rounded-[18px] border border-white/10 bg-[#0b1020] px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/30 focus:ring-2 focus:ring-emerald-400/15 disabled:cursor-not-allowed disabled:opacity-60"
+                        value={draft}
+                        onChange={(event) => setDraft(event.target.value)}
+                        placeholder="Pregunta sobre la plataforma, sensores, reportes o navegación..."
+                        disabled={isSending}
+                        rows={2}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' && !event.shiftKey) {
+                            event.preventDefault();
+                            void handleSend();
+                          }
+                        }}
+                      />
+                    </div>
+
+                    <button
+                      className="inline-flex items-center justify-center gap-2 rounded-[18px] bg-gradient-to-r from-emerald-500 to-teal-500 px-5 py-3 text-sm font-semibold text-white transition hover:from-emerald-400 hover:to-teal-400 disabled:cursor-not-allowed disabled:opacity-60"
+                      type="button"
+                      onClick={() => void handleSend()}
+                      disabled={isSending || !draft.trim()}
+                    >
+                      <i className="fas fa-paper-plane" />
+                      Enviar
+                    </button>
                   </div>
 
-                  <button
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60"
-                    type="button"
-                    onClick={() => void handleSend()}
-                    disabled={isSending || !draft.trim()}
-                  >
-                    <i className="fas fa-paper-plane" />
-                    Enviar
-                  </button>
+                  <p className="mt-2 text-xs text-slate-500">
+                    Enter envía. Shift + Enter agrega una nueva línea.
+                  </p>
                 </div>
-
-                <p className="mt-2 text-xs text-slate-500">
-                  El asistente responde corto para ahorrar tokens y mantener la conversación más fluida.
-                </p>
               </div>
             </div>
           </PageSection>
