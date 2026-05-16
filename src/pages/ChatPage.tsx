@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { PageSection } from '../components/layout/PageSection';
 import type { ChatMessage, ChatThreadId } from '../types/app';
 
@@ -31,6 +31,11 @@ function formatTime(timestamp: number) {
 
 export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, isSending, errorMessage }: ChatPageProps) {
   const [draft, setDraft] = useState('');
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  }, [messages, selectedChat]);
 
   const handleSend = async () => {
     const value = draft.trim();
@@ -86,6 +91,7 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
                   </div>
                 </div>
               ))}
+              <div ref={messagesEndRef} />
             </div>
             <div className="flex gap-2">
               <input
