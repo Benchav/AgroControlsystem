@@ -3,7 +3,6 @@ import { DashboardAlerts } from '../components/dashboard/DashboardAlerts';
 import { DashboardInsights } from '../components/dashboard/DashboardInsights';
 import { DashboardMetricsGrid } from '../components/dashboard/DashboardMetricsGrid';
 import { DashboardSensors } from '../components/dashboard/DashboardSensors';
-import type { AppPageId } from '../types/app';
 
 const metrics = [
   { label: 'Humedad Promedio', value: '68%', icon: 'fa-tint', tone: 'text-emerald-300' },

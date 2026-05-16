@@ -31,7 +31,7 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-export function AppShell({ profile}: AppShellProps) {
+export function AppShell({ profile }: AppShellProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -91,9 +91,9 @@ export function AppShell({ profile}: AppShellProps) {
 
         <aside
           className={cn(
-            "fixed inset-y-0 left-0 z-50 w-72 flex-col border-r border-white/5 bg-[#222233] transition-transform duration-200 xl:static xl:z-auto xl:flex xl:w-64",
+            "fixed top-0 left-0 h-screen w-72 xl:w-64 z-50 flex-col border-r border-white/5 bg-[#222233] transition-transform duration-200 overflow-hidden",
             isMobileMenuOpen
-              ? "flex translate-x-0"
+              ? "translate-x-0 flex"
               : "-translate-x-full xl:translate-x-0 xl:flex",
           )}
         >
@@ -103,7 +103,7 @@ export function AppShell({ profile}: AppShellProps) {
             className="border-b border-white/5 px-5 py-6 text-left"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-[11px] border border-white/10 bg-gradient-to-br from-emerald-500 to-emerald-700 text-[18px] shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-emerald-500 to-emerald-700 text-[18px] shadow-[0_0_20px_rgba(16,185,129,0.2)]">
                 🌱
               </div>
               <div>
@@ -122,7 +122,7 @@ export function AppShell({ profile}: AppShellProps) {
             SYS ONLINE · 24 sensores
           </div>
 
-          <nav className="flex flex-1 flex-col gap-5 overflow-y-auto px-3 py-3 scrollbar-hide">
+          <nav className="flex-1 overflow-y-auto px-3 py-3 scrollbar-hide">
             {(["principal", "modulos", "sistema"] as const).map((section) => (
               <div key={section} className="space-y-2">
                 <div className="px-2 text-[9px] font-medium uppercase tracking-[0.35em] text-slate-500">
@@ -196,7 +196,7 @@ export function AppShell({ profile}: AppShellProps) {
           </div>
         </aside>
 
-        <main className="flex min-h-screen flex-1 flex-col bg-[#1e1e2f] xl:ml-0">
+        <main className="ml-0 xl:ml-64 flex h-screen flex-1 flex-col overflow-hidden bg-[#1e1e2f]">
           <header className="sticky top-0 z-20 border-b border-white/5 bg-[#1e1e2f]/95 px-4 py-[14px] backdrop-blur md:px-7">
             <div className="flex items-center justify-between gap-4">
               <div>
