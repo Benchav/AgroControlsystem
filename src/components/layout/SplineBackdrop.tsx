@@ -64,7 +64,7 @@ export function SplineBackdrop() {
 
         {/* Carga el modelo de forma segura */}
         <Suspense fallback={null}>
-          <group position={[2.2, 0, 0]}>
+          <group position={[2, 0, 0]}>//puedes modificar el 2 por mas o menos para moverlo de la derecha
             <Center>
               <Model />
             </Center>
