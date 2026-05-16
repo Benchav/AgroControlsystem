@@ -50,10 +50,15 @@ export function LandingPage({ onEnterApp, onEnterModule }: LandingPageProps) {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-black text-white">
+    <div
+      className="relative min-h-screen overflow-hidden bg-black text-white bg-cover bg-center bg-no-repeat"
+      style={{
+        backgroundImage: "url('/fondo.jpg')",
+      }}
+    >
       <div className="absolute inset-0">
         <SplineBackdrop />
-        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(30,30,47,0.4)_62%,rgba(30,30,47,0.95)_90%,#1e1e2f_100%)]" />
+        {/* <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0)_0%,rgba(30,30,47,0.4)_62%,rgba(30,30,47,0.95)_90%,#1e1e2f_100%)]" /> */}
       </div>
 
       <div className="relative z-10 flex min-h-screen flex-col">
@@ -76,7 +81,7 @@ export function LandingPage({ onEnterApp, onEnterModule }: LandingPageProps) {
             {navbarOptions.map((item) => (
               <span
                 key={item.id}
-                onClick={() => onEnterModule(item.value || 'dashboard')}
+                onClick={() => onEnterModule(item.value || "dashboard")}
                 className="rounded-full px-4 py-2 text-sm font-medium text-slate-300/90 transition hover:bg-white/5 hover:text-white"
               >
                 {item.name}
@@ -94,8 +99,8 @@ export function LandingPage({ onEnterApp, onEnterModule }: LandingPageProps) {
 
         <main className="flex flex-1 items-center px-4 pb-10 md:px-8 md:pb-14">
           <div className="max-w-3xl space-y-6 md:space-y-7">
-            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/8 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-emerald-300">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" />
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/8 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.35em] text-white">
+              <span className="h-2 w-2 rounded-full bg-white" />
               Sistema Activo · 24 sensores en línea
             </div>
 
