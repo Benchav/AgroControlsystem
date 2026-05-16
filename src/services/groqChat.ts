@@ -2,9 +2,9 @@ import type { ChatMessage, ChatThreadId, SystemSettings, UserProfile } from '../
 
 const GROQ_CHAT_URL = 'https://api.groq.com/openai/v1/chat/completions';
 const DEFAULT_MODEL = 'llama-3.3-70b-versatile';
-const DEFAULT_MAX_COMPLETION_TOKENS = 2048;
-const DEFAULT_TEMPERATURE = 0.2;
-const RECENT_MESSAGE_LIMIT = 12;
+const DEFAULT_MAX_COMPLETION_TOKENS = 512;
+const DEFAULT_TEMPERATURE = 0.15;
+const RECENT_MESSAGE_LIMIT = 8;
 
 const threadContext: Record<ChatThreadId, { title: string; specialization: string }> = {
   bot: {
@@ -82,6 +82,9 @@ function buildSystemPrompt(thread: ChatThreadId, profile: UserProfile, settings:
     'Si la consulta no tiene relación con el proyecto, redirige educadamente la conversación hacia Agro Control y ofrece ayuda con la plataforma.',
     'No inventes endpoints, módulos o funciones que no estén respaldados por el código visible en la aplicación.',
     'Si falta contexto, explica qué archivo, módulo o parte de la UI conviene revisar.',
+    'Responde de forma breve: idealmente entre 2 y 4 frases cortas o hasta 3 viñetas.',
+    'Evita introducciones largas, repeticiones y explicaciones extensas; prioriza la claridad y la acción.',
+    'Si la respuesta puede ser directa, usa una sola frase.',
     '',
     `Hilo activo: ${context.title}.`,
     `Especialidad del hilo: ${context.specialization}.`,
