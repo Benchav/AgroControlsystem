@@ -85,9 +85,9 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[320px_1fr]">
+      <div className="grid gap-4 xl:grid-cols-[280px_minmax(0,1fr)] 2xl:grid-cols-[300px_minmax(0,1fr)]">
         <div className="space-y-4">
-          <PageSection title="Canales" subtitle="Selecciona el hilo de conversación">
+          <PageSection title="Canales" subtitle="Selecciona el hilo de conversación" className="h-full">
             <div className="space-y-3">
               {(
                 [
@@ -121,33 +121,10 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
               ))}
             </div>
           </PageSection>
-
-          <PageSection title="Atajos" subtitle="Preguntas frecuentes">
-            <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
-              {quickPrompts[selectedChat].map((prompt) => (
-                <button
-                  key={prompt}
-                  type="button"
-                  disabled={isSending}
-                  onClick={() => setDraft(prompt)}
-                  className="rounded-2xl border border-white/6 bg-black/10 px-3 py-2 text-left text-sm text-slate-300 transition hover:border-emerald-400/15 hover:bg-emerald-500/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-          </PageSection>
-
-          <div className="rounded-[20px] border border-white/8 bg-[#25283d]/75 p-4">
-            <div className="text-sm font-semibold text-white">Modo conversación</div>
-            <p className="mt-2 text-sm leading-6 text-slate-400">
-              Cambia de hilo, usa atajos y escribe mensajes cortos para respuestas más rápidas y ordenadas.
-            </p>
-          </div>
         </div>
 
         <div className="space-y-4">
-          <PageSection title={selectedChat === 'bot' ? 'Asistente AgroControl' : chatLabels[selectedChat]} subtitle={isSending ? 'Generando respuesta breve...' : 'Groq · Llama 3 · contexto de la plataforma'}>
+          <PageSection title={selectedChat === 'bot' ? 'Asistente AgroControl' : chatLabels[selectedChat]} subtitle={isSending ? 'Generando respuesta breve...' : 'Groq · Llama 3 · contexto de la plataforma'} className="min-h-[calc(100vh-210px)]">
             <div className="space-y-4">
               <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-4 py-3">
                 <div className="min-w-0">
@@ -161,13 +138,36 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
                 </div>
               </div>
 
+              <div className="rounded-[22px] border border-white/8 bg-black/15 p-3">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Atajos rápidos</div>
+                    <div className="text-sm text-slate-300">Toca uno para escribirlo al instante.</div>
+                  </div>
+                  <div className="text-[11px] font-medium text-slate-500">Dentro del chat</div>
+                </div>
+                <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+                  {quickPrompts[selectedChat].map((prompt) => (
+                    <button
+                      key={prompt}
+                      type="button"
+                      disabled={isSending}
+                      onClick={() => setDraft(prompt)}
+                      className="rounded-2xl border border-white/6 bg-[#202334] px-3 py-2 text-left text-sm text-slate-300 transition hover:border-emerald-400/15 hover:bg-emerald-500/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {prompt}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {errorMessage ? (
                 <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
                   {errorMessage}
                 </div>
               ) : null}
 
-              <div className="flex h-[56vh] flex-col rounded-[24px] border border-white/8 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.08),_transparent_35%),#111521] p-3 shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+              <div className="flex min-h-[70vh] flex-col rounded-[24px] border border-white/8 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.08),_transparent_35%),#111521] p-3 shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
                 <div className="flex-1 space-y-3 overflow-y-auto rounded-[20px] px-1 py-2 text-sm text-slate-300">
                   {hasMessages ? (
                     <div className="mx-auto flex max-w-4xl flex-col gap-3">
