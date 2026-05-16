@@ -32,19 +32,6 @@ const quickPrompts: Record<ChatThreadId, string[]> = {
   expert3: ['¿Cómo detecto plagas?', 'Resume el flujo de diagnóstico', '¿Cómo uso el chat?', '¿Qué módulos ayudan al seguimiento?'],
 };
 
-function getThreadAccent(thread: ChatThreadId) {
-  switch (thread) {
-    case 'bot':
-      return 'from-emerald-400/20 via-emerald-500/10 to-transparent';
-    case 'expert1':
-      return 'from-sky-400/20 via-sky-500/10 to-transparent';
-    case 'expert2':
-      return 'from-amber-400/20 via-amber-500/10 to-transparent';
-    case 'expert3':
-      return 'from-rose-400/20 via-rose-500/10 to-transparent';
-  }
-}
-
 function getThreadBadge(thread: ChatThreadId) {
   switch (thread) {
     case 'bot':
