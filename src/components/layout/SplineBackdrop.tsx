@@ -6,7 +6,7 @@ import * as THREE from "three";
 // 1. Subcomponente que carga el archivo .glb y lo hace girar
 function Model() {
   // Busca el archivo agro_model.glb dentro de tu carpeta 'public'
-  const { scene } = useGLTF("/tractor3D.glb");
+  const { scene } = useGLTF("/bot.glb");
   const modelRef = useRef<THREE.Group>(null);
 
   // Hace que el objeto gire solo de forma infinita (ajusta 0.005 para cambiar la velocidad)
@@ -84,4 +84,4 @@ export function SplineBackdrop() {
 }
 
 // Pre-carga el modelo en segundo plano
-useGLTF.preload("/tractor3D.glb");
+useGLTF.preload("/bot.glb");
