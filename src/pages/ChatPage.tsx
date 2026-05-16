@@ -53,11 +53,27 @@ function formatTime(timestamp: number) {
 export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, onClearChat, isSending, errorMessage }: ChatPageProps) {
   const [draft, setDraft] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const messagesPanelRef = useRef<HTMLDivElement | null>(null);
   const hasMessages = messages.length > 0;
+  const [isNearBottom, setIsNearBottom] = useState(true);
 
   useEffect(() => {
+    setIsNearBottom(true);
+    messagesEndRef.current?.scrollIntoView({ behavior: 'auto', block: 'end' });
+  }, [selectedChat]);
+
+  useEffect(() => {
+    if (!isNearBottom) return;
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
-  }, [messages, selectedChat]);
+  }, [messages, isNearBottom]);
+
+  const handleMessagesScroll = () => {
+    const container = messagesPanelRef.current;
+    if (!container) return;
+
+    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
+    setIsNearBottom(distanceFromBottom < 120);
+  };
 
   const handleSend = async () => {
     const value = draft.trim();
@@ -68,7 +84,7 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
   };
 
   return (
-    <div className="space-y-4 md:space-y-5">
+    <div className="flex min-h-0 flex-col gap-4 md:gap-5">
       <div className="flex flex-col gap-3 rounded-[24px] border border-white/8 bg-[#25283d]/70 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:flex-row md:items-center md:justify-between md:p-5">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-emerald-300/80">Mensajería profesional</p>
@@ -86,7 +102,7 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[260px_minmax(0,1fr)] 2xl:grid-cols-[280px_minmax(0,1fr)]">
+      <div className="grid min-h-0 gap-4 xl:grid-cols-[260px_minmax(0,1fr)] 2xl:grid-cols-[280px_minmax(0,1fr)]">
         <div className="space-y-4">
           <PageSection title="Canales" subtitle="Selecciona el hilo de conversación" className="h-full">
             <div className="space-y-3">
@@ -124,9 +140,13 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
           </PageSection>
         </div>
 
-        <div className="space-y-4">
-          <PageSection title={selectedChat === 'bot' ? 'Asistente AgroControl' : chatLabels[selectedChat]} subtitle={isSending ? 'Generando respuesta breve...' : 'Groq · Llama 3 · contexto de la plataforma'} className="min-h-[calc(100vh-210px)]">
-            <div className="space-y-4">
+        <div className="min-h-0 space-y-4">
+          <PageSection
+            title={selectedChat === 'bot' ? 'Asistente AgroControl' : chatLabels[selectedChat]}
+            subtitle={isSending ? 'Generando respuesta breve...' : 'Groq · Llama 3 · contexto de la plataforma'}
+            className="flex min-h-0 flex-col overflow-hidden"
+          >
+            <div className="flex min-h-0 flex-1 flex-col gap-4">
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-4 py-3">
                 <div className="min-w-0">
                   <div className="truncate text-sm font-semibold text-white">{chatLabels[selectedChat]}</div>
@@ -179,10 +199,14 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
                 </div>
               ) : null}
 
-              <div className="flex min-h-[70vh] flex-col rounded-[24px] border border-white/8 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.08),_transparent_35%),#111521] p-3 shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
-                <div className="flex-1 space-y-3 overflow-y-auto rounded-[20px] px-1 py-2 text-sm text-slate-300">
+              <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden rounded-[24px] border border-white/8 bg-[radial-gradient(circle_at_top,_rgba(16,185,129,0.08),_transparent_35%),#111521] p-3 shadow-[0_18px_50px_rgba(0,0,0,0.22)]">
+                <div
+                  ref={messagesPanelRef}
+                  onScroll={handleMessagesScroll}
+                  className="flex-1 space-y-3 overflow-y-auto rounded-[20px] px-1 py-2 text-sm text-slate-300"
+                >
                   {hasMessages ? (
-                    <div className="mx-auto flex max-w-4xl flex-col gap-3">
+                    <div className="mx-auto flex max-w-5xl flex-col gap-3">
                       {messages.map((message) => {
                         const isUser = message.role === 'user';
                         return (
@@ -234,6 +258,17 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
 
                   <div ref={messagesEndRef} />
                 </div>
+
+                {!isNearBottom && hasMessages ? (
+                  <button
+                    type="button"
+                    onClick={() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })}
+                    className="absolute bottom-24 right-5 inline-flex items-center gap-2 rounded-full border border-white/10 bg-[#1b2030]/95 px-4 py-2 text-xs font-semibold text-white shadow-[0_12px_30px_rgba(0,0,0,0.24)] transition hover:border-emerald-400/20 hover:text-emerald-300"
+                  >
+                    <i className="fas fa-arrow-down" />
+                    Ir al final
+                  </button>
+                ) : null}
 
                 <div className="mt-3 rounded-[20px] border border-white/8 bg-black/20 p-3">
                   <div className="flex flex-col gap-3 md:flex-row md:items-end">
