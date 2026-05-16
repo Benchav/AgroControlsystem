@@ -1,12 +1,9 @@
+import { useNavigate } from 'react-router-dom';
 import { DashboardAlerts } from '../components/dashboard/DashboardAlerts';
 import { DashboardInsights } from '../components/dashboard/DashboardInsights';
 import { DashboardMetricsGrid } from '../components/dashboard/DashboardMetricsGrid';
 import { DashboardSensors } from '../components/dashboard/DashboardSensors';
 import type { AppPageId } from '../types/app';
-
-type DashboardPageProps = {
-  onNavigate: (page: AppPageId) => void;
-};
 
 const metrics = [
   { label: 'Humedad Promedio', value: '68%', icon: 'fa-tint', tone: 'text-emerald-300' },
@@ -15,7 +12,9 @@ const metrics = [
   { label: 'Alertas Activas', value: '3', icon: 'fa-exclamation-triangle', tone: 'text-red-300' },
 ];
 
-export function DashboardPage({ onNavigate }: DashboardPageProps) {
+export function DashboardPage() {
+  const navigate = useNavigate();
+  
   return (
     <div className="space-y-6">
       <p className="text-sm text-slate-400">Resumen general · Última actualización hace 2 min · <span className="text-emerald-300">10:24 AM</span></p>
@@ -28,7 +27,7 @@ export function DashboardPage({ onNavigate }: DashboardPageProps) {
         <DashboardSensors />
       </div>
 
-      <DashboardInsights onNavigate={onNavigate} />
+      <DashboardInsights onNavigate={(page) => navigate(`/app/${page}`)} />
     </div>
   );
 }
