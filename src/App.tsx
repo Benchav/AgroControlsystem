@@ -196,6 +196,13 @@ function App() {
             selectedChat={selectedChat}
             messages={chatMessagesByThread[selectedChat] ?? []}
             onSelectChat={setSelectedChat}
+            onClearChat={() => {
+              setChatError(null);
+              setChatMessagesByThread((current) => ({
+                ...current,
+                [selectedChat]: [],
+              }));
+            }}
             isSending={isChatSending}
             errorMessage={chatError}
             onSendMessage={async (text) => {

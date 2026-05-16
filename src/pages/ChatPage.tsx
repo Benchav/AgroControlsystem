@@ -7,6 +7,7 @@ type ChatPageProps = {
   messages: ChatMessage[];
   onSelectChat: (thread: ChatThreadId) => void;
   onSendMessage: (text: string) => void | Promise<void>;
+  onClearChat: () => void;
   isSending: boolean;
   errorMessage?: string | null;
 };
@@ -49,7 +50,7 @@ function formatTime(timestamp: number) {
   return new Date(timestamp).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
 }
 
-export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, isSending, errorMessage }: ChatPageProps) {
+export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, onClearChat, isSending, errorMessage }: ChatPageProps) {
   const [draft, setDraft] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const hasMessages = messages.length > 0;
@@ -85,7 +86,7 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
         </div>
       </div>
 
-      <div className="grid gap-4 xl:grid-cols-[280px_minmax(0,1fr)] 2xl:grid-cols-[300px_minmax(0,1fr)]">
+      <div className="grid gap-4 xl:grid-cols-[260px_minmax(0,1fr)] 2xl:grid-cols-[280px_minmax(0,1fr)]">
         <div className="space-y-4">
           <PageSection title="Canales" subtitle="Selecciona el hilo de conversación" className="h-full">
             <div className="space-y-3">
@@ -126,7 +127,7 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
         <div className="space-y-4">
           <PageSection title={selectedChat === 'bot' ? 'Asistente AgroControl' : chatLabels[selectedChat]} subtitle={isSending ? 'Generando respuesta breve...' : 'Groq · Llama 3 · contexto de la plataforma'} className="min-h-[calc(100vh-210px)]">
             <div className="space-y-4">
-              <div className="flex items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-4 py-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-4 py-3">
                 <div className="min-w-0">
                   <div className="truncate text-sm font-semibold text-white">{chatLabels[selectedChat]}</div>
                   <div className="truncate text-xs text-slate-400">{chatRoles[selectedChat]}</div>
@@ -138,14 +139,25 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
                 </div>
               </div>
 
-              <div className="rounded-[22px] border border-white/8 bg-black/15 p-3">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <div>
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Atajos rápidos</div>
-                    <div className="text-sm text-slate-300">Toca uno para escribirlo al instante.</div>
-                  </div>
-                  <div className="text-[11px] font-medium text-slate-500">Dentro del chat</div>
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-[22px] border border-white/8 bg-black/15 p-3">
+                <div>
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Atajos rápidos</div>
+                  <div className="text-sm text-slate-300">Toca uno para escribirlo al instante.</div>
                 </div>
+
+                <button
+                  type="button"
+                  disabled={isSending || !messages.length}
+                  onClick={onClearChat}
+                  className="inline-flex items-center gap-2 rounded-full border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-rose-200 transition hover:bg-rose-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <i className="fas fa-trash" />
+                  Vaciar chat
+                </button>
+
+              </div>
+
+              <div className="rounded-[22px] border border-white/8 bg-black/15 p-3">
                 <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                   {quickPrompts[selectedChat].map((prompt) => (
                     <button
