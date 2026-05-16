@@ -10,8 +10,8 @@ import { ModulePage } from './pages/ModulePage';
 import { ReportsPage } from './pages/ReportsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { IotPage } from './pages/IotPage';
-import type { AppPageId } from './types/app';
-import type { ChatMessage, ChatThreadId, SystemSettings, UserProfile } from './types/app';
+import { generateGroqChatReply } from './services/groqChat';
+import type { AppPageId, ChatMessage, ChatMessagesByThread, ChatThreadId, SystemSettings, UserProfile } from './types/app';
 import { readJson, writeJson } from './utils/storage';
 
 const STORAGE_KEYS = {
@@ -47,22 +47,80 @@ const defaultSettings: SystemSettings = {
   phThreshold: 6,
 };
 
-const defaultMessages: ChatMessage[] = [
-  {
-    id: 'welcome',
-    role: 'bot',
-    text: '¡Hola! Soy el asistente de Agro Control. Estoy conectado a los sensores de tus parcelas y puedo ayudarte con diagnósticos y recomendaciones.',
-    timestamp: Date.now(),
-  },
-];
+const createDefaultChatMessages = (): ChatMessagesByThread => {
+  const now = Date.now();
 
-const chatReplies = [
-  'Para controlar plagas orgánicamente te recomiendo rotación de cultivos y jabón potásico. ¿Quieres un plan para tu tipo específico de cultivo?',
-  'La humedad óptima para hortalizas está entre 60–75%. Con tus sensores puedo configurar alertas automáticas cuando caiga de ese rango.',
-  'Basándome en los datos del Sector 3B, necesita intervención en las próximas 24h. ¿Te conecto con un agrónomo disponible ahora?',
-  'El bicarbonato de sodio es efectivo contra hongos superficiales. Aplica 5g/L en spray foliar, preferiblemente en la mañana para evitar quemaduras.',
-  'Los sensores de Parcela Norte muestran condiciones óptimas. La fertilidad está en 94% — excelente momento para la siguiente siembra.',
-];
+  return {
+    bot: [
+      {
+        id: 'welcome-bot',
+        role: 'bot',
+        text: '¡Hola! Soy el asistente de Agro Control. Puedo ayudarte a entender la plataforma, revisar módulos, interpretar sensores y navegar por la aplicación.',
+        timestamp: now,
+      },
+    ],
+    expert1: [
+      {
+        id: 'welcome-expert1',
+        role: 'bot',
+        text: 'Soy María Campos. Puedo ayudarte con consultas sobre cultivos y cómo aprovechar los módulos de Agro Control para ese caso.',
+        timestamp: now,
+      },
+    ],
+    expert2: [
+      {
+        id: 'welcome-expert2',
+        role: 'bot',
+        text: 'Soy Jorge Méndez. Si necesitas interpretar suelos, fertilización o umbrales, este hilo está listo para eso.',
+        timestamp: now,
+      },
+    ],
+    expert3: [
+      {
+        id: 'welcome-expert3',
+        role: 'bot',
+        text: 'Soy Ana López. Aquí podemos revisar plagas, diagnóstico preventivo y el uso de la plataforma para esas alertas.',
+        timestamp: now,
+      },
+    ],
+  };
+};
+
+function isChatMessage(value: unknown): value is ChatMessage {
+  if (!value || typeof value !== 'object') return false;
+
+  const candidate = value as Partial<ChatMessage>;
+  return (
+    typeof candidate.id === 'string' &&
+    (candidate.role === 'user' || candidate.role === 'bot') &&
+    typeof candidate.text === 'string' &&
+    typeof candidate.timestamp === 'number'
+  );
+}
+
+function normalizeChatMessages(value: unknown): ChatMessagesByThread {
+  const defaults = createDefaultChatMessages();
+
+  if (Array.isArray(value)) {
+    return {
+      ...defaults,
+      bot: value.filter(isChatMessage),
+    };
+  }
+
+  if (!value || typeof value !== 'object') {
+    return defaults;
+  }
+
+  const candidate = value as Partial<Record<ChatThreadId, unknown>>;
+
+  return {
+    bot: Array.isArray(candidate.bot) ? candidate.bot.filter(isChatMessage) : defaults.bot,
+    expert1: Array.isArray(candidate.expert1) ? candidate.expert1.filter(isChatMessage) : defaults.expert1,
+    expert2: Array.isArray(candidate.expert2) ? candidate.expert2.filter(isChatMessage) : defaults.expert2,
+    expert3: Array.isArray(candidate.expert3) ? candidate.expert3.filter(isChatMessage) : defaults.expert3,
+  };
+}
 
 const LazyModels3dPage = lazy(() => import('./pages/Models3dPage').then((module) => ({ default: module.Models3dPage })));
 
@@ -72,7 +130,9 @@ function App() {
   const [profile, setProfile] = useState<UserProfile>(() => readJson(STORAGE_KEYS.profile, defaultProfile));
   const [settings, setSettings] = useState<SystemSettings>(() => readJson(STORAGE_KEYS.settings, defaultSettings));
   const [selectedChat, setSelectedChat] = useState<ChatThreadId>(() => readJson(STORAGE_KEYS.chatThread, 'bot'));
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() => readJson(STORAGE_KEYS.chatMessages, defaultMessages));
+  const [chatMessagesByThread, setChatMessagesByThread] = useState<ChatMessagesByThread>(() => normalizeChatMessages(readJson(STORAGE_KEYS.chatMessages, createDefaultChatMessages())));
+  const [isChatSending, setIsChatSending] = useState(false);
+  const [chatError, setChatError] = useState<string | null>(null);
 
   useEffect(() => {
     writeJson(STORAGE_KEYS.mode, mode);
@@ -95,8 +155,12 @@ function App() {
   }, [selectedChat]);
 
   useEffect(() => {
-    writeJson(STORAGE_KEYS.chatMessages, chatMessages);
-  }, [chatMessages]);
+    writeJson(STORAGE_KEYS.chatMessages, chatMessagesByThread);
+  }, [chatMessagesByThread]);
+
+  useEffect(() => {
+    setChatError(null);
+  }, [selectedChat]);
 
   const renderPage = () => {
     switch (currentPage) {
@@ -130,28 +194,66 @@ function App() {
         return (
           <ChatPage
             selectedChat={selectedChat}
-            messages={chatMessages}
+            messages={chatMessagesByThread[selectedChat] ?? []}
             onSelectChat={setSelectedChat}
-            onSendMessage={(text) => {
+            isSending={isChatSending}
+            errorMessage={chatError}
+            onSendMessage={async (text) => {
+              const thread = selectedChat;
               const now = Date.now();
               const userMessage: ChatMessage = {
-                id: `user-${now}`,
+                id: `user-${thread}-${now}`,
                 role: 'user',
                 text,
                 timestamp: now,
               };
 
-              setChatMessages((current) => {
-                const reply = chatReplies[current.length % chatReplies.length];
+              const threadMessages = [...(chatMessagesByThread[thread] ?? []), userMessage];
+
+              setChatError(null);
+              setIsChatSending(true);
+              setChatMessagesByThread((current) => ({
+                ...current,
+                [thread]: threadMessages,
+              }));
+
+              try {
+                const replyText = await generateGroqChatReply({
+                  thread,
+                  messages: threadMessages,
+                  profile,
+                  settings,
+                });
+
                 const botMessage: ChatMessage = {
-                  id: `bot-${now}`,
+                  id: `bot-${thread}-${now}`,
                   role: 'bot',
-                  text: reply,
+                  text: replyText,
                   timestamp: now + 1,
                 };
 
-                return [...current, userMessage, botMessage];
-              });
+                setChatMessagesByThread((current) => ({
+                  ...current,
+                  [thread]: [...(current[thread] ?? []), botMessage],
+                }));
+              } catch (error) {
+                const errorMessage = error instanceof Error ? error.message : 'No fue posible conectar con Groq.';
+                setChatError(errorMessage);
+
+                const botMessage: ChatMessage = {
+                  id: `bot-error-${thread}-${now}`,
+                  role: 'bot',
+                  text: `No pude responder ahora mismo: ${errorMessage}`,
+                  timestamp: now + 1,
+                };
+
+                setChatMessagesByThread((current) => ({
+                  ...current,
+                  [thread]: [...(current[thread] ?? []), botMessage],
+                }));
+              } finally {
+                setIsChatSending(false);
+              }
             }}
           />
         );

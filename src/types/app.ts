@@ -37,3 +37,5 @@ export type ChatMessage = {
   text: string;
   timestamp: number;
 };
+
+export type ChatMessagesByThread = Record<ChatThreadId, ChatMessage[]>;
