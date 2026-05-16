@@ -1,13 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import { SplineBackdrop } from "../components/layout/SplineBackdrop";
 import { itemInfoBase, navbarItem } from "../entities/item_base";
-import { AppPageId } from "../types/app";
 
-type LandingPageProps = {
-  onEnterApp: () => void;
-  onEnterModule: (page: AppPageId) => void;
-};
-
-export function LandingPage({ onEnterApp, onEnterModule }: LandingPageProps) {
+export function LandingPage() {
   const navbarOptions: navbarItem[] = [
     {
       id: "1",
@@ -49,6 +44,8 @@ export function LandingPage({ onEnterApp, onEnterModule }: LandingPageProps) {
     },
   ];
 
+  const navigate = useNavigate();
+
   return (
     <div
       className="relative min-h-screen overflow-hidden bg-black text-white bg-cover bg-center bg-no-repeat"
@@ -81,7 +78,7 @@ export function LandingPage({ onEnterApp, onEnterModule }: LandingPageProps) {
             {navbarOptions.map((item) => (
               <span
                 key={item.id}
-                onClick={() => onEnterModule(item.value || "dashboard")}
+                onClick={() => navigate(`/app/${item.value}`)}
                 className="rounded-full px-4 py-2 text-sm font-medium text-slate-300/90 transition hover:bg-white/5 hover:text-white"
               >
                 {item.name}
@@ -89,7 +86,7 @@ export function LandingPage({ onEnterApp, onEnterModule }: LandingPageProps) {
             ))}
             <button
               type="button"
-              onClick={onEnterApp}
+              onClick={() => navigate("/app/dashboard")}
               className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-5 py-2.5 text-sm font-semibold text-emerald-300 transition hover:border-emerald-300/40 hover:bg-emerald-500/15"
             >
               Ingresar al panel →
@@ -120,7 +117,7 @@ export function LandingPage({ onEnterApp, onEnterModule }: LandingPageProps) {
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"
-                onClick={onEnterApp}
+                onClick={() => navigate("/app/dashboard")}
                 className="inline-flex items-center gap-3 rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 px-6 py-4 text-sm font-bold text-white shadow-[0_10px_30px_rgba(16,185,129,0.28)] transition hover:brightness-110"
               >
                 <i className="fas fa-arrow-right" />
