@@ -34,6 +34,22 @@
   .shadow-glow {
     box-shadow: 0 0 24px rgba(16, 185, 129, 0.25);
   }
+
+  .chat-bubble-enter {
+    animation: chatBubbleEnter 180ms ease-out both;
+  }
+}
+
+@keyframes chatBubbleEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 @layer utilities {
