@@ -54,6 +54,7 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
   const [draft, setDraft] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const messagesPanelRef = useRef<HTMLDivElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const hasMessages = messages.length > 0;
   const [isNearBottom, setIsNearBottom] = useState(true);
 
@@ -77,10 +78,7 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
 
   const handlePromptSelect = (prompt: string) => {
     setDraft(prompt);
-    requestAnimationFrame(() => {
-      const input = messagesPanelRef.current?.closest('section')?.querySelector('textarea');
-      input instanceof HTMLTextAreaElement && input.focus();
-    });
+    requestAnimationFrame(() => textareaRef.current?.focus());
   };
 
   const handleSend = async () => {
@@ -188,7 +186,7 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
               <div className="rounded-[22px] border border-white/8 bg-black/15 p-3">
                 <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                   {quickPrompts[selectedChat].map((prompt) => (
-                      <button
+                    <button
                       key={prompt}
                       type="button"
                       disabled={isSending}
@@ -283,6 +281,7 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
                     <div className="flex-1">
                       <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-500">Escribir mensaje</label>
                       <textarea
+                        ref={textareaRef}
                         className="min-h-[56px] w-full resize-none rounded-[18px] border border-white/10 bg-[#0b1020] px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/30 focus:ring-2 focus:ring-emerald-400/15 disabled:cursor-not-allowed disabled:opacity-60"
                         value={draft}
                         onChange={(event) => setDraft(event.target.value)}
