@@ -233,9 +233,20 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
 
                       {isSending ? (
                         <div className="flex justify-start">
-                          <div className="inline-flex items-center gap-2 rounded-[18px] border border-white/8 bg-white/[0.04] px-4 py-3 text-slate-300">
-                            <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400" />
-                            Escribiendo respuesta...
+                          <div className="flex items-end gap-2">
+                            <div className="mb-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-white/8 bg-white/[0.04] text-[10px] font-semibold text-slate-200">
+                              AG
+                            </div>
+                            <div className="rounded-[20px] rounded-bl-md border border-white/8 bg-white/[0.04] px-4 py-3 text-slate-300">
+                              <div className="flex items-center gap-1.5">
+                                <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-400 [animation-delay:-0.2s]" />
+                                <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-400 [animation-delay:-0.1s]" />
+                                <span className="h-2 w-2 animate-bounce rounded-full bg-emerald-400" />
+                              </div>
+                              <div className="mt-2 text-[10px] uppercase tracking-[0.18em] text-slate-500">
+                                AgroControl AI escribiendo
+                              </div>
+                            </div>
                           </div>
                         </div>
                       ) : null}
