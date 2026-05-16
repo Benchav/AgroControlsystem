@@ -75,6 +75,14 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
     setIsNearBottom(distanceFromBottom < 120);
   };
 
+  const handlePromptSelect = (prompt: string) => {
+    setDraft(prompt);
+    requestAnimationFrame(() => {
+      const input = messagesPanelRef.current?.closest('section')?.querySelector('textarea');
+      input instanceof HTMLTextAreaElement && input.focus();
+    });
+  };
+
   const handleSend = async () => {
     const value = draft.trim();
     if (!value || isSending) return;
@@ -84,7 +92,7 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
   };
 
   return (
-    <div className="flex min-h-0 flex-col gap-4 md:gap-5">
+    <div className="flex min-h-[calc(100vh-170px)] flex-col gap-4 md:gap-5">
       <div className="flex flex-col gap-3 rounded-[24px] border border-white/8 bg-[#25283d]/70 p-4 shadow-[0_18px_50px_rgba(0,0,0,0.18)] backdrop-blur-xl md:flex-row md:items-center md:justify-between md:p-5">
         <div>
           <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-emerald-300/80">Mensajería profesional</p>
@@ -144,7 +152,7 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
           <PageSection
             title={selectedChat === 'bot' ? 'Asistente AgroControl' : chatLabels[selectedChat]}
             subtitle={isSending ? 'Generando respuesta breve...' : 'Groq · Llama 3 · contexto de la plataforma'}
-            className="flex min-h-0 flex-col overflow-hidden"
+            className="flex min-h-0 flex-1 flex-col overflow-hidden"
           >
             <div className="flex min-h-0 flex-1 flex-col gap-4">
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-white/8 bg-black/15 px-4 py-3">
@@ -180,11 +188,11 @@ export function ChatPage({ selectedChat, messages, onSelectChat, onSendMessage, 
               <div className="rounded-[22px] border border-white/8 bg-black/15 p-3">
                 <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
                   {quickPrompts[selectedChat].map((prompt) => (
-                    <button
+                      <button
                       key={prompt}
                       type="button"
                       disabled={isSending}
-                      onClick={() => setDraft(prompt)}
+                      onClick={() => handlePromptSelect(prompt)}
                       className="rounded-2xl border border-white/6 bg-[#202334] px-3 py-2 text-left text-sm text-slate-300 transition hover:border-emerald-400/15 hover:bg-emerald-500/5 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       {prompt}
