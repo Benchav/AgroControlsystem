@@ -1,10 +1,54 @@
-import { SplineBackdrop } from '../components/layout/SplineBackdrop';
+import { SplineBackdrop } from "../components/layout/SplineBackdrop";
+import { itemInfoBase, navbarItem } from "../entities/item_base";
+import { AppPageId } from "../types/app";
 
 type LandingPageProps = {
   onEnterApp: () => void;
+  onEnterModule: (page: AppPageId) => void;
 };
 
-export function LandingPage({ onEnterApp }: LandingPageProps) {
+export function LandingPage({ onEnterApp, onEnterModule }: LandingPageProps) {
+  const navbarOptions: navbarItem[] = [
+    {
+      id: "1",
+      name: "Módulos",
+      value: "modelos3d",
+    },
+    {
+      id: "2",
+      name: "Tecnología",
+      value: "iot",
+    },
+    {
+      id: "3",
+      name: "Subastas",
+      value: "market",
+    },
+  ];
+
+  const itemInfo: itemInfoBase[] = [
+    {
+      id: "1",
+      name: "24",
+      description: "Sensores activos",
+    },
+    {
+      id: "2",
+      name: "12km",
+      description: "Terreno monitoreado",
+    },
+    {
+      id: "3",
+      name: "+150h",
+      description: "Uptime del sistema",
+    },
+    {
+      id: "4",
+      name: "+4",
+      description: "Módulos integrados",
+    },
+  ];
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-black text-white">
       <div className="absolute inset-0">
@@ -15,11 +59,13 @@ export function LandingPage({ onEnterApp }: LandingPageProps) {
       <div className="relative z-10 flex min-h-screen flex-col">
         <header className="flex items-center justify-between px-4 py-5 md:px-8 md:py-7">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 text-xl shadow-glow">
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 text-xl shadow-glow">
               🌱
             </div>
             <div>
-              <div className="text-2xl font-extrabold tracking-tight">Agro Control</div>
+              <div className="text-2xl font-extrabold tracking-tight">
+                Agro Control
+              </div>
               <div className="-mt-1 text-[10px] font-semibold uppercase tracking-[0.4em] text-emerald-300">
                 Smart Farm Platform
               </div>
@@ -27,9 +73,13 @@ export function LandingPage({ onEnterApp }: LandingPageProps) {
           </div>
 
           <nav className="hidden items-center gap-2 md:flex">
-            {['Módulos', 'Tecnología', 'Marketplace'].map((item) => (
-              <span key={item} className="rounded-full px-4 py-2 text-sm font-medium text-slate-300/90 transition hover:bg-white/5 hover:text-white">
-                {item}
+            {navbarOptions.map((item) => (
+              <span
+                key={item.id}
+                onClick={() => onEnterModule(item.value || 'dashboard')}
+                className="rounded-full px-4 py-2 text-sm font-medium text-slate-300/90 transition hover:bg-white/5 hover:text-white"
+              >
+                {item.name}
               </span>
             ))}
             <button
@@ -52,11 +102,14 @@ export function LandingPage({ onEnterApp }: LandingPageProps) {
             <h1 className="max-w-2xl text-5xl font-black leading-[0.92] tracking-tight text-white md:text-7xl">
               Cultiva más
               <br />
-              inteligente con <span className="font-serif italic text-emerald-400">IA</span>
+              inteligente con{" "}
+              <span className="font-serif italic text-emerald-400">IA</span>
             </h1>
 
             <p className="max-w-xl text-base leading-7 text-slate-300 md:text-lg">
-              Monitoreo IoT en tiempo real, diagnóstico visual con Gemini, asistente Llama 3 y un ecosistema comercial para rentabilizar tus parcelas.
+              Monitoreo IoT en tiempo real, diagnóstico visual con Gemini,
+              asistente Llama 3 y un ecosistema comercial para rentabilizar tus
+              parcelas.
             </p>
 
             <div className="flex flex-wrap gap-3">
@@ -78,15 +131,17 @@ export function LandingPage({ onEnterApp }: LandingPageProps) {
             </div>
 
             <div className="grid max-w-2xl grid-cols-2 gap-3 pt-4 sm:grid-cols-4">
-              {[
-                ['24', 'Sensores activos'],
-                ['12km', 'Terreno monitoreado'],
-                ['+150h', 'Uptime del sistema'],
-                ['+4', 'Módulos integrados'],
-              ].map(([value, label]) => (
-                <div key={label} className="rounded-3xl border border-white/8 bg-white/[0.03] p-4 backdrop-blur">
-                  <div className="text-2xl font-black tracking-tight text-white md:text-3xl">{value}</div>
-                  <div className="mt-1 text-xs text-slate-400">{label}</div>
+              {itemInfo.map((item) => (
+                <div
+                  key={item.id}
+                  className="rounded-3xl border border-white/8 bg-white/[0.03] p-4 backdrop-blur"
+                >
+                  <div className="text-2xl font-black tracking-tight text-white md:text-3xl">
+                    {item.name}
+                  </div>
+                  <div className="mt-1 text-xs text-slate-400">
+                    {item.description}
+                  </div>
                 </div>
               ))}
             </div>
