@@ -103,8 +103,8 @@ export function AppShell({ profile }: AppShellProps) {
             className="border-b border-white/5 px-5 py-6 text-left"
           >
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-emerald-500 to-emerald-700 text-[18px] shadow-[0_0_20px_rgba(16,185,129,0.2)]">
-                🌱
+              <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-emerald-500 to-emerald-700 text-[18px] shadow-[0_0_20px_rgba(16,185,129,0.2)] overflow-hidden">
+                <img src="/Logo.png" alt="Agro Control" className="h-full w-full"/>
               </div>
               <div>
                 <div className="text-[18px] font-bold tracking-[-0.5px] text-white">

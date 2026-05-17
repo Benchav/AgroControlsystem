@@ -61,8 +61,8 @@ export function LandingPage() {
       <div className="relative z-10 flex min-h-screen flex-col">
         <header className="flex items-center justify-between px-4 py-5 md:px-8 md:py-7">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 text-xl shadow-glow">
-              🌱
+            <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 text-xl shadow-glow overflow-hidden">
+              <img src="/Logo.png" alt="Agro Control" className="h-full w-full"/>
             </div>
             <div>
               <div className="text-2xl font-extrabold tracking-tight">
