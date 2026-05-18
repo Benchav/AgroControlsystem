@@ -65,6 +65,12 @@ function downloadDiagnosisItem(item: ScanHistoryItem) {
   );
 }
 
+function deleteDiagnosisItem(items: ScanHistoryItem[], id: string) {
+  const nextItems = items.filter((item) => item.id !== id);
+  writeHistory(nextItems);
+  return nextItems;
+}
+
 function clearHistoryStorage() {
   writeJsonSafe(HISTORY_STORAGE_KEY, [] as ScanHistoryItem[]);
 }
@@ -290,8 +296,18 @@ export function AiPage() {
   };
 
   const clearHistory = () => {
+    const confirmed = window.confirm('¿Deseas borrar todo el historial de análisis?');
+    if (!confirmed) return;
+
     setHistory([]);
     clearHistoryStorage();
+  };
+
+  const removeHistoryItem = (id: string) => {
+    const confirmed = window.confirm('¿Deseas borrar este análisis del historial?');
+    if (!confirmed) return;
+
+    setHistory((current) => deleteDiagnosisItem(current, id));
   };
 
   const exportReport = () => {
@@ -386,13 +402,13 @@ export function AiPage() {
               <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
                 {errorMessage}
               </div>
-              ) : null}
+            ) : null}
 
-              <div className="rounded-[28px] border border-white/8 bg-[#27293d] p-5">
-                <div className="text-sm font-semibold text-white">Informe Gemini</div>
-                <div className="mt-1 text-xs text-slate-400">Reporte profesional estructurado</div>
+            <div className="rounded-[28px] border border-white/8 bg-[#27293d] p-5">
+              <div className="text-sm font-semibold text-white">Informe Gemini</div>
+              <div className="mt-1 text-xs text-slate-400">Reporte profesional estructurado</div>
 
-                {report ? (
+              {report ? (
                 <div className={`report-shell mt-4 space-y-3 ${displayResult ? 'report-shell--visible' : 'report-shell--hidden'}`}>
                   <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
                     <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Resultado</div>
@@ -484,6 +500,9 @@ export function AiPage() {
                 <div className="mt-3 flex flex-wrap gap-2">
                   <button type="button" onClick={() => downloadDiagnosisItem(item)} className="rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/15">
                     Descargar informe
+                  </button>
+                  <button type="button" onClick={() => removeHistoryItem(item.id)} className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-semibold text-slate-200 transition hover:border-white/20 hover:bg-white/8">
+                    Borrar
                   </button>
                 </div>
               </div>
