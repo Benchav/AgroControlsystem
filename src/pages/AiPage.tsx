@@ -14,9 +14,13 @@ type ReportSections = {
   resultado: string;
   cultivo: string;
   problema: string;
+  causa: string;
   confianza: string;
   resumen: string;
+  porQueSucede: string;
   recomendaciones: string[];
+  manejoSugerido: string;
+  comoMejorarLaSalud: string;
   seguimiento: string;
   raw: string;
 };
@@ -58,9 +62,13 @@ function parseReportSections(text: string): ReportSections {
     resultado: '',
     cultivo: '',
     problema: '',
+    causa: '',
     confianza: '',
     resumen: '',
+    porQueSucede: '',
     recomendaciones: [],
+    manejoSugerido: '',
+    comoMejorarLaSalud: '',
     seguimiento: '',
     raw: text,
   };
@@ -80,8 +88,12 @@ function parseReportSections(text: string): ReportSections {
     if (current === 'resultado') sections.resultado = value || line;
     if (current === 'cultivo') sections.cultivo = value || line;
     if (current === 'problema') sections.problema = value || line;
+    if (current === 'causa') sections.causa = value || line;
     if (current === 'confianza') sections.confianza = value || line;
     if (current === 'resumen') sections.resumen = value || line;
+    if (current === 'porQueSucede') sections.porQueSucede = value || line;
+    if (current === 'manejoSugerido') sections.manejoSugerido = value || line;
+    if (current === 'comoMejorarLaSalud') sections.comoMejorarLaSalud = value || line;
     if (current === 'seguimiento') sections.seguimiento = value || line;
   };
 
@@ -106,6 +118,12 @@ function parseReportSections(text: string): ReportSections {
       continue;
     }
 
+    if (lower.startsWith('causa probable:')) {
+      current = 'causa';
+      sections.causa = line.replace(/^causa probable:\s*/i, '').trim();
+      continue;
+    }
+
     if (lower.startsWith('confianza:')) {
       current = 'confianza';
       sections.confianza = line.replace(/^confianza:\s*/i, '').trim();
@@ -118,10 +136,28 @@ function parseReportSections(text: string): ReportSections {
       continue;
     }
 
+    if (lower.startsWith('por qué sucede:')) {
+      current = 'porQueSucede';
+      sections.porQueSucede = line.replace(/^por qué sucede:\s*/i, '').trim();
+      continue;
+    }
+
     if (lower.startsWith('recomendaciones:')) {
       current = 'recomendaciones';
       const rest = line.replace(/^recomendaciones:\s*/i, '').trim();
       if (rest) sections.recomendaciones.push(rest);
+      continue;
+    }
+
+    if (lower.startsWith('manejo sugerido:')) {
+      current = 'manejoSugerido';
+      sections.manejoSugerido = line.replace(/^manejo sugerido:\s*/i, '').trim();
+      continue;
+    }
+
+    if (lower.startsWith('cómo mejorar la salud:')) {
+      current = 'comoMejorarLaSalud';
+      sections.comoMejorarLaSalud = line.replace(/^cómo mejorar la salud:\s*/i, '').trim();
       continue;
     }
 
@@ -137,9 +173,13 @@ function parseReportSections(text: string): ReportSections {
   if (!sections.resultado) sections.resultado = 'Resultado no especificado';
   if (!sections.cultivo) sections.cultivo = 'No identificado';
   if (!sections.problema) sections.problema = 'No identificado';
+  if (!sections.causa) sections.causa = 'No identificada';
   if (!sections.confianza) sections.confianza = 'No disponible';
   if (!sections.resumen) sections.resumen = text;
+  if (!sections.porQueSucede) sections.porQueSucede = 'Condiciones ambientales, manejo o sintomatología no suficientemente claras en la imagen.';
   if (!sections.recomendaciones.length) sections.recomendaciones = ['Revisar la imagen con otra toma más cercana y mejor luz.'];
+  if (!sections.manejoSugerido) sections.manejoSugerido = 'Retirar tejido afectado, corregir humedad y reforzar ventilación y monitoreo.';
+  if (!sections.comoMejorarLaSalud) sections.comoMejorarLaSalud = 'Aplicar manejo preventivo, nutrición equilibrada y seguimiento frecuente del cultivo.';
   if (!sections.seguimiento) sections.seguimiento = 'Monitorear evolución y repetir la toma en 24-48 horas si persisten los síntomas.';
 
   return sections;
@@ -311,6 +351,10 @@ export function AiPage() {
                       <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Problema probable</div>
                       <div className="mt-2 text-sm text-slate-200">{report.problema}</div>
                     </div>
+                    <div className="rounded-2xl border border-white/8 bg-black/20 p-4 sm:col-span-2">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Causa probable</div>
+                      <div className="mt-2 text-sm text-slate-200">{report.causa}</div>
+                    </div>
                     <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
                       <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Confianza</div>
                       <div className="mt-2 text-sm text-slate-200">{report.confianza}</div>
@@ -326,6 +370,17 @@ export function AiPage() {
                     <div className="mt-2 text-sm leading-7 text-slate-200">{report.resumen}</div>
                   </div>
 
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Por qué sucede</div>
+                      <div className="mt-2 text-sm leading-7 text-slate-200">{report.porQueSucede}</div>
+                    </div>
+                    <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Manejo sugerido</div>
+                      <div className="mt-2 text-sm leading-7 text-slate-200">{report.manejoSugerido}</div>
+                    </div>
+                  </div>
+
                   <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
                     <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Recomendaciones</div>
                     <ul className="mt-3 space-y-2 text-sm text-slate-200">
@@ -336,6 +391,11 @@ export function AiPage() {
                         </li>
                       ))}
                     </ul>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                    <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Cómo mejorar la salud</div>
+                    <div className="mt-2 text-sm leading-7 text-slate-200">{report.comoMejorarLaSalud}</div>
                   </div>
                 </div>
               ) : (

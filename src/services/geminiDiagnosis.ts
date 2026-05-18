@@ -97,12 +97,19 @@ function buildPrompt() {
     'Resultado:',
     'Cultivo probable:',
     'Problema probable:',
+    'Causa probable:',
     'Confianza:',
     'Resumen clínico:',
+    'Por qué sucede:',
     'Recomendaciones:',
+    'Manejo sugerido:',
+    'Cómo mejorar la salud:',
     'Seguimiento:',
     'Si la imagen no alcanza para determinarlo, dilo explícitamente y da una guía de nueva toma.',
-    'Mantén cada sección breve, profesional y orientada a campo.',
+    'Menciona el nombre científico cuando sea pertinente.',
+    'Explica causas típicas como humedad, ventilación, nutrición, estrés hídrico o infecciones.',
+    'Incluye acciones preventivas y correctivas realistas.',
+    'Mantén cada sección profesional, concreta y orientada a campo.',
   ].join('\n');
 }
 
