@@ -115,7 +115,7 @@ export function AppShell({ profile }: AppShellProps) {
           <button
             type="button"
             onClick={handleBackToLanding}
-            className="border-b border-white/45 px-5 py-6 text-left"
+            className="border-b border-white/45 px-5 py-4 text-left"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-emerald-500 to-emerald-700 text-[18px] shadow-[0_0_20px_rgba(16,185,129,0.2)] overflow-hidden">
@@ -215,8 +215,19 @@ export function AppShell({ profile }: AppShellProps) {
           </div>
         </aside>
 
-        <main className="ml-0 xl:ml-64 flex h-screen flex-1 flex-col overflow-hidden bg-[#1e1e2f]">
-          <header className="sticky top-0 z-20 border-b border-white/5 bg-[#1e1e2f]/95 px-4 py-[14px] backdrop-blur md:px-7">
+        <main
+          className="ml-0 xl:ml-64 flex h-screen flex-1 flex-col overflow-hidden bg-[#01040b] bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `
+              linear-gradient(
+                rgba(0,0,0,0.35),
+                rgba(0,0,0,0.65)
+              ),
+              url('/leavesMain.png')
+            `,
+          }}
+        >
+          <header className="sticky top-0 z-20 border-b border-white/5 px-4 py-[14px] backdrop-blur md:px-7">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h1 className="text-[16px] font-bold tracking-[-0.3px] text-white md:text-[18px]">
@@ -263,7 +274,7 @@ export function AppShell({ profile }: AppShellProps) {
             </div>
           </header>
 
-          <section className="flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6">
+          <section className="flex-1 overflow-y-auto px-4 py-5">
             <Outlet />
           </section>
         </main>

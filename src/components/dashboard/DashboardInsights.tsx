@@ -7,7 +7,7 @@ type DashboardInsightsProps = {
 export function DashboardInsights({ onNavigate }: DashboardInsightsProps) {
   return (
     <div className="grid gap-4 xl:grid-cols-3">
-      <div className="rounded-[14px] border border-white/6 bg-[#27293d] p-5">
+      <div className="rounded-[14px] border border-white/6 backdrop-blur p-5">
         <div className="text-[13.5px] font-semibold text-white">🤖 Diagnóstico IA</div>
         <p className="mt-2 text-[11.5px] text-slate-400">3 plantas analizadas hoy. 1 requiere atención.</p>
         <div className="mt-4 rounded-[8px] border border-red-400/15 bg-red-500/[0.07] p-3 text-[12px] text-slate-300">
@@ -22,10 +22,10 @@ export function DashboardInsights({ onNavigate }: DashboardInsightsProps) {
         </button>
       </div>
 
-      <div className="rounded-[14px] border border-white/6 bg-[#27293d] p-5">
+      <div className="rounded-[14px] border border-white/6 backdrop-blur p-5">
         <div className="text-[13.5px] font-semibold text-white">💬 Asistente Virtual</div>
         <p className="mt-2 text-[11.5px] text-slate-400">Groq · Llama 3 — Respuesta en ~0.3s</p>
-        <div className="mt-4 rounded-[8px] border border-white/8 bg-[#2d2f45] p-3 text-[12px] italic text-slate-300">
+        <div className="mt-4 rounded-[8px] border border-white/8 bg-[#2d2f45]/50 p-3 text-[12px] italic text-slate-300">
           &quot;¿Cuál es el mejor pesticida orgánico para el mildiu en tomates?&quot;
         </div>
         <button
@@ -37,7 +37,7 @@ export function DashboardInsights({ onNavigate }: DashboardInsightsProps) {
         </button>
       </div>
 
-      <div className="rounded-[14px] border border-white/6 bg-[#27293d] p-5">
+      <div className="rounded-[14px] border border-white/6 backdrop-blur p-5">
         <div className="text-[13.5px] font-semibold text-white">🏪 Marketplace</div>
         <p className="mt-2 text-[11.5px] text-slate-400">8 anuncios activos · 2 subastas hoy</p>
         <div className="mt-4 flex gap-3">
