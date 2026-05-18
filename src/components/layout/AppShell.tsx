@@ -123,8 +123,17 @@ export function AppShell({ profile }: AppShellProps) {
         >
           <button
             type="button"
+            aria-label="Cerrar menú"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white/80 transition hover:border-white/20 hover:bg-black/50 hover:text-white xl:hidden"
+          >
+            <i className="fas fa-times text-[13px]" />
+          </button>
+
+          <button
+            type="button"
             onClick={handleBackToLanding}
-            className="border-b border-white/45 px-5 py-4 text-left"
+            className="border-b border-white/45 px-5 py-4 pr-14 text-left"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-emerald-500 to-emerald-700 text-[18px] shadow-[0_0_20px_rgba(16,185,129,0.2)] overflow-hidden">
