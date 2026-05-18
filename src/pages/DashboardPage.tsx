@@ -15,7 +15,7 @@ export function DashboardPage() {
   const navigate = useNavigate();
   
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       <p className="text-sm text-slate-400">Resumen general · Última actualización hace 2 min · <span className="text-emerald-300">10:24 AM</span></p>
 
       <DashboardMetricsGrid metrics={metrics} />
