@@ -21,6 +21,14 @@ const badgeTone = (badge?: string) => {
   return "bg-emerald-500/15 text-emerald-300 border border-white/10";
 };
 
+const mobileNavItems = [
+  { id: 'dashboard', label: 'Inicio', icon: 'fa-th-large' },
+  { id: 'map', label: 'Mapa', icon: 'fa-map-marked-alt' },
+  { id: 'ai', label: 'IA', icon: 'fa-brain' },
+  { id: 'chat', label: 'Chat', icon: 'fa-comments' },
+  { id: 'settings', label: 'Más', icon: 'fa-ellipsis-h' },
+] as const;
+
 function getInitials(name: string) {
   return name
     .split(" ")
@@ -115,8 +123,17 @@ export function AppShell({ profile }: AppShellProps) {
         >
           <button
             type="button"
+            aria-label="Cerrar menú"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-black/30 text-white/80 transition hover:border-white/20 hover:bg-black/50 hover:text-white xl:hidden"
+          >
+            <i className="fas fa-times text-[13px]" />
+          </button>
+
+          <button
+            type="button"
             onClick={handleBackToLanding}
-            className="border-b border-white/45 px-5 py-4 text-left"
+            className="border-b border-white/45 px-5 py-4 pr-14 text-left"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-emerald-500 to-emerald-700 text-[18px] shadow-[0_0_20px_rgba(16,185,129,0.2)] overflow-hidden">
@@ -275,11 +292,45 @@ export function AppShell({ profile }: AppShellProps) {
             </div>
           </header>
 
-          <section className="flex-1 overflow-y-auto px-4 py-5">
+          <section className="flex-1 overflow-y-auto px-4 py-5 pb-24 md:pb-5">
             <Outlet />
           </section>
         </main>
       </div>
+
+      <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-white/10 bg-[#081114]/95 px-2 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-12px_32px_rgba(0,0,0,0.28)] backdrop-blur-xl xl:hidden">
+        <div className="mx-auto grid max-w-md grid-cols-5 gap-1">
+          {mobileNavItems.map((item) => {
+            const isActive = currentPage === item.id;
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => {
+                  if (item.id === 'settings') {
+                    setIsMobileMenuOpen(true);
+                    return;
+                  }
+
+                  handleNavigate(item.id);
+                }}
+                className={cn(
+                  'flex flex-col items-center justify-center gap-1 rounded-[18px] px-2 py-2 text-[11px] font-medium transition',
+                  isActive
+                    ? 'bg-emerald-500/12 text-emerald-300'
+                    : 'text-slate-400 hover:bg-white/5 hover:text-white',
+                )}
+              >
+                <span className={cn('flex h-8 w-8 items-center justify-center rounded-full border transition', isActive ? 'border-emerald-400/20 bg-emerald-500/10 text-emerald-300' : 'border-white/10 bg-white/5 text-slate-300')}>
+                  <i className={cn('fas', item.icon)} />
+                </span>
+                <span className="leading-none">{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }
