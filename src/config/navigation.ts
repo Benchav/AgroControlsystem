@@ -6,7 +6,7 @@ export const navigation: NavigationItem[] = [
   { id: 'iot', label: 'Sensores IoT', icon: 'fa-microchip', section: 'modulos', badge: '2' },
   { id: 'ai', label: 'Diagnóstico IA', icon: 'fa-brain', section: 'modulos' },
   { id: 'chat', label: 'Asistente / Expertos', icon: 'fa-comments', section: 'modulos', badge: '1' },
-  { id: 'market', label: 'Marketplace', icon: 'fa-store', section: 'modulos', badge: '8' },
+  { id: 'market', label: 'Subastas', icon: 'fa-store', section: 'modulos', badge: '8' },
   { id: 'modelos3d', label: 'Modelos 3D', icon: 'fa-cube', section: 'sistema' },
   { id: 'reportes', label: 'Reportes', icon: 'fa-chart-line', section: 'sistema' },
   { id: 'settings', label: 'Configuración', icon: 'fa-sliders-h', section: 'sistema' },
