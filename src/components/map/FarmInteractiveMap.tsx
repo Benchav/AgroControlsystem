@@ -125,8 +125,8 @@ export function FarmInteractiveMap() {
 
   return (
     <div className="grid gap-4 xl:grid-cols-[1.7fr_1fr]">
-      <div className="overflow-hidden rounded-[28px] border border-white/8 bg-white/[0.03] p-4">
-        <div className="mb-4 flex items-center justify-between gap-3 px-1">
+      <div className="overflow-hidden rounded-[14px] border border-white/8 bg-white/[0.03]">
+        <div className="mb-4 flex items-center justify-between gap-3 p-4 backdrop-blur">
           <div>
             <div className="text-lg font-semibold text-white">Mapa interactivo del terreno</div>
             <div className="text-sm text-slate-400">Pan, zoom, click por parcela y lectura en vivo</div>
@@ -136,7 +136,7 @@ export function FarmInteractiveMap() {
           </div>
         </div>
 
-        <div className="h-[520px] overflow-hidden rounded-3xl border border-white/8">
+        <div className="h-full overflow-hidden border border-white/8">
           <MapContainer center={mapCenter} zoom={16} scrollWheelZoom className="h-full w-full">
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -199,20 +199,20 @@ export function FarmInteractiveMap() {
         </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 backdrop-blur">
         <div className="rounded-[28px] border border-white/8 bg-white/[0.03] p-5">
           <div className="text-sm font-semibold text-white">Parcela seleccionada</div>
           <div className="mt-3 text-2xl font-black tracking-tight text-emerald-300">{selectedParcel.name}</div>
           <div className="mt-2 text-sm text-slate-400">{selectedParcel.area} · Última lectura hace 2 min</div>
 
-          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+          <div className="mt-4 grid gap-3 grid-cols-2">
             {[
               ['Humedad', selectedParcel.humidity],
               ['Fertilidad', selectedParcel.fertility],
               ['Temperatura', selectedParcel.temperature],
               ['Estado', selectedParcel.status],
             ].map(([label, value]) => (
-              <div key={label as string} className="rounded-2xl border border-white/8 bg-black/20 p-4">
+              <div key={label as string} className="rounded-[10px] border border-white/8 bg-black/20 p-4">
                 <div className="text-xs uppercase tracking-[0.25em] text-slate-500">{label as string}</div>
                 <div className="mt-2 text-xl font-semibold text-white">{value as string}</div>
               </div>
@@ -220,7 +220,7 @@ export function FarmInteractiveMap() {
           </div>
         </div>
 
-        <div className="rounded-[28px] border border-white/8 bg-white/[0.03] p-5">
+        <div className="rounded-[14px] border border-white/8 bg-white/[0.03] p-5">
           <div className="text-sm font-semibold text-white">Leyenda</div>
           <div className="mt-4 space-y-3 text-sm text-slate-300">
             <div className="flex items-center gap-3"><span className="h-3 w-3 rounded-full bg-emerald-400" /> Óptimo</div>

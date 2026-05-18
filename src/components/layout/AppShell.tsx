@@ -161,7 +161,7 @@ export function AppShell({ profile }: AppShellProps) {
 
           <nav className="flex-1 overflow-y-auto px-3 py-3 scrollbar-hide">
             {(["principal", "modulos", "sistema"] as const).map((section) => (
-              <div key={section} className="space-y-2">
+              <div key={section} className="space-y-2 mt-2">
                 <div className="px-2 text-[9px] font-medium uppercase tracking-[0.35em] text-slate-500">
                   {sectionLabels[section]}
                 </div>
