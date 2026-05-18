@@ -115,26 +115,6 @@ Completan la experiencia con reportes, simulación de negocio y configuración b
 - OpenStreetMap para el mapa
 - Sketchfab para modelos 3D
 
-## Variables de entorno
-
-### Chat Groq
-
-- `VITE_GROQ_API_KEY`
-- `VITE_GROQ_MODEL`
-- `VITE_GROQ_MAX_COMPLETION_TOKENS`
-- `VITE_GROQ_TEMPERATURE`
-
-### Diagnóstico Gemini
-
-- `VITE_GEMINI_API_KEY_1`
-- `VITE_GEMINI_API_KEY_2`
-- `VITE_GEMINI_API_KEY_3`
-- `VITE_GEMINI_API_KEY_4`
-- `VITE_GEMINI_API_KEY_5`
-- `VITE_GEMINI_MODEL`
-
-Consulta el archivo `.env.example` para copiar la estructura base.
-
 ## Scripts
 
 - `npm run dev` inicia el servidor de desarrollo
@@ -168,13 +148,6 @@ Las siguientes imágenes forman parte de la documentación visual del proyecto:
 
 ![Dashboard del proyecto](./documents/dashboart.jpg)
 
-## Observaciones de implementación
-
-- El build actual compila correctamente.
-- El bundle principal es grande, sobre todo por dependencias visuales y de mapas.
-- Las claves de Groq y Gemini están pensadas para prototipo y no deberían exponerse así en un despliegue productivo.
-- La configuración de usuario y umbrales todavía vive en estado local en la UI; no hay persistencia real compartida entre pantallas.
-
 ## Propósito del proyecto
 
-Agro Control está orientado a mostrar cómo una plataforma agrícola puede unificar monitoreo, diagnóstico, asistencia y visualización en una sola experiencia moderna. El proyecto funciona bien como demo funcional, base de producto o prototipo avanzado para evolucionar hacia una solución productiva.
+Agro Control está orientado a mostrar cómo una plataforma agrícola puede unificar monitoreo, diagnóstico, asistencia y visualización en una sola experiencia moderna.
