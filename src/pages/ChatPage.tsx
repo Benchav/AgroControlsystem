@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { PageSection } from '../components/layout/PageSection';
+import { generateGroqChatReply } from '../services/groqChat';
 import type { ChatMessage, ChatThreadId } from '../types/app';
 
 const chatLabels: Record<ChatThreadId, string> = {
@@ -27,9 +28,23 @@ function formatTime(timestamp: number) {
   return new Date(timestamp).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
 }
 
+const defaultProfile = {
+  name: 'Juan Rodríguez',
+  email: 'juan@agrocontrol.io',
+  org: 'Finca La Esperanza',
+};
+
+const defaultSettings = {
+  humidityThreshold: 40,
+  temperatureThreshold: 30,
+  phThreshold: 6,
+};
+
 export function ChatPage() {
   const [selectedChat, setSelectedChat] = useState<ChatThreadId>('bot');
   const [draft, setDraft] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [messagesByThread, setMessagesByThread] = useState<Record<ChatThreadId, ChatMessage[]>>({
     bot: [
       {
@@ -48,28 +63,65 @@ export function ChatPage() {
 
   const handleSend = () => {
     const value = draft.trim();
-    if (!value) return;
+    if (!value || isSending) return;
 
     const now = Date.now();
+    const thread = selectedChat;
     const userMessage: ChatMessage = {
-      id: `user-${selectedChat}-${now}`,
+      id: `user-${thread}-${now}`,
       role: 'user',
       text: value,
       timestamp: now,
     };
 
-    const botMessage: ChatMessage = {
-      id: `bot-${selectedChat}-${now}`,
-      role: 'bot',
-      text: 'Procesando diagnóstico agronómico...',
-      timestamp: now + 1,
-    };
+    const threadMessages = [...(messagesByThread[thread] ?? []), userMessage];
 
+    setErrorMessage(null);
+    setIsSending(true);
     setMessagesByThread((current) => ({
       ...current,
-      [selectedChat]: [...(current[selectedChat] ?? []), userMessage, botMessage],
+      [thread]: threadMessages,
     }));
     setDraft('');
+
+    void generateGroqChatReply({
+      thread,
+      messages: threadMessages,
+      profile: defaultProfile,
+      settings: defaultSettings,
+    })
+      .then((replyText) => {
+        const botMessage: ChatMessage = {
+          id: `bot-${thread}-${now}`,
+          role: 'bot',
+          text: replyText,
+          timestamp: now + 1,
+        };
+
+        setMessagesByThread((current) => ({
+          ...current,
+          [thread]: [...(current[thread] ?? []), botMessage],
+        }));
+      })
+      .catch((error) => {
+        const message = error instanceof Error ? error.message : 'No fue posible conectar con Groq.';
+        setErrorMessage(message);
+
+        const botMessage: ChatMessage = {
+          id: `bot-error-${thread}-${now}`,
+          role: 'bot',
+          text: `No pude responder ahora mismo: ${message}`,
+          timestamp: now + 1,
+        };
+
+        setMessagesByThread((current) => ({
+          ...current,
+          [thread]: [...(current[thread] ?? []), botMessage],
+        }));
+      })
+      .finally(() => {
+        setIsSending(false);
+      });
   };
 
   return (
@@ -103,6 +155,12 @@ export function ChatPage() {
       <div className="space-y-4">
         <PageSection title={selectedChat === 'bot' ? 'Asistente AgroControl' : chatLabels[selectedChat]} subtitle="Respuesta instantánea">
           <div className="space-y-4">
+            {errorMessage ? (
+              <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+                {errorMessage}
+              </div>
+            ) : null}
+
             <div className="max-h-[420px] space-y-3 overflow-y-auto rounded-2xl border border-white/8 bg-black/20 p-4 text-sm text-slate-300">
               {messages.map((message) => (
                 <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -133,6 +191,7 @@ export function ChatPage() {
                 value={draft}
                 onChange={(event) => setDraft(event.target.value)}
                 placeholder="Escribe tu consulta agronómica..."
+                disabled={isSending}
                 onKeyDown={(event) => {
                   if (event.key === 'Enter') {
                     handleSend();
@@ -143,8 +202,9 @@ export function ChatPage() {
                 className="rounded-2xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white"
                 type="button"
                 onClick={handleSend}
+                disabled={isSending || !draft.trim()}
               >
-                <i className="fas fa-paper-plane" />
+                {isSending ? '...' : <i className="fas fa-paper-plane" />}
               </button>
             </div>
           </div>
