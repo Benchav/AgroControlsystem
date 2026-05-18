@@ -5,10 +5,10 @@ import { DashboardMetricsGrid } from '../components/dashboard/DashboardMetricsGr
 import { DashboardSensors } from '../components/dashboard/DashboardSensors';
 
 const metrics = [
-  { label: 'Humedad Promedio', value: '68%', icon: 'fa-tint', tone: 'text-emerald-300' },
-  { label: 'Temp. del Suelo', value: '24°C', icon: 'fa-thermometer-half', tone: 'text-amber-300' },
-  { label: 'Parcelas Activas', value: '12 ha', icon: 'fa-seedling', tone: 'text-sky-300' },
-  { label: 'Alertas Activas', value: '3', icon: 'fa-exclamation-triangle', tone: 'text-red-300' },
+  { label: 'Humedad Promedio', value: '68%', icon: 'fa-tint' },
+  { label: 'Temp. del Suelo', value: '24°C', icon: 'fa-thermometer-half' },
+  { label: 'Parcelas Activas', value: '12 H', icon: 'fa-seedling' },
+  { label: 'Alertas Activas', value: '3', icon: 'fa-exclamation-triangle' },
 ];
 
 export function DashboardPage() {
