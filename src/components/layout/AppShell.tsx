@@ -36,7 +36,8 @@ export function AppShell({ profile }: AppShellProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const currentPage = location.pathname.split("/").pop() as AppPageId;
+  const [, , routePage = 'dashboard'] = location.pathname.split('/');
+  const currentPage = routePage as AppPageId;
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
