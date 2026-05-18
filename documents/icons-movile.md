@@ -1,7 +1,7 @@
 # Iconos y Menú Móvil
 
 ## Objetivo
-Esta guía explica cómo se ve y cómo funciona la navegación móvil de Agro Control, para que cualquier persona del equipo la entienda sin entrar al código.
+Vista y funcionamiento de navegación móvil de Agro Control.
 
 ## Vista de iconos
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" fill="none">
