@@ -79,7 +79,7 @@ export function AppShell({ profile }: AppShellProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#1e1e2f] text-[#f8fafc]">
+    <div className="min-h-screen bg-[#0c0c49] text-[#f8fafc]">
       <div className="flex min-h-screen">
         {isMobileMenuOpen ? (
           <button
@@ -92,26 +92,45 @@ export function AppShell({ profile }: AppShellProps) {
 
         <aside
           className={cn(
-            "fixed top-0 left-0 h-screen w-72 xl:w-64 z-50 flex-col border-r border-white/5 bg-[#222233] transition-transform duration-200 overflow-hidden",
+            "fixed top-0 left-0 h-screen w-72 xl:w-64 z-50 flex-col border-r border-white/5 bg-[#051c1a] transition-transform duration-200 overflow-hidden bg-no-repeat",
             isMobileMenuOpen
               ? "translate-x-0 flex"
               : "-translate-x-full xl:translate-x-0 xl:flex",
           )}
+          style={{
+            backgroundImage: `
+              linear-gradient(
+                to top,
+                rgba(5,28,26,0.55) 0%,
+                rgba(5,28,26,0.85) 35%,
+                rgba(5,28,26,0.98) 70%,
+                rgba(5,28,26,1) 100%
+              ),
+              url('/leavesSidebar.png')
+            `,
+            backgroundPosition: "left bottom",
+            backgroundSize: "contain",
+            backgroundRepeat: "no-repeat",
+          }}
         >
           <button
             type="button"
             onClick={handleBackToLanding}
-            className="border-b border-white/5 px-5 py-6 text-left"
+            className="border-b border-white/45 px-5 py-4 text-left"
           >
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-emerald-500 to-emerald-700 text-[18px] shadow-[0_0_20px_rgba(16,185,129,0.2)] overflow-hidden">
-                <img src="/Logo.png" alt="Agro Control" className="h-full w-full"/>
+                <img
+                  src="/Logo.png"
+                  alt="Agro Control"
+                  className="h-full w-full"
+                />
               </div>
               <div>
-                <div className="text-[18px] font-bold tracking-[-0.5px] text-white">
+                <div className="text-[18px] font-bold tracking-[-0.5px] text-white/80">
                   Agro Control
                 </div>
-                <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.35em] text-slate-500">
+                <div className="mt-0.5 font-mono text-[9px] uppercase tracking-[0.35em] text-white/60">
                   Smart Farm v2.0
                 </div>
               </div>
@@ -175,15 +194,15 @@ export function AppShell({ profile }: AppShellProps) {
             ))}
           </nav>
 
-          <div className="flex items-center gap-3 border-t border-white/5 px-4 py-3">
+          <div className="flex items-center gap-3 border-t border-white/40 px-4 py-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-gradient-to-br from-emerald-900 to-emerald-950 text-[12px] font-bold text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.15)]">
               {getInitials(profile.name)}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-[12px] font-semibold text-white">
+              <div className="truncate text-[12px] font-semibold text-white/80">
                 {profile.name}
               </div>
-              <div className="truncate text-[10px] text-slate-500">
+              <div className="truncate text-[10px] text-white/60">
                 Administrador
               </div>
             </div>
@@ -197,8 +216,19 @@ export function AppShell({ profile }: AppShellProps) {
           </div>
         </aside>
 
-        <main className="ml-0 xl:ml-64 flex h-screen flex-1 flex-col overflow-hidden bg-[#1e1e2f]">
-          <header className="sticky top-0 z-20 border-b border-white/5 bg-[#1e1e2f]/95 px-4 py-[14px] backdrop-blur md:px-7">
+        <main
+          className="ml-0 xl:ml-64 flex h-screen flex-1 flex-col overflow-hidden bg-[#01040b] bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: `
+              linear-gradient(
+                rgba(0,0,0,0.35),
+                rgba(0,0,0,0.65)
+              ),
+              url('/leavesMain.png')
+            `,
+          }}
+        >
+          <header className="sticky top-0 z-20 border-b border-white/5 px-4 py-[14px] backdrop-blur md:px-7">
             <div className="flex items-center justify-between gap-4">
               <div>
                 <h1 className="text-[16px] font-bold tracking-[-0.3px] text-white md:text-[18px]">
@@ -245,7 +275,7 @@ export function AppShell({ profile }: AppShellProps) {
             </div>
           </header>
 
-          <section className="flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6">
+          <section className="flex-1 overflow-y-auto px-4 py-5">
             <Outlet />
           </section>
         </main>
