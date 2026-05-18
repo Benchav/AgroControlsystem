@@ -158,23 +158,15 @@ documents/
 
 ## Imágenes del proyecto
 
-Las siguientes imágenes viven en `public/` y forman parte de la identidad visual del proyecto:
+Las siguientes imágenes forman parte de la documentación visual del proyecto:
 
-### Portada
+### Landing
 
-![Portada del proyecto](./public/fondo.jpg)
+![Landing del proyecto](./documents/landing.jpg)
 
-### Logo
+### Dashboard
 
-![Logo de Agro Control](./public/Logo.png)
-
-### Fondo lateral del panel
-
-![Fondo lateral](./public/leavesSidebar.png)
-
-### Fondo principal del panel
-
-![Fondo principal](./public/leavesMain.png)
+![Dashboard del proyecto](./documents/dashboart.jpg)
 
 ## Observaciones de implementación
 
