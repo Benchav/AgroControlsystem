@@ -108,10 +108,23 @@ function extractJson(text: string) {
     const start = candidate.indexOf('{');
     const end = candidate.lastIndexOf('}');
     if (start >= 0 && end > start) {
-      return JSON.parse(candidate.slice(start, end + 1)) as Record<string, unknown>;
+      try {
+        return JSON.parse(candidate.slice(start, end + 1)) as Record<string, unknown>;
+      } catch {
+        // Continue to relaxed parsing below.
+      }
     }
 
-    throw new Error('Gemini no devolvió JSON válido.');
+    const relaxed = candidate
+      .replace(/\r?\n/g, ' ')
+      .replace(/([,{\s])(\w+)\s*:/g, '$1"$2":')
+      .replace(/'/g, '"');
+
+    try {
+      return JSON.parse(relaxed) as Record<string, unknown>;
+    } catch {
+      throw new Error('Gemini no devolvió JSON válido.');
+    }
   }
 }
 
@@ -146,6 +159,7 @@ function buildPrompt() {
   return [
     'Eres un experto en fitopatología y diagnóstico visual de plantas.',
     'Analiza la imagen adjunta y responde SOLO con JSON válido, sin texto extra ni markdown.',
+    'No uses bloques ``` ni explicación adicional.',
     'El JSON debe tener esta forma exacta:',
     '{',
     '  "plant": "nombre de la planta o cultivo",',
@@ -221,6 +235,7 @@ async function analyzeWithKey(file: File, apiKey: string, keyUsed: number) {
           temperature: 0.2,
           topP: 1,
           maxOutputTokens: 512,
+          responseMimeType: 'application/json',
         },
       }),
     },
