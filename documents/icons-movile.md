@@ -3,6 +3,9 @@
 ## Objetivo
 Esta guía explica cómo se ve y cómo funciona la navegación móvil de Agro Control, para que cualquier persona del equipo la entienda sin entrar al código.
 
+## Vista de iconos
+![Iconos móviles](./iconos-movile.svg)
+
 ## Qué aparece en móvil
 En pantallas pequeñas se usa una barra inferior fija, tipo aplicación móvil.
 
