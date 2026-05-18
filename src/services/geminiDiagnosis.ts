@@ -1,19 +1,8 @@
 const DEFAULT_MODEL = 'gemini-2.5-flash';
 const RECENT_API_KEY_INDEX_STORAGE = 'agro_gemini_api_key_index';
 
-export type PlantDiagnosisSeverity = 'Baja' | 'Media' | 'Alta' | 'Crítica';
-
-export type PlantDiagnosisResult = {
-  model: string;
-  plant: string;
-  disease: string;
-  confidence: number;
-  severity: PlantDiagnosisSeverity;
-  summary: string;
-  recommendations: string[];
-  notes: string;
-  rawText: string;
-  keyUsed: number;
+type RetryableError = Error & {
+  retryable?: boolean;
 };
 
 type GeminiResponse = {
@@ -29,8 +18,10 @@ type GeminiResponse = {
   };
 };
 
-type RetryableError = Error & {
-  retryable?: boolean;
+export type PlantDiagnosisResult = {
+  model: string;
+  text: string;
+  keyUsed: number;
 };
 
 function getGeminiApiKeys() {
@@ -97,81 +88,19 @@ function fileToBase64(file: File) {
   });
 }
 
-function extractJson(text: string) {
-  const trimmed = text.trim();
-  const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
-  const candidate = fenced?.[1]?.trim() ?? trimmed;
-
-  try {
-    return JSON.parse(candidate) as Record<string, unknown>;
-  } catch {
-    const start = candidate.indexOf('{');
-    const end = candidate.lastIndexOf('}');
-    if (start >= 0 && end > start) {
-      try {
-        return JSON.parse(candidate.slice(start, end + 1)) as Record<string, unknown>;
-      } catch {
-        // Continue to relaxed parsing below.
-      }
-    }
-
-    const relaxed = candidate
-      .replace(/\r?\n/g, ' ')
-      .replace(/([,{\s])(\w+)\s*:/g, '$1"$2":')
-      .replace(/'/g, '"');
-
-    try {
-      return JSON.parse(relaxed) as Record<string, unknown>;
-    } catch {
-      throw new Error('Gemini no devolvió JSON válido.');
-    }
-  }
-}
-
-function asString(value: unknown, fallback = '') {
-  return typeof value === 'string' && value.trim() ? value.trim() : fallback;
-}
-
-function asNumber(value: unknown, fallback = 0) {
-  if (typeof value === 'number' && Number.isFinite(value)) return value;
-  if (typeof value === 'string') {
-    const parsed = Number.parseFloat(value);
-    if (Number.isFinite(parsed)) return parsed;
-  }
-  return fallback;
-}
-
-function asStringArray(value: unknown) {
-  if (!Array.isArray(value)) return [];
-  return value.map((item) => asString(item)).filter(Boolean);
-}
-
-function normalizeSeverity(value: unknown): PlantDiagnosisSeverity {
-  const text = asString(value, 'Media').toLowerCase();
-
-  if (text.includes('crit')) return 'Crítica';
-  if (text.includes('alta') || text.includes('severa')) return 'Alta';
-  if (text.includes('baja') || text.includes('leve')) return 'Baja';
-  return 'Media';
-}
-
 function buildPrompt() {
   return [
-    'Eres un experto en fitopatología y diagnóstico visual de plantas.',
-    'Analiza la imagen adjunta y responde SOLO con JSON válido, sin texto extra ni markdown.',
-    'No uses bloques ``` ni explicación adicional.',
-    'El JSON debe tener esta forma exacta:',
-    '{',
-    '  "plant": "nombre de la planta o cultivo",',
-    '  "disease": "tipo de enfermedad o plaga detectada",',
-    '  "confidence": 0,',
-    '  "severity": "Baja|Media|Alta|Crítica",',
-    '  "summary": "resumen corto en español",',
-    '  "recommendations": ["accion 1", "accion 2"],',
-    '  "notes": "observaciones adicionales"',
-    '}',
-    'Si la imagen no es suficiente, indica enfermedad como "Imagen insuficiente" y baja confianza.',
-    'Mantén las recomendaciones prácticas, breves y orientadas a campo.',
+    'Eres un especialista en fitopatología y diagnóstico visual de plantas.',
+    'Analiza la imagen y responde en español, con texto claro y directo.',
+    'No uses JSON, no uses markdown y no uses bloques de código.',
+    'La respuesta debe incluir en este orden:',
+    '1. Cultivo o planta probable.',
+    '2. Enfermedad o problema probable.',
+    '3. Nivel de confianza aproximado en porcentaje.',
+    '4. Un resumen breve.',
+    '5. 3 a 5 recomendaciones prácticas.',
+    'Si la imagen no alcanza para determinarlo, dilo explícitamente y da una guía de nueva toma.',
+    'Mantén el texto breve, útil y orientado a campo.',
   ].join('\n');
 }
 
@@ -235,7 +164,6 @@ async function analyzeWithKey(file: File, apiKey: string, keyUsed: number) {
           temperature: 0.2,
           topP: 1,
           maxOutputTokens: 512,
-          responseMimeType: 'application/json',
         },
       }),
     },
@@ -253,19 +181,10 @@ async function analyzeWithKey(file: File, apiKey: string, keyUsed: number) {
     throw createRetryableError('Gemini respondió vacío.', true);
   }
 
-  const dataJson = extractJson(text);
-
   return {
     model,
     keyUsed,
-    plant: asString(dataJson.plant, 'Cultivo no identificado'),
-    disease: asString(dataJson.disease, 'Diagnóstico no disponible'),
-    confidence: Math.max(0, Math.min(100, asNumber(dataJson.confidence, 0))),
-    severity: normalizeSeverity(dataJson.severity),
-    summary: asString(dataJson.summary, text),
-    recommendations: asStringArray(dataJson.recommendations),
-    notes: asString(dataJson.notes, ''),
-    rawText: text,
+    text,
   } satisfies PlantDiagnosisResult;
 }
 
