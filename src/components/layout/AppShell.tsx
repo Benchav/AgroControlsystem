@@ -56,7 +56,7 @@ export function AppShell({ profile }: AppShellProps) {
     iot: "Sensores IoT",
     ai: "Diagnóstico IA",
     chat: "Asistente & Expertos",
-    market: "Marketplace",
+    market: "Subastas",
     map: "Mapa Interactivo",
     modelos3d: "Modelos 3D",
     reportes: "Reportes",
