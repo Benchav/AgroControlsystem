@@ -9,7 +9,7 @@ type PageSectionProps = {
 
 export function PageSection({ title, subtitle, children, className = '' }: PageSectionProps) {
   return (
-    <section className={`min-h-0 rounded-[14px] border border-white/6 backdrop-blur p-5 shadow-[0_4px_12px_rgba(0,0,0,0.15)] md:p-6 ${className}`}>
+    <section className={`min-h-0 rounded-[14px] border border-white/6 backdrop-blur bg-emerald-500/10 p-5 shadow-[0_4px_12px_rgba(0,0,0,0.15)] md:p-6 ${className}`}>
       <div className="mb-4 flex items-start justify-between gap-4">
         <div>
           <h2 className="text-[13.5px] font-semibold tracking-tight text-white md:text-[14px]">{title}</h2>

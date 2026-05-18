@@ -13,17 +13,17 @@ export function ParcelStatusTabs({ parcels }: Props) {
     {
       key: "optimo" as ParcelStatus,
       label: "Óptimo",
-      color: "bg-emerald-500/10 text-emerald-300 border-emerald-400/20",
+      color: "bg-emerald-500/50 text-emerald-300 border-emerald-400/20",
     },
     {
       key: "atencion" as ParcelStatus,
       label: "Atención",
-      color: "bg-amber-500/10 text-amber-300 border-amber-400/20",
+      color: "bg-amber-500/50 text-amber-300 border-amber-400/20",
     },
     {
       key: "critico" as ParcelStatus,
       label: "Crítico",
-      color: "bg-red-500/10 text-red-300 border-red-400/20",
+      color: "bg-red-500/50 text-red-300 border-red-400/20",
     },
   ];
 
@@ -48,7 +48,7 @@ export function ParcelStatusTabs({ parcels }: Props) {
               className={`rounded-2xl border px-5 py-2 text-sm font-semibold transition-all duration-300 ${
                 isActive
                   ? `${tab.color} scale-105 shadow-lg`
-                  : "border-white/10 bg-white/[0.03] text-slate-400 hover:bg-white/[0.06]"
+                  : "border-white/10 bg-white/[0.03] text-white hover:bg-white/[0.06]"
               }`}
             >
               {tab.label}
@@ -70,7 +70,7 @@ export function ParcelStatusTabs({ parcels }: Props) {
           return (
             <div
               key={parcel.id}
-              className="rounded-3xl border border-white/8 bg-white/[0.03] p-5 backdrop-blur"
+              className="rounded-[14px] border border-white/8 bg-black/50 p-5 backdrop-blur"
             >
               <div className="flex items-start justify-between">
                 <div>
