@@ -52,6 +52,23 @@ function exportTextFile(fileName: string, content: string) {
   URL.revokeObjectURL(url);
 }
 
+function downloadDiagnosisItem(item: ScanHistoryItem) {
+  exportTextFile(
+    `diagnostico-ia-${item.fileName}-${item.createdAt}.txt`,
+    [
+      'Diagnóstico IA - Agro Control',
+      `Archivo: ${item.fileName}`,
+      `Fecha: ${formatTime(item.createdAt)}`,
+      '',
+      item.resultText,
+    ].join('\n'),
+  );
+}
+
+function clearHistoryStorage() {
+  writeJsonSafe(HISTORY_STORAGE_KEY, [] as ScanHistoryItem[]);
+}
+
 function parseReportSections(text: string): ReportSections {
   const lines = text
     .split(/\r?\n/)
@@ -191,10 +208,16 @@ export function AiPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [result, setResult] = useState<PlantDiagnosisResult | null>(null);
+  const [displayResult, setDisplayResult] = useState<PlantDiagnosisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [history, setHistory] = useState<ScanHistoryItem[]>(() => readHistory());
   const report = result ? parseReportSections(result.text) : null;
+
+  useEffect(() => {
+    if (isAnalyzing) return;
+    setDisplayResult(result);
+  }, [result, isAnalyzing]);
 
   useEffect(() => {
     writeHistory(history);
@@ -220,6 +243,7 @@ export function AiPage() {
     setSelectedFile(file);
     setPreviewUrl(URL.createObjectURL(file));
     setResult(null);
+    setDisplayResult(null);
   };
 
   const analyze = async () => {
@@ -227,6 +251,7 @@ export function AiPage() {
 
     setIsAnalyzing(true);
     setErrorMessage(null);
+    setDisplayResult(null);
 
     try {
       const diagnosis = await analyzePlantImage(selectedFile);
@@ -253,6 +278,7 @@ export function AiPage() {
   const clearAnalysis = () => {
     setSelectedFile(null);
     setResult(null);
+    setDisplayResult(null);
     setErrorMessage(null);
     setPreviewUrl((current) => {
       if (current) URL.revokeObjectURL(current);
@@ -261,6 +287,11 @@ export function AiPage() {
 
     if (fileInputRef.current) fileInputRef.current.value = '';
     if (cameraInputRef.current) cameraInputRef.current.value = '';
+  };
+
+  const clearHistory = () => {
+    setHistory([]);
+    clearHistoryStorage();
   };
 
   const exportReport = () => {
@@ -305,11 +336,37 @@ export function AiPage() {
               <input ref={cameraInputRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={(event) => handleFile(event.target.files?.[0] ?? null)} />
             </div>
 
-            {previewUrl ? (
-              <div className="overflow-hidden rounded-[28px] border border-white/8 bg-[#27293d]">
-                <img src={previewUrl} alt="Vista previa del cultivo" className="max-h-[420px] w-full object-cover" />
-              </div>
-            ) : null}
+            <div className={`analysis-frame overflow-hidden rounded-[28px] border border-white/8 bg-[#27293d] ${isAnalyzing ? 'analysis-frame--active' : ''}`}>
+              {previewUrl ? (
+                <div className="relative">
+                  <img src={previewUrl} alt="Vista previa del cultivo" className="max-h-[420px] w-full object-cover" />
+                  {isAnalyzing ? (
+                    <div className="analysis-overlay absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#0b1020]/92 via-[#0b1020]/45 to-transparent p-5">
+                      <div className="mb-3 inline-flex w-fit items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-300">
+                        <span className="relative flex h-2 w-2 items-center justify-center">
+                          <span className="absolute h-2 w-2 animate-ping rounded-full bg-emerald-400/60" />
+                          <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.8)]" />
+                        </span>
+                        Analizando imagen
+                      </div>
+                      <div className="space-y-2">
+                        <div className="analysis-line h-3 w-4/5 rounded-full bg-white/10" />
+                        <div className="analysis-line h-3 w-3/5 rounded-full bg-white/10 [animation-delay:120ms]" />
+                        <div className="analysis-line h-3 w-2/3 rounded-full bg-white/10 [animation-delay:240ms]" />
+                        <div className="analysis-line h-3 w-1/2 rounded-full bg-white/10 [animation-delay:360ms]" />
+                        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/8">
+                          <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-emerald-500 via-cyan-400 to-emerald-300 analysis-progress" />
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : (
+                <div className="flex h-[240px] items-center justify-center px-6 text-center text-sm text-slate-400">
+                  Aún no has seleccionado una imagen.
+                </div>
+              )}
+            </div>
 
             <div className="flex gap-2">
               <button type="button" onClick={analyze} disabled={!selectedFile || isAnalyzing} className="rounded-xl bg-emerald-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60">
@@ -329,14 +386,14 @@ export function AiPage() {
               <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
                 {errorMessage}
               </div>
-            ) : null}
+              ) : null}
 
-            <div className="rounded-[28px] border border-white/8 bg-[#27293d] p-5">
-              <div className="text-sm font-semibold text-white">Informe Gemini</div>
-              <div className="mt-1 text-xs text-slate-400">Reporte profesional estructurado</div>
+              <div className="rounded-[28px] border border-white/8 bg-[#27293d] p-5">
+                <div className="text-sm font-semibold text-white">Informe Gemini</div>
+                <div className="mt-1 text-xs text-slate-400">Reporte profesional estructurado</div>
 
-              {report ? (
-                <div className="mt-4 space-y-3">
+                {report ? (
+                <div className={`report-shell mt-4 space-y-3 ${displayResult ? 'report-shell--visible' : 'report-shell--hidden'}`}>
                   <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
                     <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Resultado</div>
                     <div className="mt-2 text-xl font-semibold text-white">{report.resultado}</div>
@@ -399,8 +456,8 @@ export function AiPage() {
                   </div>
                 </div>
               ) : (
-                <div className="mt-4 min-h-[320px] rounded-3xl border border-white/8 bg-black/20 p-4 text-sm leading-7 text-slate-200 whitespace-pre-wrap">
-                  Aquí aparecerá el informe de diagnóstico una vez analices la imagen.
+                <div className="report-placeholder mt-4 min-h-[320px] rounded-3xl border border-white/8 bg-black/20 p-4 text-sm leading-7 text-slate-200 whitespace-pre-wrap">
+                  {isAnalyzing ? 'Generando informe técnico...' : 'Aquí aparecerá el informe de diagnóstico una vez analices la imagen.'}
                 </div>
               )}
             </div>
@@ -409,6 +466,12 @@ export function AiPage() {
       </PageSection>
 
       <PageSection title="Historial de análisis" subtitle="Últimos resultados guardados">
+        <div className="mb-4 flex flex-wrap gap-2">
+          <button type="button" onClick={clearHistory} className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-white/20 hover:bg-white/8" disabled={!history.length}>
+            Borrar historial
+          </button>
+        </div>
+
         {history.length ? (
           <div className="space-y-3 text-sm text-slate-300">
             {history.map((item) => (
@@ -418,6 +481,11 @@ export function AiPage() {
                   <div className="text-xs text-slate-500">{formatTime(item.createdAt)}</div>
                 </div>
                 <div className="mt-2 whitespace-pre-wrap text-slate-300">{item.resultText}</div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button type="button" onClick={() => downloadDiagnosisItem(item)} className="rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-500/15">
+                    Descargar informe
+                  </button>
+                </div>
               </div>
             ))}
           </div>

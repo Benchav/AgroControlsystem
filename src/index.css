@@ -38,6 +38,30 @@
   .chat-bubble-enter {
     animation: chatBubbleEnter 180ms ease-out both;
   }
+
+  .analysis-frame--active {
+    animation: analysisFramePulse 1.6s ease-in-out infinite;
+  }
+
+  .analysis-overlay {
+    animation: analysisOverlayEnter 220ms ease-out both;
+  }
+
+  .analysis-line {
+    animation: analysisLinePulse 1.2s ease-in-out infinite;
+  }
+
+  .analysis-progress {
+    animation: analysisProgress 1.15s ease-in-out infinite;
+  }
+
+  .report-shell--visible {
+    animation: reportReveal 280ms ease-out both;
+  }
+
+  .report-placeholder {
+    animation: reportPlaceholderPulse 1.8s ease-in-out infinite;
+  }
 }
 
 @keyframes chatBubbleEnter {
@@ -49,6 +73,85 @@
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes analysisFramePulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0);
+    transform: translateY(0);
+  }
+
+  50% {
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.12), 0 0 32px rgba(16, 185, 129, 0.08);
+    transform: translateY(-1px);
+  }
+}
+
+@keyframes analysisOverlayEnter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes analysisLinePulse {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: translateX(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateX(4px);
+  }
+}
+
+@keyframes analysisProgress {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0.65;
+  }
+
+  60% {
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(260%);
+    opacity: 0.45;
+  }
+}
+
+@keyframes reportReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+    filter: blur(2px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes reportPlaceholderPulse {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+
+  50% {
+    opacity: 1;
   }
 }
 
