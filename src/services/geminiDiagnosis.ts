@@ -91,16 +91,18 @@ function fileToBase64(file: File) {
 function buildPrompt() {
   return [
     'Eres un especialista en fitopatología y diagnóstico visual de plantas.',
-    'Analiza la imagen y responde en español, con texto claro y directo.',
+    'Analiza la imagen y responde en español con formato profesional, claro y compuesto.',
     'No uses JSON, no uses markdown y no uses bloques de código.',
-    'La respuesta debe incluir en este orden:',
-    '1. Cultivo o planta probable.',
-    '2. Enfermedad o problema probable.',
-    '3. Nivel de confianza aproximado en porcentaje.',
-    '4. Un resumen breve.',
-    '5. 3 a 5 recomendaciones prácticas.',
+    'Usa exactamente estas secciones con estos títulos, una por línea:',
+    'Resultado:',
+    'Cultivo probable:',
+    'Problema probable:',
+    'Confianza:',
+    'Resumen clínico:',
+    'Recomendaciones:',
+    'Seguimiento:',
     'Si la imagen no alcanza para determinarlo, dilo explícitamente y da una guía de nueva toma.',
-    'Mantén el texto breve, útil y orientado a campo.',
+    'Mantén cada sección breve, profesional y orientada a campo.',
   ].join('\n');
 }
 

@@ -10,6 +10,17 @@ type ScanHistoryItem = {
   createdAt: number;
 };
 
+type ReportSections = {
+  resultado: string;
+  cultivo: string;
+  problema: string;
+  confianza: string;
+  resumen: string;
+  recomendaciones: string[];
+  seguimiento: string;
+  raw: string;
+};
+
 const HISTORY_STORAGE_KEY = 'agro_ai_diagnosis_history';
 
 function readHistory() {
@@ -37,6 +48,103 @@ function exportTextFile(fileName: string, content: string) {
   URL.revokeObjectURL(url);
 }
 
+function parseReportSections(text: string): ReportSections {
+  const lines = text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const sections: ReportSections = {
+    resultado: '',
+    cultivo: '',
+    problema: '',
+    confianza: '',
+    resumen: '',
+    recomendaciones: [],
+    seguimiento: '',
+    raw: text,
+  };
+
+  let current: keyof Omit<ReportSections, 'raw' | 'recomendaciones'> | 'recomendaciones' | null = null;
+
+  const assign = (line: string) => {
+    if (current === 'recomendaciones') {
+      sections.recomendaciones.push(line.replace(/^[-•*]\s*/, ''));
+      return;
+    }
+
+    if (!current) return;
+
+    const value = line.replace(/^[^:]+:\s*/, '').trim();
+
+    if (current === 'resultado') sections.resultado = value || line;
+    if (current === 'cultivo') sections.cultivo = value || line;
+    if (current === 'problema') sections.problema = value || line;
+    if (current === 'confianza') sections.confianza = value || line;
+    if (current === 'resumen') sections.resumen = value || line;
+    if (current === 'seguimiento') sections.seguimiento = value || line;
+  };
+
+  for (const line of lines) {
+    const lower = line.toLowerCase();
+
+    if (lower.startsWith('resultado:')) {
+      current = 'resultado';
+      sections.resultado = line.replace(/^resultado:\s*/i, '').trim();
+      continue;
+    }
+
+    if (lower.startsWith('cultivo probable:')) {
+      current = 'cultivo';
+      sections.cultivo = line.replace(/^cultivo probable:\s*/i, '').trim();
+      continue;
+    }
+
+    if (lower.startsWith('problema probable:')) {
+      current = 'problema';
+      sections.problema = line.replace(/^problema probable:\s*/i, '').trim();
+      continue;
+    }
+
+    if (lower.startsWith('confianza:')) {
+      current = 'confianza';
+      sections.confianza = line.replace(/^confianza:\s*/i, '').trim();
+      continue;
+    }
+
+    if (lower.startsWith('resumen clínico:')) {
+      current = 'resumen';
+      sections.resumen = line.replace(/^resumen clínico:\s*/i, '').trim();
+      continue;
+    }
+
+    if (lower.startsWith('recomendaciones:')) {
+      current = 'recomendaciones';
+      const rest = line.replace(/^recomendaciones:\s*/i, '').trim();
+      if (rest) sections.recomendaciones.push(rest);
+      continue;
+    }
+
+    if (lower.startsWith('seguimiento:')) {
+      current = 'seguimiento';
+      sections.seguimiento = line.replace(/^seguimiento:\s*/i, '').trim();
+      continue;
+    }
+
+    assign(line);
+  }
+
+  if (!sections.resultado) sections.resultado = 'Resultado no especificado';
+  if (!sections.cultivo) sections.cultivo = 'No identificado';
+  if (!sections.problema) sections.problema = 'No identificado';
+  if (!sections.confianza) sections.confianza = 'No disponible';
+  if (!sections.resumen) sections.resumen = text;
+  if (!sections.recomendaciones.length) sections.recomendaciones = ['Revisar la imagen con otra toma más cercana y mejor luz.'];
+  if (!sections.seguimiento) sections.seguimiento = 'Monitorear evolución y repetir la toma en 24-48 horas si persisten los síntomas.';
+
+  return sections;
+}
+
 export function AiPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const cameraInputRef = useRef<HTMLInputElement | null>(null);
@@ -46,6 +154,7 @@ export function AiPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [history, setHistory] = useState<ScanHistoryItem[]>(() => readHistory());
+  const report = result ? parseReportSections(result.text) : null;
 
   useEffect(() => {
     writeHistory(history);
@@ -184,10 +293,56 @@ export function AiPage() {
 
             <div className="rounded-[28px] border border-white/8 bg-[#27293d] p-5">
               <div className="text-sm font-semibold text-white">Informe Gemini</div>
-              <div className="mt-1 text-xs text-slate-400">Respuesta en texto directo</div>
-              <div className="mt-4 min-h-[320px] rounded-3xl border border-white/8 bg-black/20 p-4 text-sm leading-7 text-slate-200 whitespace-pre-wrap">
-                {result ? result.text : 'Aquí aparecerá el informe de diagnóstico una vez analices la imagen.'}
-              </div>
+              <div className="mt-1 text-xs text-slate-400">Reporte profesional estructurado</div>
+
+              {report ? (
+                <div className="mt-4 space-y-3">
+                  <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                    <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Resultado</div>
+                    <div className="mt-2 text-xl font-semibold text-white">{report.resultado}</div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Cultivo probable</div>
+                      <div className="mt-2 text-sm text-slate-200">{report.cultivo}</div>
+                    </div>
+                    <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Problema probable</div>
+                      <div className="mt-2 text-sm text-slate-200">{report.problema}</div>
+                    </div>
+                    <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Confianza</div>
+                      <div className="mt-2 text-sm text-slate-200">{report.confianza}</div>
+                    </div>
+                    <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                      <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Seguimiento</div>
+                      <div className="mt-2 text-sm text-slate-200">{report.seguimiento}</div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                    <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Resumen clínico</div>
+                    <div className="mt-2 text-sm leading-7 text-slate-200">{report.resumen}</div>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/8 bg-black/20 p-4">
+                    <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Recomendaciones</div>
+                    <ul className="mt-3 space-y-2 text-sm text-slate-200">
+                      {report.recomendaciones.map((item, index) => (
+                        <li key={`${item}-${index}`} className="flex gap-3">
+                          <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-[10px] font-semibold text-emerald-300">{index + 1}</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-4 min-h-[320px] rounded-3xl border border-white/8 bg-black/20 p-4 text-sm leading-7 text-slate-200 whitespace-pre-wrap">
+                  Aquí aparecerá el informe de diagnóstico una vez analices la imagen.
+                </div>
+              )}
             </div>
           </div>
         </div>
