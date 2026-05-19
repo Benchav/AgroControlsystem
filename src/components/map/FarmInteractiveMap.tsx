@@ -15,22 +15,9 @@ import { FeatureGroup } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import type { Parcel, ParcelStatus } from "../../entities/parcel_model";
 import { initialParcels } from "../../data/parcels";
+import { FitBounds } from "../../utils/fitBounds";
 
 const mapCenter: [number, number] = [14.0711, -87.1989];
-
-function FitBounds() {
-  const map = useMap();
-
-  useEffect(() => {
-    const bounds: LatLngBoundsExpression = initialParcels.flatMap(
-      (parcel) => parcel.bounds,
-    ) as LatLngBoundsExpression;
-
-    map.fitBounds(bounds, { padding: [24, 24] });
-  }, [map]);
-
-  return null;
-}
 
 export function FarmInteractiveMap({
   dynamicParcels,

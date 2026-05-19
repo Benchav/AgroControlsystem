@@ -1,0 +1,1 @@
+export const HISTORY_STORAGE_KEY = 'agro_ai_diagnosis_history';
