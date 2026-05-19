@@ -63,7 +63,8 @@ const chatThreads: {
 }[] = [
   {
     thread: "bot",
-    avatar: "https://cdn.prod.website-files.com/65ba9a1f0a4a7ab901ad8d3e/6696608407e73f8c26e6e422_KI%20Assistent.webp",
+    avatar:
+      "https://cdn.prod.website-files.com/65ba9a1f0a4a7ab901ad8d3e/6696608407e73f8c26e6e422_KI%20Assistent.webp",
   },
   {
     thread: "expert1",
@@ -72,11 +73,13 @@ const chatThreads: {
   },
   {
     thread: "expert2",
-    avatar: "https://media.licdn.com/dms/image/v2/D4D03AQGzNupeLUFAyw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1730153946491?e=2147483647&v=beta&t=IlTbPxy6bAEzcbG5Sz5Fi2AZEPHLeNh9o_QzsPKdP0M",
+    avatar:
+      "https://media.licdn.com/dms/image/v2/D4D03AQGzNupeLUFAyw/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1730153946491?e=2147483647&v=beta&t=IlTbPxy6bAEzcbG5Sz5Fi2AZEPHLeNh9o_QzsPKdP0M",
   },
   {
     thread: "expert3",
-    avatar: "https://upload.wikimedia.org/wikipedia/commons/2/24/HANDSHAKE_-_BRATISLAVA_INFORMAL_PARLIAMENTARY_SUMMIT_2016-10-07_%2830166706905%29_%28cropped%29.jpg",
+    avatar:
+      "https://upload.wikimedia.org/wikipedia/commons/2/24/HANDSHAKE_-_BRATISLAVA_INFORMAL_PARLIAMENTARY_SUMMIT_2016-10-07_%2830166706905%29_%28cropped%29.jpg",
   },
 ];
 
@@ -195,16 +198,14 @@ export function ChatPage() {
                 <div className="text-sm font-semibold text-white">
                   {chatLabels[thread]}
                 </div>
-                <div className="text-xs text-white/70">
-                  {chatRoles[thread]}
-                </div>
+                <div className="text-xs text-white/70">{chatRoles[thread]}</div>
               </div>
             </button>
           ))}
         </div>
       </PageSection>
 
-      <div className="space-y-4">
+      <div className="h-full min-h-0">
         <PageSection
           title={
             selectedChat === "bot"
@@ -212,31 +213,33 @@ export function ChatPage() {
               : chatLabels[selectedChat]
           }
           subtitle="Respuesta instantánea"
-          className="rounded-l-none h-full"
+          className="rounded-l-none h-full px-3"
         >
-          <div className="space-y-4">
+          <div className="flex h-full flex-col gap-4">
             {errorMessage ? (
-              <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+              <div className="rounded-[14px] border border-amber-400/20 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
                 {errorMessage}
               </div>
             ) : null}
 
-            <div className="max-h-[420px] space-y-3 overflow-y-auto rounded-2xl border border-white/8 bg-black/20 p-4 text-sm text-slate-300">
-              {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                >
+            <div className="basis-[70%] min-h-0 overflow-y-auto rounded-[14px] border border-white/8 bg-black/50 p-4 text-sm text-slate-300">
+              <div className="space-y-3">
+                {messages.map((message) => (
                   <div
-                    className={`max-w-[78%] rounded-2xl px-4 py-3 ${message.role === "user" ? "border border-emerald-400/20 bg-emerald-500/10 text-white" : "border border-white/8 bg-white/[0.03] text-slate-300"}`}
+                    key={message.id}
+                    className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                   >
-                    <div>{message.text}</div>
-                    <div className="mt-2 text-[10px] text-slate-500">
-                      {formatShortTime(message.timestamp)}
+                    <div
+                      className={`max-w-[78%] rounded-[10px] px-4 py-3 ${message.role === "user" ? "border border-emerald-400/20 bg-emerald-500/10 text-white" : "border border-white/8 bg-white/[0.03] text-slate-300"}`}
+                    >
+                      <div>{message.text}</div>
+                      <div className="mt-2 text-[10px] text-slate-500">
+                        {formatShortTime(message.timestamp)}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             <div className="flex flex-wrap gap-2">
