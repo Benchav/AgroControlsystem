@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { PageSection } from '../components/layout/PageSection';
 import { generateGroqChatReply } from '../services/groqChat';
 import type { ChatMessage, ChatThreadId } from '../types/app';
+import { formatShortTime } from '../utils/formatTime';
 
 const chatLabels: Record<ChatThreadId, string> = {
   bot: 'Asistente IA',
@@ -23,10 +24,6 @@ const quickPrompts: Record<ChatThreadId, string[]> = {
   expert2: ['¿Cómo interpreto alertas IoT?', '¿Qué umbral recomiendas?', '¿Cómo ajusto pH?', '¿Cómo priorizo acciones?'],
   expert3: ['¿Cómo detecto plagas?', 'Resume el flujo de diagnóstico', '¿Cómo uso el chat?', '¿Qué módulos ayudan al seguimiento?'],
 };
-
-function formatTime(timestamp: number) {
-  return new Date(timestamp).toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
-}
 
 const defaultProfile = {
   name: 'Juan Rodríguez',
@@ -166,7 +163,7 @@ export function ChatPage() {
                 <div key={message.id} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                   <div className={`max-w-[78%] rounded-2xl px-4 py-3 ${message.role === 'user' ? 'border border-emerald-400/20 bg-emerald-500/10 text-white' : 'border border-white/8 bg-white/[0.03] text-slate-300'}`}>
                     <div>{message.text}</div>
-                    <div className="mt-2 text-[10px] text-slate-500">{formatTime(message.timestamp)}</div>
+                    <div className="mt-2 text-[10px] text-slate-500">{formatShortTime(message.timestamp)}</div>
                   </div>
                 </div>
               ))}

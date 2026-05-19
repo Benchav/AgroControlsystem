@@ -15,22 +15,9 @@ import { FeatureGroup } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import type { Parcel, ParcelStatus } from "../../entities/parcel_model";
 import { initialParcels } from "../../data/parcels";
+import { FitBounds } from "../../utils/fitBounds";
 
 const mapCenter: [number, number] = [14.0711, -87.1989];
-
-function FitBounds() {
-  const map = useMap();
-
-  useEffect(() => {
-    const bounds: LatLngBoundsExpression = initialParcels.flatMap(
-      (parcel) => parcel.bounds,
-    ) as LatLngBoundsExpression;
-
-    map.fitBounds(bounds, { padding: [24, 24] });
-  }, [map]);
-
-  return null;
-}
 
 export function FarmInteractiveMap({
   dynamicParcels,
@@ -239,8 +226,8 @@ export function FarmInteractiveMap({
         </div>
       </div>
 
-      <div className="space-y-4 backdrop-blur">
-        <div className="rounded-[28px] border border-white/8 bg-white/[0.03] p-5">
+      <div className="space-y-4 backdrop-blur bg-emerald-500/10">
+        <div className="rounded-[14px] border border-white/8 bg-white/[0.03] p-5">
           <div className="flex flex-row items-center justify-between">
             <div className="text-sm font-semibold text-white">
               Parcela seleccionada
@@ -271,9 +258,9 @@ export function FarmInteractiveMap({
             ].map(([label, value]) => (
               <div
                 key={label as string}
-                className="rounded-[10px] border border-white/8 bg-black/20 p-4"
+                className="rounded-[10px] border border-white/8 bg-black/50 p-4"
               >
-                <div className="text-xs uppercase tracking-[0.25em] text-slate-500">
+                <div className="text-xs uppercase tracking-[0.25em] text-white/80">
                   {label as string}
                 </div>
                 <div className="mt-2 text-xl font-semibold text-white">
