@@ -5,6 +5,7 @@ import { MarketCategory } from "../entities/market_model";
 
 export function MarketPage() {
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
+  const [selectedImage, setSelectedImage] = useState("");
   const [currentBid, setCurrentBid] = useState(0);
   const [bidAmount, setBidAmount] = useState("");
   const [auctionActive, setAuctionActive] = useState(false);
@@ -62,7 +63,7 @@ export function MarketPage() {
 
   const openAuction = (item: any) => {
     setSelectedItem(item);
-
+    setSelectedImage(item.imageUrl[0]);
     setCurrentBid(item.price);
 
     setBidAmount("");
@@ -250,7 +251,7 @@ export function MarketPage() {
             <div className="flex h-36 items-center justify-center bg-black/20 text-5xl">
               {item.imageUrl ? (
                 <img
-                  src={item.imageUrl}
+                  src={item.imageUrl[0]}
                   alt={item.name}
                   className="h-full w-full object-cover"
                 />
@@ -342,12 +343,12 @@ export function MarketPage() {
             </div>
 
             {/* CONTENT */}
-            <div className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
+            <div className="mt-6 grid items-stretch gap-6 xl:grid-cols-[1.2fr_0.8fr_0.5fr]">
               {/* GALERÍA */}
-              <div className="space-y-4">
-                <div className="overflow-hidden rounded-[20px] border border-white/10">
+              <div className="flex h-full flex-col gap-4">
+                <div className="overflow-hidden rounded-[14px] border border-white/10">
                   <img
-                    src={selectedItem.imageUrl}
+                    src={selectedImage}
                     alt={selectedItem.name}
                     className="h-[340px] w-full object-cover"
                   />
@@ -355,22 +356,30 @@ export function MarketPage() {
 
                 {/* mini imágenes */}
                 <div className="grid grid-cols-3 gap-3">
-                  {[1, 2, 3].map((img) => (
-                    <div
+                  {selectedItem.imageUrl.map((img: string) => (
+                    <button
                       key={img}
-                      className="overflow-hidden rounded-xl border border-white/10"
+                      type="button"
+                      onClick={() => setSelectedImage(img)}
+                      className={`
+                        overflow-hidden
+                        rounded-xl
+                        border
+                        transition
+                        ${selectedImage === img ? "border-emerald-400" : "border-white/10"}
+                      `}
                     >
                       <img
-                        src={selectedItem.imageUrl}
+                        src={img}
                         alt=""
                         className="h-24 w-full object-cover"
                       />
-                    </div>
+                    </button>
                   ))}
                 </div>
 
                 {/* descripción */}
-                <div className="rounded-[18px] border border-white/10 bg-white/[0.03] p-5">
+                <div className="rounded-[14px] border border-white/10 bg-white/[0.03] p-5">
                   <div className="text-lg font-semibold text-white">
                     Detalles del producto
                   </div>
@@ -384,12 +393,14 @@ export function MarketPage() {
               </div>
 
               {/* SIDEBAR SUBASTA */}
-              <div className="space-y-4">
+              <div className="flex h-full flex-col gap-4">
                 {/* precio actual */}
-                <div className="rounded-[20px] border border-emerald-400/20 bg-emerald-500/10 p-6">
-                  <div className="text-sm text-emerald-200">Oferta actual</div>
+                <div className="rounded-[14px] border border-emerald-400/20 bg-emerald-500/10 p-6">
+                  <div className="text-sm font-semibold text-white">
+                    Oferta actual
+                  </div>
 
-                  <div className="mt-5 rounded-2xl border border-red-400/20 bg-red-500/10 p-4">
+                  <div className="mt-5 rounded-2xl border border-red-400/20 bg-red-500/30 p-4">
                     <div className="text-xs uppercase tracking-[0.2em] text-red-200">
                       Tiempo restante
                     </div>
@@ -399,14 +410,10 @@ export function MarketPage() {
                     </div>
 
                     {auctionEnded && (
-                      <div className="mt-2 text-sm font-semibold text-red-200">
+                      <div className="mt-2 text-sm font-semibold text-white">
                         Subasta finalizada
                       </div>
                     )}
-                  </div>
-
-                  <div className="mt-2 text-5xl font-black text-emerald-300">
-                    ${currentBid.toFixed(2)}
                   </div>
 
                   <div className="mt-3 text-xs text-emerald-100/70">
@@ -416,10 +423,14 @@ export function MarketPage() {
                   <div className="text-xs text-emerald-100/70">
                     Oferta máxima permitida: ${maxBid.toFixed(2)}
                   </div>
+
+                  <div className="mt-2 text-5xl font-black text-emerald-300">
+                    ${currentBid.toFixed(2)}
+                  </div>
                 </div>
 
                 {/* input */}
-                <div className="rounded-[20px] border border-white/10 bg-white/[0.03] p-5">
+                <div className="rounded-[14px] border border-white/10 bg-white/[0.03] p-5 h-full ">
                   <div className="text-sm font-semibold text-white">
                     Realizar oferta
                   </div>
@@ -458,23 +469,38 @@ export function MarketPage() {
                     Retirarse de la subasta
                   </button>
                 </div>
-
-                {/* actividad */}
-                <div className="rounded-[20px] border border-white/10 bg-white/[0.03] p-5">
+              </div>
+              {/* actividad */}
+              <div className="flex max-h-[calc(90vh-20px)] min-h-0 flex-col rounded-[14px] border border-white/10 bg-white/[0.03] p-3 overflow-y-auto">
+                <div className="flex flex-col items-start justify-between gap-2">
                   <div className="text-sm font-semibold text-white">
                     Actividad reciente
                   </div>
 
-                  <div className="mt-4 space-y-3">
-                    {bidHistory.map((activity, index) => (
-                      <div
-                        key={`${activity}-${index}`}
-                        className="rounded-xl border border-white/5 bg-black/20 p-3 text-sm text-slate-300"
-                      >
-                        {activity}
-                      </div>
-                    ))}
+                  <div className="rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-semibold text-emerald-300">
+                    {bidHistory.length} movimientos
                   </div>
+                </div>
+
+                {/* CONTENEDOR CON SCROLL */}
+                <div className="mt-4 flex-1 overflow-y-auto pr-1 space-y-2">
+                  {bidHistory.map((activity, index) => (
+                    <div
+                      key={`${activity}-${index}`}
+                      className="
+                      rounded-xl
+                      border
+                      border-white/5
+                      bg-black/20
+                      p-3
+                      text-sm
+                      text-slate-300
+                      animate-[fadeIn_.2s_ease]
+                    "
+                    >
+                      {activity}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>

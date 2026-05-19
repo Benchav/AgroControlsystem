@@ -5,7 +5,7 @@ export interface MarketItem {
   price: number;
   status: MarketStatus;
   category: MarketCategory;
-  imageUrl?: string;
+  imageUrl?: string[];
 }
 
 export type MarketStatus = 'disponible' | 'no disponible' | 'pendiente';

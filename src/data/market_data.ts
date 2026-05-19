@@ -8,7 +8,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 5.7,
     status: "disponible",
     category: "alimentos",
-    imageUrl: "https://chilehuerta.cl/wp-content/uploads/2017/01/tomates-organicos.jpg",
+    imageUrl: [
+      "https://chilehuerta.cl/wp-content/uploads/2017/01/tomates-organicos.jpg",
+      "https://www.imporalaska.com/uploads/products/2019/02/pic_1549256422_1549256476.jpg",
+      "https://sembralia.com/cdn/shop/articles/tomate.jpg?v=1648560931",
+    ],
   },
   {
     id: "2",
@@ -17,7 +21,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 12.5,
     status: "disponible",
     category: "alimentos",
-    imageUrl: "https://i.bolder.run/r/czoyMzA1MyxnOjEwMDB4/e0404f14/926281-papa-blanca-por-kilo.JPG",
+    imageUrl: [
+      "https://i.bolder.run/r/czoyMzA1MyxnOjEwMDB4/e0404f14/926281-papa-blanca-por-kilo.JPG",
+      "https://dietamediterranea.com/wp-content/uploads/2018/06/20180625-Papas-ali%C3%B1%C3%A1s-2000x1500.jpg",
+      "https://images.cookforyourlife.org/wp-content/uploads/2018/09/Patatas.jpg",
+    ],
   },
   {
     id: "3",
@@ -26,7 +34,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 25000,
     status: "pendiente",
     category: "parcelas",
-    imageUrl: "https://www.shutterstock.com/image-photo/aerial-drone-view-cultivated-farmland-600nw-2662620859.jpg",
+    imageUrl: [
+      "https://www.shutterstock.com/image-photo/aerial-drone-view-cultivated-farmland-600nw-2662620859.jpg",
+      "https://images.discovernica.com/propiedad/1600/13509_4.jpg",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQliTk2PoLR5JB7gKq51xTavQgdHUV27Xz_AA&s",
+    ],
   },
   {
     id: "4",
@@ -35,7 +47,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 950,
     status: "disponible",
     category: "animales",
-    imageUrl: "https://revistageneticabovina.com/wp-content/uploads/2020/07/v1.jpg",
+    imageUrl: [
+      "https://revistageneticabovina.com/wp-content/uploads/2020/07/v1.jpg",
+      "https://certifiedhumanelatino.org/wp-content/uploads/2023/06/CERTIFIED-HUMANE_Post-blog-2.png",
+      "https://a.storyblok.com/f/160385/890x605/102e20b6ba/cronica-7-razas-lecheras.jpg/m/filters:quality(70)/",
+    ],
   },
   {
     id: "5",
@@ -44,7 +60,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 18,
     status: "disponible",
     category: "alimentos",
-    imageUrl: "https://www.lajornadadeoriente.com.mx/wp-content/uploads/2025/12/MAIZ-AMARILLO.jpg",
+    imageUrl: [
+      "https://www.lajornadadeoriente.com.mx/wp-content/uploads/2025/12/MAIZ-AMARILLO.jpg",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCkQtG7YBddEoKOTKyV7mEsHReXdPIP4wH8A&s",
+      "https://www.molinosycia.com/wp-content/uploads/2024/01/foto-maiz.png",
+    ],
   },
   {
     id: "6",
@@ -53,7 +73,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 42000,
     status: "no disponible",
     category: "parcelas",
-    imageUrl: "https://quecafe.info/wp-content/uploads/2019/05/Caf%C3%A9-de-monta%C3%B1a-1.png",
+    imageUrl: [
+      "https://quecafe.info/wp-content/uploads/2019/05/Caf%C3%A9-de-monta%C3%B1a-1.png",
+      "https://www.netafimceca.com/cdn-cgi/image/format=auto,fit=crop,quality=80/contentassets/39566c7676a24b899b44524274d48b34/cafe01.jpg?v=4af996",
+      "https://mundocafeto.com/wp-content/uploads/2018/05/planta-cafe-cafeto-750x440.jpg",
+    ],
   },
   {
     id: "7",
@@ -62,7 +86,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 230,
     status: "disponible",
     category: "animales",
-    imageUrl: "https://montanaweb-bucket.s3.amazonaws.com/web/blog/265/shutterstock_1103310314b.jpg",
+    imageUrl: [
+      "https://montanaweb-bucket.s3.amazonaws.com/web/blog/265/shutterstock_1103310314b.jpg",
+      "https://avifasa.com/wp-content/uploads/2025/03/image-100.jpg",
+      "https://framerusercontent.com/images/78jjv8X052kLMLIPFt45AOBJB14.jpg?width=699&height=420",
+    ],
   },
   {
     id: "8",
@@ -71,7 +99,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 7.2,
     status: "pendiente",
     category: "alimentos",
-    imageUrl: "https://carrefourar.vtexassets.com/arquivos/ids/799900/2372243000009_02.jpg?v=639064301521200000",
+    imageUrl: [
+      "https://carrefourar.vtexassets.com/arquivos/ids/799900/2372243000009_02.jpg?v=639064301521200000",
+      "https://agrofertas.co/images/detailed/10/plantula_cebolla_blanca.jpg",
+      "https://s3.ppllstatics.com/diariovasco/www/multimedia/2024/05/08/onion-RlsgTtfuasHlKSVNGU6wzAL-1200x840@Diario%20Vasco.jpg",
+    ],
   },
   {
     id: "9",
@@ -80,7 +112,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 1800,
     status: "disponible",
     category: "animales",
-    imageUrl: "https://demascotas.info/wp-content/uploads/2019/10/horse-4136931_640.jpg",
+    imageUrl: [
+      "https://demascotas.info/wp-content/uploads/2019/10/horse-4136931_640.jpg",
+      "https://www.clarin.com/2022/07/20/PfTw4ndF4_720x0__1.jpg",
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoKTXBv746zcwbEGOQf7z0R2W1TQ1gkZlHPw&s",
+    ],
   },
   {
     id: "10",
@@ -89,7 +125,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 56000,
     status: "disponible",
     category: "parcelas",
-    imageUrl: "https://noticias.cocampo.com/wp-content/uploads/2024/04/Sistema-de-riego.webp",
+    imageUrl: [
+      "https://noticias.cocampo.com/wp-content/uploads/2024/04/Sistema-de-riego.webp",
+      "https://proain.com/cdn/shop/articles/Frecuencia_de_riego_y_tiempos_de_riego_para_los_cultivos_500x.png?v=1599167961",
+      "https://imagenagropecuaria.com/wp-content/uploads/2016/06/pivot-de-riego-por-aspersion.jpg",
+    ],
   },
   {
     id: "11",
@@ -98,7 +138,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 9.8,
     status: "disponible",
     category: "alimentos",
-    imageUrl: "https://i.blogs.es/d39e9a/sandia-mas-dulce-truco-sal/650_1200.jpeg",
+    imageUrl: [
+      "https://i.blogs.es/d39e9a/sandia-mas-dulce-truco-sal/650_1200.jpeg",
+      "https://media.diariouno.com.ar/p/c66915f285e27bfb2a4ab01b364ec42a/adjuntos/298/imagenes/009/672/0009672757/1200x0/smart/sandia-fruta1.jpg",
+      "https://img.freepik.com/fotos-premium/dulces-forma-sandia-dulces-multicolores-cerca-dulces-infantiles-causa-caries-infantil_96872-1404.jpg",
+    ],
   },
   {
     id: "12",
@@ -107,7 +151,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 430,
     status: "pendiente",
     category: "animales",
-    imageUrl: "https://cdn.bmeditores.mx/2022/06/Salud-Cerdo-Desarrollo-Engorda-a.jpg",
+    imageUrl: [
+      "https://cdn.bmeditores.mx/2022/06/Salud-Cerdo-Desarrollo-Engorda-a.jpg",
+      "https://certifiedhumanelatino.org/wp-content/uploads/2020/10/Cerdos-de-engorde-9-consejos-para-un-manejo-compasivo.png",
+      "https://a.storyblok.com/f/160385/890x605/17a825f992/engordar-cerdos-rapidamente.jpg/m/?w=256&q=100",
+    ],
   },
   {
     id: "13",
@@ -116,7 +164,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 72000,
     status: "disponible",
     category: "parcelas",
-    imageUrl: "https://a.storyblok.com/f/160385/7f96d757c8/maqueta_articulo.jpg",
+    imageUrl: [
+      "https://a.storyblok.com/f/160385/7f96d757c8/maqueta_articulo.jpg",
+      "https://s3.ppllstatics.com/elnortedecastilla/www/multimedia/2025/03/14/1493263456-kZmB-U2301139921690eCF-1200x840@El%20Norte.jpg",
+      "https://http2.mlstatic.com/D_NQ_NP_2X_717630-MLC85301875682_062025-N-ganaderas-en-venta-en-mariquina.webp",
+    ],
   },
   {
     id: "14",
@@ -125,7 +177,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 4.9,
     status: "disponible",
     category: "alimentos",
-    imageUrl: "https://m.media-amazon.com/images/I/71N+XL-b8aL._AC_UF1000,1000_QL80_.jpg",
+    imageUrl: [
+      "https://m.media-amazon.com/images/I/71N+XL-b8aL._AC_UF1000,1000_QL80_.jpg",
+      "https://m.media-amazon.com/images/I/81Kou+IFecL._AC_UF350,350_QL80_.jpg",
+      "https://img.freepik.com/fotos-premium/raiz-yuca-fresca-sobre-mesa-madera_259266-186.jpg",
+    ],
   },
   {
     id: "15",
@@ -134,7 +190,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 1200,
     status: "no disponible",
     category: "animales",
-    imageUrl: "https://cdn0.expertoanimal.com/es/posts/0/9/5/cuentan_con_reconocimiento_facial_26590_1_600.jpg",
+    imageUrl: [
+      "https://cdn0.expertoanimal.com/es/posts/0/9/5/cuentan_con_reconocimiento_facial_26590_1_600.jpg",
+      "https://cdn.shopify.com/s/files/1/0268/6861/files/sheep-4356668_960_720_grande.jpg?v=1592323019",
+      "https://comadsa.mx/wp-content/uploads/2016/04/GettyImages-629900498.jpg",
+    ],
   },
   {
     id: "16",
@@ -143,7 +203,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 15,
     status: "disponible",
     category: "alimentos",
-    imageUrl: "https://m.media-amazon.com/images/I/71FDb21i24L._AC_UF894,1000_QL80_.jpg",
+    imageUrl: [
+      "https://m.media-amazon.com/images/I/71FDb21i24L._AC_UF894,1000_QL80_.jpg",
+      "https://confidencial.digital/wp-content/uploads/2022/11/Frijoles.jpg",
+      "https://baobabmart.com/wp-content/uploads/2024/10/Long-grains-red-beans-1.jpg",
+    ],
   },
   {
     id: "17",
@@ -152,7 +216,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 39000,
     status: "pendiente",
     category: "parcelas",
-    imageUrl: "https://st2.depositphotos.com/3203643/6231/i/450/depositphotos_62313371-stock-photo-lettuce-in-plots.jpg",
+    imageUrl: [
+      "https://st2.depositphotos.com/3203643/6231/i/450/depositphotos_62313371-stock-photo-lettuce-in-plots.jpg",
+      "https://previews.123rf.com/images/siur/siur1410/siur141000089/32766274-small-plot-farming-or-agricultural-garden-with-various-species-of-vegetables.jpg",
+      "https://st3.depositphotos.com/1562606/13522/i/450/depositphotos_135225078-stock-photo-vegetable-plots-on-farm.jpg",
+    ],
   },
   {
     id: "18",
@@ -161,7 +229,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 670,
     status: "disponible",
     category: "animales",
-    imageUrl: "https://ruminants.ceva.pro/hubfs/cabras-lecheras-00.jpg",
+    imageUrl: [
+      "https://ruminants.ceva.pro/hubfs/cabras-lecheras-00.jpg",
+      "https://preview.redd.it/help-me-come-up-with-a-buckling-name-v0-rbfqadlkz0ue1.jpeg?width=640&crop=smart&auto=webp&s=c6517c4697d025a418dfa8e579f16b15cee2b3d0",
+      "https://ruminants.ceva.pro/hubfs/cabras-lecheras-00.jpg",
+    ],
   },
   {
     id: "19",
@@ -170,7 +242,11 @@ export const mockMarketItems: MarketItem[] = [
     price: 8.4,
     status: "disponible",
     category: "alimentos",
-    imageUrl: "https://www.editorialderiego.com/wp-content/uploads/2023/02/Pina_0122feb-scaled.jpg",
+    imageUrl: [
+      "https://www.editorialderiego.com/wp-content/uploads/2023/02/Pina_0122feb-scaled.jpg",
+      "https://www.aboutespanol.com/thmb/sKow2jLZVfy-g0VYwMdjVD3JGww=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Piasencaja-5b368acfc9e77c001a59d5ea.jpg",
+      "https://img.waimaoniu.net/2423/2423-202504181801337590.jpg"
+    ],
   },
   {
     id: "20",
@@ -179,6 +255,10 @@ export const mockMarketItems: MarketItem[] = [
     price: 31000,
     status: "disponible",
     category: "parcelas",
-    imageUrl: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgCLwKYOM26sUWBIwzAlPWGGE10g2yr8AXWg&s",
+    imageUrl: [
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgCLwKYOM26sUWBIwzAlPWGGE10g2yr8AXWg&s",
+      "https://img4.idealista.com/blur/480_360_mq/0/id.pro.es.image.master/bd/9e/06/1274184170.jpg",
+      "https://cdn.thinkwebcontent.com/property/33660/9312897/20260310082236/w1600h900/s640x480/x-275104655.jpg"
+    ],
   },
 ];
