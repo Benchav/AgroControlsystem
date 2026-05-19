@@ -223,23 +223,38 @@ export function ChatPage() {
             ) : null}
 
             <div className="basis-[70%] min-h-0 overflow-y-auto rounded-[14px] border border-white/8 bg-black/50 p-4 text-sm text-slate-300">
-              <div className="space-y-3">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-                  >
+              {messages.length ? (
+                <div className="space-y-3">
+                  {messages.map((message) => (
                     <div
-                      className={`max-w-[78%] rounded-[10px] px-4 py-3 ${message.role === "user" ? "border border-emerald-400/20 bg-emerald-500/10 text-white" : "border border-white/8 bg-white/[0.03] text-slate-300"}`}
+                      key={message.id}
+                      className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                     >
-                      <div>{message.text}</div>
-                      <div className="mt-2 text-[10px] text-slate-500">
-                        {formatShortTime(message.timestamp)}
+                      <div
+                        className={`max-w-[78%] rounded-[10px] px-4 py-3 ${message.role === "user" ? "border border-emerald-400/40 bg-emerald-500/20 text-white" : "border border-white/8 bg-gray-500/20 text-slate-300"}`}
+                      >
+                        <div>{message.text}</div>
+                        <div className="mt-2 text-[10px] text-white/80 w-full text-right">
+                          {formatShortTime(message.timestamp)}
+                        </div>
                       </div>
                     </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex h-full items-center justify-center text-center">
+                  <div>
+                    <div className="text-lg font-semibold text-white">
+                      Aún no hay mensajes
+                    </div>
+
+                    <div className="mt-2 text-sm text-slate-400">
+                      Inicia una conversación escribiendo un mensaje o usando
+                      una sugerencia rápida.
+                    </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-wrap gap-2">
