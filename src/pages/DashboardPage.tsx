@@ -10,9 +10,30 @@ const metrics: DashboardMetric[] = [
     label: "Humedad Promedio",
     description: "Humedad del aire",
     value: "68%",
+    percentage: 68,
     icon: "/gota.png",
     color: "#00ffcc",
     chartData: [
+      { value: 42 },
+      { value: 58 },
+      { value: 51 },
+      { value: 67 },
+      { value: 49 },
+      { value: 73 },
+      { value: 61 },
+      { value: 80 },
+      { value: 55 },
+      { value: 69 },
+      { value: 47 },
+      { value: 76 },
+      { value: 63 },
+      { value: 84 },
+      { value: 59 },
+      { value: 71 },
+      { value: 53 },
+      { value: 88 },
+      { value: 66 },
+      { value: 74 },
       { value: 42 },
       { value: 58 },
       { value: 51 },
@@ -40,6 +61,7 @@ const metrics: DashboardMetric[] = [
     label: "Temp. del Suelo",
     description: "Temperatura promedio",
     value: "24°C",
+    percentage: 24,
     icon: "/sol.png",
     color: "#ffd93d",
     chartData: [
@@ -70,6 +92,7 @@ const metrics: DashboardMetric[] = [
     label: "Parcelas Activas",
     description: "Monitoreo en curso",
     value: "12 H",
+    percentage: 50,
     icon: "/tractor.png",
     color: "#00ff88",
     chartData: [
@@ -100,9 +123,30 @@ const metrics: DashboardMetric[] = [
     label: "Alertas Activas",
     description: "Críticas del sistema",
     value: "3",
+    percentage: 25,
     icon: "/campana.png",
     color: "#ff3b3b",
     chartData: [
+      { value: 96 },
+      { value: 58 },
+      { value: 89 },
+      { value: 34 },
+      { value: 77 },
+      { value: 92 },
+      { value: 41 },
+      { value: 68 },
+      { value: 23 },
+      { value: 85 },
+      { value: 37 },
+      { value: 74 },
+      { value: 18 },
+      { value: 63 },
+      { value: 49 },
+      { value: 95 },
+      { value: 27 },
+      { value: 57 },
+      { value: 11 },
+      { value: 72 },
       { value: 96 },
       { value: 58 },
       { value: 89 },
@@ -142,7 +186,7 @@ export function DashboardPage() {
       <div className="grid gap-4 xl:grid-cols-2">
         <DashboardAlerts />
 
-        <DashboardSensors />
+        <DashboardSensors  metrics={metrics}/>
       </div>
 
       <DashboardInsights onNavigate={(page) => navigate(`/app/${page}`)} />

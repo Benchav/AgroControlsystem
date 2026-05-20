@@ -27,7 +27,7 @@ export function DashboardMetricsGrid({ metrics }: DashboardMetricsGridProps) {
             </div>
           </div>
           <div className="flex flex-row items-center justify-between">
-            <div className="text-xs text-slate-400">{metric.description}</div>
+            <div className="text-xs text-slate-400 min-w-[150px]">{metric.description}</div>
             <MiniSensorChart data={metric.chartData} color={metric.color} />
           </div>
         </div>

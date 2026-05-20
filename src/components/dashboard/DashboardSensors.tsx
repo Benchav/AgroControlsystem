@@ -1,26 +1,36 @@
-import { PageSection } from '../layout/PageSection';
+import { DashboardMetricsGridProps } from "../../entities/dashboard_metric";
+import { GaugeSensorChart } from "../../utils/gauge_sensor_chart";
+import { MiniSensorChart } from "../../utils/wave_recharts";
+import { PageSection } from "../layout/PageSection";
 
-export function DashboardSensors() {
+export function DashboardSensors({ metrics }: DashboardMetricsGridProps) {
   return (
     <PageSection title="Estado sensores" subtitle="En línea">
       <div className="space-y-4">
-        {[
-          ['Humedad S1', 68, 'emerald'],
-          ['pH Suelo S2', 72, 'cyan'],
-          ['Temperatura S3', 48, 'amber'],
-          ['Humedad S4', 34, 'red'],
-        ].map(([label, value, tone]) => (
-          <div key={label as string}>
-            <div className="mb-2 flex items-center justify-between text-[12.5px]">
-              <span className="font-medium text-white">{label as string}</span>
-              <span className={`font-mono font-bold ${tone === 'red' ? 'text-red-300' : tone === 'amber' ? 'text-amber-300' : tone === 'cyan' ? 'text-cyan-300' : 'text-emerald-300'}`}>
-                {value as number}%
+        {metrics.map((item) => (
+          <div key={item.label} className="flex flex-col">
+            <div className="flex flex-row items-center justify-between">
+              <span className="font-medium text-white">{item.label}</span>
+              <span
+                className={`font-mono font-bold ${item.color === "red" ? "text-red-300" : item.color === "amber" ? "text-amber-300" : item.color === "cyan" ? "text-cyan-300" : "text-emerald-300"}`}
+              >
+                {item.percentage ? `${item.percentage}%` : item.value}
               </span>
+            </div>
+            <div className="mb-2 flex items-center justify-between text-[12.5px] gap-4">
+              <GaugeSensorChart
+                percentage={item.percentage ?? 0}
+                color={item.color}
+              />
+              <MiniSensorChart data={item.chartData} color={item.color} />
             </div>
             <div className="h-[3px] rounded-[2px] bg-white/5">
               <div
-                className={`h-[3px] rounded-[2px] ${tone === 'red' ? 'bg-red-400' : tone === 'amber' ? 'bg-amber-400' : tone === 'cyan' ? 'bg-cyan-400' : 'bg-emerald-400'}`}
-                style={{ width: `${value}%` }}
+                className={`h-[3px] rounded-[2px] `}
+                style={{
+                  width: `${item.percentage ?? 0}%`,
+                  backgroundColor: item.color,
+                }}
               />
             </div>
           </div>

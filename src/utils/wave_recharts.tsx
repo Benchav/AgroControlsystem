@@ -9,7 +9,7 @@ export const MiniSensorChart = ({
   data,
   color,
 }: MiniSensorChartProps) => (
-  <div style={{ width: "120px", height: "40px" }}>
+  <div style={{ width: "100%", height: "40px" }}>
     <ResponsiveContainer width="100%" height="100%">
       <LineChart data={data}>
         <YAxis hide domain={["dataMin - 10", "dataMax + 10"]} />
