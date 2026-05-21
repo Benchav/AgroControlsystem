@@ -16,24 +16,25 @@ import { EditControl } from "react-leaflet-draw";
 import type { Parcel, ParcelStatus } from "../../entities/parcel_model";
 import { initialParcels } from "../../data/parcels";
 import { FitBounds } from "../../utils/fitBounds";
+import { SoilMetricsPanel } from "../../utils/soil_metrics_panel";
 
 const mapCenter: [number, number] = [14.0711, -87.1989];
 
 export function FarmInteractiveMap({
   dynamicParcels,
   setDynamicParcels,
+  selectedParcelId,
+  setSelectedParcelId,
 }: {
   dynamicParcels: Parcel[];
   setDynamicParcels: React.Dispatch<React.SetStateAction<Parcel[]>>;
+  selectedParcelId: string;
+  setSelectedParcelId: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   const [editingParcel, setEditingParcel] = useState<Parcel | null>(
     initialParcels[0],
-  );
-
-  const [selectedParcelId, setSelectedParcelId] = useState(
-    initialParcels[0].id,
   );
 
   const selectedParcel = useMemo(
@@ -46,10 +47,44 @@ export function FarmInteractiveMap({
   const updateParcel = (field: keyof Parcel, value: string) => {
     if (!editingParcel) return;
 
-    const updatedParcel = {
+    let updatedParcel: Parcel = {
       ...editingParcel,
       [field]: value,
     };
+
+    // si cambia humedad -> actualizar último registro del soilHistory
+    if (field === "humidity") {
+      const humidityValue = Number(value.replace("%", ""));
+
+      updatedParcel = {
+        ...updatedParcel,
+        soilHistory: (updatedParcel.soilHistory || []).map((item, index, array) =>
+          index === array.length - 1
+            ? {
+                ...item,
+                humidity: humidityValue,
+              }
+            : item,
+        ),
+      };
+    }
+
+    // si cambia fertilidad -> actualizar último registro también
+    if (field === "fertility") {
+      const fertilityValue = Number(value.replace("%", ""));
+
+      updatedParcel = {
+        ...updatedParcel,
+        soilHistory: (updatedParcel.soilHistory || []).map((item, index, array) =>
+          index === array.length - 1
+            ? {
+                ...item,
+                fertility: fertilityValue,
+              }
+            : item,
+        ),
+      };
+    }
 
     setEditingParcel(updatedParcel);
 
@@ -205,6 +240,7 @@ export function FarmInteractiveMap({
                       temperature: "--",
                       bounds: latlngs,
                       center: latlngs[0],
+                      soilHistory: [{ time: "0", humidity: 0, fertility: 0 }],
                     };
 
                     setDynamicParcels((prev) => [...prev, newParcel]);
@@ -232,15 +268,6 @@ export function FarmInteractiveMap({
             <div className="text-sm font-semibold text-white">
               Parcela seleccionada
             </div>
-            <button
-              onClick={() => {
-                setEditingParcel(selectedParcel);
-                setIsEditorOpen(true);
-              }}
-              className="rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-400"
-            >
-              Editar
-            </button>
           </div>
           <div className="mt-3 text-2xl font-black tracking-tight text-emerald-300">
             {selectedParcel.name}
@@ -269,22 +296,18 @@ export function FarmInteractiveMap({
               </div>
             ))}
           </div>
+          <button
+            onClick={() => {
+              setEditingParcel(selectedParcel);
+              setIsEditorOpen(true);
+            }}
+            className="rounded-xl bg-emerald-500/60 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 mt-4 w-full h-[2.5rem]"
+          >
+            Editar
+          </button>
         </div>
 
-        <div className="rounded-[14px] border border-white/8 bg-white/[0.03] p-5">
-          <div className="text-sm font-semibold text-white">Leyenda</div>
-          <div className="mt-4 space-y-3 text-sm text-slate-300">
-            <div className="flex items-center gap-3">
-              <span className="h-3 w-3 rounded-full bg-emerald-400" /> Óptimo
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="h-3 w-3 rounded-full bg-amber-400" /> Atención
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="h-3 w-3 rounded-full bg-red-400" /> Crítico
-            </div>
-          </div>
-        </div>
+        <SoilMetricsPanel selectedParcel={selectedParcel} />
       </div>
       {isEditorOpen && editingParcel && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -344,7 +367,8 @@ export function FarmInteractiveMap({
                 <label>Humedad:</label>
                 <div className="relative">
                   <input
-                    type="number" inputMode="decimal"
+                    type="number"
+                    inputMode="decimal"
                     className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white appearance-none
                     [&::-webkit-outer-spin-button]:appearance-none
                     [&::-webkit-inner-spin-button]:appearance-none
@@ -364,7 +388,8 @@ export function FarmInteractiveMap({
                 <label>Fertilidad:</label>
                 <div className="relative">
                   <input
-                    type="number" inputMode="decimal"
+                    type="number"
+                    inputMode="decimal"
                     className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white appearance-none
                     [&::-webkit-outer-spin-button]:appearance-none
                     [&::-webkit-inner-spin-button]:appearance-none
@@ -384,7 +409,8 @@ export function FarmInteractiveMap({
                 <label>Temperatura:</label>
                 <div className="relative">
                   <input
-                    type="number" inputMode="decimal"
+                    type="number"
+                    inputMode="decimal"
                     className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white appearance-none
                     [&::-webkit-outer-spin-button]:appearance-none
                     [&::-webkit-inner-spin-button]:appearance-none
