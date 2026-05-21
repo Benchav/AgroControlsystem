@@ -7,9 +7,14 @@ type Props = {
 };
 
 export function ParcelStatusTabs({ parcels }: Props) {
-  const [activeTab, setActiveTab] = useState<ParcelStatus>("optimo");
+  const [activeTab, setActiveTab] = useState<ParcelStatus | "todas">("todas");
 
   const tabs = [
+    {
+      key: "todas" as const,
+      label: "Todas",
+      color: "bg-cyan-500/50 text-cyan-300 border-cyan-400/20",
+    },
     {
       key: "optimo" as ParcelStatus,
       label: "Óptimo",
@@ -28,6 +33,10 @@ export function ParcelStatusTabs({ parcels }: Props) {
   ];
 
   const filteredParcels = useMemo(() => {
+    if (activeTab === "todas") {
+      return parcels;
+    }
+
     return parcels.filter((parcel) => parcel.statusTone === activeTab);
   }, [parcels, activeTab]);
 
@@ -58,7 +67,7 @@ export function ParcelStatusTabs({ parcels }: Props) {
       </div>
 
       {/* Parcel cards */}
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {filteredParcels.map((parcel) => {
           const toneStyles =
             parcel.statusTone === "critico"

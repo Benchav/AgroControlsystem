@@ -10,13 +10,21 @@ export const initialParcels: Parcel[] = [
     humidity: "68%",
     fertility: "94%",
     temperature: "22°C",
-     bounds: [
+    bounds: [
       [11.8478, -86.1992],
       [11.8485, -86.1974],
       [11.8471, -86.1968],
       [11.8465, -86.1986],
     ],
-    center: [11.8475, -86.1980],
+    center: [11.8475, -86.198],
+    soilHistory: [
+      { time: "0", humidity: 40, fertility: 30 },
+      { time: "10", humidity: 55, fertility: 45 },
+      { time: "24", humidity: 50, fertility: 40 },
+      { time: "30", humidity: 70, fertility: 65 },
+      { time: "40", humidity: 65, fertility: 58 },
+      { time: "50", humidity: 68, fertility: 94 },
+    ],
   },
   {
     id: "sur",
@@ -28,12 +36,20 @@ export const initialParcels: Parcel[] = [
     fertility: "87%",
     temperature: "21°C",
     bounds: [
-      [11.8462, -86.1990],
+      [11.8462, -86.199],
       [11.8469, -86.1973],
       [11.8455, -86.1967],
       [11.8449, -86.1983],
     ],
     center: [11.8459, -86.1981],
+    soilHistory: [
+      { time: "0", humidity: 45, fertility: 50 },
+      { time: "10", humidity: 60, fertility: 55 },
+      { time: "24", humidity: 58, fertility: 60 },
+      { time: "30", humidity: 75, fertility: 80 },
+      { time: "40", humidity: 69, fertility: 82 },
+      { time: "50", humidity: 71, fertility: 87 },
+    ],
   },
   {
     id: "sector-2a",
@@ -51,6 +67,14 @@ export const initialParcels: Parcel[] = [
       [11.8472, -86.1962],
     ],
     center: [11.8482, -86.1958],
+    soilHistory: [
+      { time: "0", humidity: 70, fertility: 85 },
+      { time: "10", humidity: 68, fertility: 80 },
+      { time: "24", humidity: 65, fertility: 78 },
+      { time: "30", humidity: 60, fertility: 75 },
+      { time: "40", humidity: 63, fertility: 77 },
+      { time: "50", humidity: 62, fertility: 76 },
+    ],
   },
   {
     id: "zona-critica",
@@ -61,13 +85,21 @@ export const initialParcels: Parcel[] = [
     humidity: "34%",
     fertility: "71%",
     temperature: "31°C",
-     bounds: [
+    bounds: [
       [11.8447, -86.2001],
       [11.8453, -86.1986],
-      [11.8440, -86.1980],
+      [11.844, -86.198],
       [11.8434, -86.1995],
     ],
-    center: [11.8444, -86.1990],
+    center: [11.8444, -86.199],
+    soilHistory: [
+      { time: "0", humidity: 55, fertility: 80 },
+      { time: "10", humidity: 48, fertility: 78 },
+      { time: "24", humidity: 40, fertility: 75 },
+      { time: "30", humidity: 30, fertility: 70 },
+      { time: "40", humidity: 35, fertility: 72 },
+      { time: "50", humidity: 34, fertility: 71 },
+    ],
   },
   {
     id: "sector-3b",
@@ -79,11 +111,19 @@ export const initialParcels: Parcel[] = [
     fertility: "79%",
     temperature: "25°C",
     bounds: [
-      [11.8450, -86.1968],
+      [11.845, -86.1968],
       [11.8457, -86.1951],
       [11.8443, -86.1944],
-      [11.8437, -86.1960],
+      [11.8437, -86.196],
     ],
     center: [11.8447, -86.1956],
+    soilHistory: [
+      { time: "0", humidity: 50, fertility: 70 },
+      { time: "10", humidity: 58, fertility: 72 },
+      { time: "24", humidity: 60, fertility: 75 },
+      { time: "30", humidity: 64, fertility: 78 },
+      { time: "40", humidity: 66, fertility: 80 },
+      { time: "50", humidity: 65, fertility: 79 },
+    ],
   },
 ];
