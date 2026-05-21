@@ -12,14 +12,14 @@ export function DashboardInsights({ onNavigate }: DashboardInsightsProps) {
           <img
             src="/icons/openai.svg"
             alt="IA Icon"
-            className="inline-block h-4 w-4 mr-2 "
+            className="inline-block h-6 w-6 mr-2 "
           />
           Diagnóstico IA
         </div>
         <p className="mt-2 text-[11.5px] text-white">
           3 plantas analizadas hoy. 1 requiere atención.
         </p>
-        <div className="mt-4 rounded-[8px] border border-red-400/15 bg-red-500/[0.07] p-3 text-[12px] text-white">
+        <div className="mt-4 rounded-[8px] border border-red-400/40 bg-red-500/25 p-3 text-[12px] text-white">
           <i className="fa-solid fa-plant-wilt" />{" "}
           <strong className="text-white">Tomate Var. Cherry</strong> — Mildiu
           polvoroso (87% confianza)
@@ -27,7 +27,7 @@ export function DashboardInsights({ onNavigate }: DashboardInsightsProps) {
         <button
           type="button"
           onClick={() => onNavigate("ai")}
-          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/8 hover:text-white"
+          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500/50 hover:text-white"
         >
           <i className="fas fa-camera" /> Analizar planta
         </button>
@@ -52,7 +52,7 @@ export function DashboardInsights({ onNavigate }: DashboardInsightsProps) {
         <button
           type="button"
           onClick={() => onNavigate("chat")}
-          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/8 hover:text-white"
+          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-500/50 hover:text-white"
         >
           <i className="fas fa-comment-dots" /> Abrir chat
         </button>
@@ -87,7 +87,7 @@ export function DashboardInsights({ onNavigate }: DashboardInsightsProps) {
         <button
           type="button"
           onClick={() => onNavigate("market")}
-          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-white/8 hover:text-white"
+          className="mt-4 inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-300 transition hover:bg-emerald-500/50 hover:text-white"
         >
           <i className="fas fa-store" /> Ver subastas
         </button>

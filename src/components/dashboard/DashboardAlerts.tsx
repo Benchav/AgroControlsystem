@@ -11,7 +11,7 @@ export function DashboardAlerts() {
         ].map(([title, desc, tone]) => (
           <div
             key={title}
-            className={`flex items-start gap-3 rounded-[10px] border p-4 ${tone === 'red' ? 'border-red-400/14 bg-red-500/[0.05]' : tone === 'amber' ? 'border-amber-400/14 bg-amber-500/[0.05]' : 'border-sky-400/14 bg-sky-500/[0.05]'}`}
+            className={`flex items-start gap-3 rounded-[10px] border p-4 ${tone === 'red' ? 'border-red-400/40 bg-red-500/25' : tone === 'amber' ? 'border-amber-400/40 bg-amber-500/25' : 'border-sky-400/40 bg-sky-500/25'}`}
           >
             <span className={`mt-1 text-[15px] ${tone === 'red' ? 'text-red-400' : tone === 'amber' ? 'text-amber-400' : 'text-sky-400'}`}>
               {tone === 'red' ? '🔴' : tone === 'amber' ? '🟡' : '🔵'}
