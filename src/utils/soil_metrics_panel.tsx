@@ -60,7 +60,7 @@ export function SoilMetricsPanel({ selectedParcel }: SoilMetricsPanelProps) {
       {/* Grid de Dos Columnas para distribuir equitativamente el espacio vacío */}
       <div className="flex flex-col gap-4">
         {/* GRÁFICO 1: Semicírculo de Fertilidad */}
-        <div className="flex flex-col items-center justify-center h-[170px] relative bg-black/20 rounded-xl border border-white/5 p-2">
+        <div className="flex flex-col items-center justify-center h-[170px] relative bg-black/50 rounded-xl border border-white/5 p-2">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
               <Pie
@@ -131,14 +131,14 @@ export function SoilMetricsPanel({ selectedParcel }: SoilMetricsPanelProps) {
             <span className="text-2xl font-black text-white font-mono tracking-tight block leading-none">
               {selectedParcel.fertility}
             </span>
-            <p className="text-[10px] uppercase tracking-widest text-white/40 font-medium mt-1">
+            <p className="text-[10px] uppercase tracking-widest text-white/80 font-medium mt-1">
               Tasa de Fertilidad
             </p>
           </div>
         </div>
 
         {/* GRÁFICO 2: Línea de Tendencia Temporal (Humedad/Fertilidad) */}
-        <div className="h-[170px] bg-black/20 rounded-xl border border-white/5 p-3 pr-5">
+        <div className="h-[170px] bg-black/50 rounded-xl border border-white/5 p-3 pr-5">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart
               data={chartData}

@@ -3,7 +3,7 @@ import { Parcel } from "../entities/parcel_model";
 export const initialParcels: Parcel[] = [
   {
     id: "norte",
-    name: "Parcela Norte",
+    name: "Cafetal Don Roberto",
     area: "4.2 ha",
     status: "Óptimo",
     statusTone: "optimo",
@@ -28,7 +28,7 @@ export const initialParcels: Parcel[] = [
   },
   {
     id: "sur",
-    name: "Parcela Sur",
+    name: "Matadero La Esperanza",
     area: "2.8 ha",
     status: "Óptimo",
     statusTone: "optimo",
@@ -53,7 +53,7 @@ export const initialParcels: Parcel[] = [
   },
   {
     id: "sector-2a",
-    name: "Sector 2A",
+    name: "Galeras Don Jose",
     area: "3.1 ha",
     status: "Atención",
     statusTone: "atencion",
@@ -78,7 +78,7 @@ export const initialParcels: Parcel[] = [
   },
   {
     id: "zona-critica",
-    name: "Zona Crítica",
+    name: "Criadero El Progreso",
     area: "1.6 ha",
     status: "Crítico",
     statusTone: "critico",
@@ -103,7 +103,7 @@ export const initialParcels: Parcel[] = [
   },
   {
     id: "sector-3b",
-    name: "Sector 3B",
+    name: "Campos El Mirador",
     area: "3.1 ha",
     status: "Atención",
     statusTone: "atencion",

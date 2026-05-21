@@ -79,7 +79,7 @@ export function ParcelStatusTabs({ parcels }: Props) {
           return (
             <div
               key={parcel.id}
-              className="rounded-[14px] border border-white/8 bg-black/50 p-5 backdrop-blur"
+              className= {`rounded-[14px] border ${toneStyles} p-5 backdrop-blur`}
             >
               <div className="flex items-start justify-between">
                 <div>
