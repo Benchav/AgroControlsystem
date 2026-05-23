@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { PageSection } from "../components/layout/PageSection";
 import { generateGroqChatReply } from "../services/groqChat";
-import type { ChatMessage, ChatThreadId } from "../types/app";
+import type { ChatMessage, ChatThreadId, UserProfile, SystemSettings } from "../types/app";
 import { formatShortTime } from "../utils/formatTime";
 
 const chatLabels: Record<ChatThreadId, string> = {
@@ -88,6 +88,27 @@ export function ChatPage() {
   const [draft, setDraft] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Cargar perfil real desde localStorage para pasar contextualizado a Groq
+  const [profile] = useState<UserProfile>(() => {
+    try {
+      const saved = localStorage.getItem("ac_profile");
+      return saved ? JSON.parse(saved) : defaultProfile;
+    } catch {
+      return defaultProfile;
+    }
+  });
+
+  // Cargar ajustes reales desde localStorage
+  const [settings] = useState<SystemSettings>(() => {
+    try {
+      const saved = localStorage.getItem("ac_settings");
+      return saved ? JSON.parse(saved) : defaultSettings;
+    } catch {
+      return defaultSettings;
+    }
+  });
+
   const [messagesByThread, setMessagesByThread] = useState<
     Record<ChatThreadId, ChatMessage[]>
   >({
@@ -132,8 +153,8 @@ export function ChatPage() {
     void generateGroqChatReply({
       thread,
       messages: threadMessages,
-      profile: defaultProfile,
-      settings: defaultSettings,
+      profile: profile,
+      settings: settings,
     })
       .then((replyText) => {
         const botMessage: ChatMessage = {

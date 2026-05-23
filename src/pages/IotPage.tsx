@@ -229,6 +229,15 @@ export function IotPage() {
       let updatedAvgHumidity = 0;
       let humidityCount = 0;
 
+      // Cargar umbrales dinámicamente desde localStorage para evitar closures de estado stale
+      let activeSettings = { humidityThreshold: 40, temperatureThreshold: 30, phThreshold: 6.0 };
+      try {
+        const saved = localStorage.getItem('ac_settings');
+        if (saved) activeSettings = JSON.parse(saved);
+      } catch (e) {
+        // Fallback silencioso en caso de error
+      }
+
       setSensors((prevSensors) => {
         const nextSensors = prevSensors.map((sensor) => {
           // Solo actualizamos sensores asociados a Arduinos activos
@@ -267,15 +276,15 @@ export function IotPage() {
           // Formatear valor visual
           let formattedVal = `${newValue.toFixed(sensor.type === 'pH' ? 1 : 0)}${sensor.unit}`;
 
-          // Calcular tono y estado según rangos realistas
+          // Calcular tono y estado según rangos dinámicos configurados
           let status: 'OK' | 'Atención' | 'Crítico' = 'OK';
           let tone: 'emerald' | 'amber' | 'red' | 'cyan' = 'emerald';
 
           if (sensor.type === 'Humedad') {
-            if (newValue < 40) {
+            if (newValue < activeSettings.humidityThreshold) {
               status = 'Crítico';
               tone = 'red';
-            } else if (newValue < 60) {
+            } else if (newValue < activeSettings.humidityThreshold + 15) {
               status = 'Atención';
               tone = 'amber';
             } else {
@@ -283,10 +292,10 @@ export function IotPage() {
               tone = 'emerald';
             }
           } else if (sensor.type === 'Temperatura') {
-            if (newValue > 32) {
+            if (newValue > activeSettings.temperatureThreshold) {
               status = 'Crítico';
               tone = 'red';
-            } else if (newValue > 27) {
+            } else if (newValue > activeSettings.temperatureThreshold - 4) {
               status = 'Atención';
               tone = 'amber';
             } else {
@@ -295,8 +304,12 @@ export function IotPage() {
             }
           } else if (sensor.type === 'pH') {
             tone = 'cyan';
-            if (newValue < 6.0 || newValue > 8.0) {
+            if (newValue < activeSettings.phThreshold) {
+              status = 'Crítico';
+              tone = 'red';
+            } else if (newValue < activeSettings.phThreshold + 1.0) {
               status = 'Atención';
+              tone = 'amber';
             } else {
               status = 'OK';
             }
