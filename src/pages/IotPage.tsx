@@ -395,9 +395,39 @@ export function IotPage() {
 
   // Alternar estado de un Arduino (Activo/Inactivo)
   const toggleArduinoStatus = (id: string) => {
-    setArduinos((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: a.status === 'active' ? 'inactive' : 'active' } : a))
-    );
+    setArduinos((prev) => {
+      const nextArds = prev.map((a) => (a.id === id ? { ...a, status: a.status === 'active' ? 'inactive' : 'active' } : a));
+      const targetArd = nextArds.find((a) => a.id === id);
+      
+      // Actualizar sensores asociados de inmediato
+      setSensors((prevSensors) =>
+        prevSensors.map((sensor) => {
+          if (sensor.arduinoId === id) {
+            if (targetArd?.status === 'inactive') {
+              return {
+                ...sensor,
+                value: '---',
+                status: 'Crítico' as const,
+                tone: 'red' as const,
+              };
+            } else {
+              // Restaurar un valor por defecto realista
+              const baseVal = sensor.type === 'Humedad' ? 68 : sensor.type === 'Temperatura' ? 28 : sensor.type === 'pH' ? 7.2 : sensor.type === 'Nutrientes' ? 185 : 820;
+              const formattedVal = `${baseVal.toFixed(sensor.type === 'pH' ? 1 : 0)}${sensor.unit}`;
+              return {
+                ...sensor,
+                numericValue: baseVal,
+                value: formattedVal,
+                status: 'OK' as const,
+                tone: sensor.type === 'pH' ? ('cyan' as const) : sensor.type === 'Humedad' ? ('emerald' as const) : ('amber' as const),
+              };
+            }
+          }
+          return sensor;
+        })
+      );
+      return nextArds;
+    });
   };
 
   // Eliminar placa Arduino
@@ -862,7 +892,7 @@ export function IotPage() {
                 <div className="aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black">
                   <iframe
                     className="w-full h-full"
-                    src="https://www.youtube.com/embed/4iUKqnasR6s?autoplay=1&mute=1&loop=1&playlist=4iUKqnasR6s"
+                    src="https://www.youtube.com/embed/4iUKqnasR6s?autoplay=1&mute=1&loop=1&playlist=4iUKqnasR6s&controls=0&showinfo=0&modestbranding=1&iv_load_policy=3&rel=0"
                     title="Configuración de Sensor de Humedad con Arduino"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
