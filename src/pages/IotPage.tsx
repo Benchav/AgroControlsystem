@@ -316,7 +316,7 @@ export function IotPage() {
           const finalAvg = Math.round(updatedAvgHumidity / humidityCount);
           const t = new Date();
           const timeStr = `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}:${t.getSeconds().toString().padStart(2, '0')}`;
-          
+
           setHumidityHistory((prevHistory) => {
             const nextHistory = [...prevHistory, { time: timeStr, value: finalAvg }];
             if (nextHistory.length > 10) {
@@ -454,15 +454,14 @@ export function IotPage() {
           <p className="text-sm text-slate-400">Panel Administrativo de Control y Telemetría Industrial</p>
           <h1 className="mt-1 text-2xl font-black tracking-tight text-white">Consola Central IoT</h1>
         </div>
-        
+
         {/* Toggle de Simulación en tiempo real */}
         <button
           onClick={() => setIsSimulating(!isSimulating)}
-          className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold border transition-all duration-200 hover:scale-105 active:scale-95 ${
-            isSimulating
+          className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold border transition-all duration-200 hover:scale-105 active:scale-95 ${isSimulating
               ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300'
               : 'border-white/10 bg-white/5 text-slate-400'
-          }`}
+            }`}
         >
           <span className={`relative flex h-2.5 w-2.5`}>
             {isSimulating && (
@@ -522,31 +521,28 @@ export function IotPage() {
       <div className="flex border-b border-white/10 text-sm">
         <button
           onClick={() => setActiveTab('monitor')}
-          className={`px-4 py-2 font-semibold transition-all border-b-2 ${
-            activeTab === 'monitor'
+          className={`px-4 py-2 font-semibold transition-all border-b-2 ${activeTab === 'monitor'
               ? 'border-emerald-500 text-white'
               : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
+            }`}
         >
           📊 Monitoreo en Vivo
         </button>
         <button
           onClick={() => setActiveTab('arduino')}
-          className={`px-4 py-2 font-semibold transition-all border-b-2 ${
-            activeTab === 'arduino'
+          className={`px-4 py-2 font-semibold transition-all border-b-2 ${activeTab === 'arduino'
               ? 'border-emerald-500 text-white'
               : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
+            }`}
         >
           🔌 Administración Arduino
         </button>
         <button
           onClick={() => setActiveTab('tutorials')}
-          className={`px-4 py-2 font-semibold transition-all border-b-2 ${
-            activeTab === 'tutorials'
+          className={`px-4 py-2 font-semibold transition-all border-b-2 ${activeTab === 'tutorials'
               ? 'border-emerald-500 text-white'
               : 'border-transparent text-slate-400 hover:text-slate-200'
-          }`}
+            }`}
         >
           📺 Guías y Tutoriales
         </button>
@@ -562,13 +558,13 @@ export function IotPage() {
                 <AreaChart data={humidityHistory}>
                   <defs>
                     <linearGradient id="colorHumidity" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <XAxis dataKey="time" stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} />
                   <YAxis stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} domain={[30, 90]} />
-                  <Tooltip 
+                  <Tooltip
                     contentStyle={{ backgroundColor: '#1e1e2f', borderColor: 'rgba(255,255,255,0.08)', borderRadius: '12px' }}
                     labelStyle={{ color: '#94a3b8', fontSize: '11px' }}
                     itemStyle={{ color: '#10b981', fontSize: '13px', fontWeight: 'bold' }}
@@ -592,15 +588,14 @@ export function IotPage() {
                 <div className="mt-3 text-4xl font-black tracking-tight text-white">{sensor.value}</div>
                 <div className="mt-2 text-xs text-slate-400">{sensor.location} · {sensor.id}</div>
                 <div className="mt-4 flex justify-between items-center">
-                  <div className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${
-                    sensor.tone === 'red'
+                  <div className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${sensor.tone === 'red'
                       ? 'bg-red-500/10 text-red-300'
                       : sensor.tone === 'amber'
-                      ? 'bg-amber-500/10 text-amber-300'
-                      : sensor.tone === 'cyan'
-                      ? 'bg-cyan-500/10 text-cyan-300'
-                      : 'bg-emerald-500/10 text-emerald-300'
-                  }`}>
+                        ? 'bg-amber-500/10 text-amber-300'
+                        : sensor.tone === 'cyan'
+                          ? 'bg-cyan-500/10 text-cyan-300'
+                          : 'bg-emerald-500/10 text-emerald-300'
+                    }`}>
                     {sensor.value === '---' ? '📴 Placa Desconectada' : `✔ ${sensor.status}`}
                   </div>
                 </div>
@@ -621,11 +616,10 @@ export function IotPage() {
                   .map((alert) => (
                     <div
                       key={alert.id}
-                      className={`flex items-start gap-4 rounded-2xl border p-4 transition-all duration-200 hover:bg-white/[0.02] ${
-                        alert.severity === 'red'
+                      className={`flex items-start gap-4 rounded-2xl border p-4 transition-all duration-200 hover:bg-white/[0.02] ${alert.severity === 'red'
                           ? 'border-red-400/15 bg-red-500/5'
                           : 'border-amber-400/15 bg-amber-500/5'
-                      }`}
+                        }`}
                     >
                       <span className="text-2xl">{alert.emoji}</span>
                       <div className="flex-1">
@@ -640,9 +634,8 @@ export function IotPage() {
                       </div>
                       <div className="text-right">
                         <div className="text-xs text-slate-500">{alert.time}</div>
-                        <span className={`mt-1 inline-block text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full ${
-                          alert.severity === 'red' ? 'bg-red-500/25 text-red-200' : 'bg-amber-500/25 text-amber-200'
-                        }`}>
+                        <span className={`mt-1 inline-block text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full ${alert.severity === 'red' ? 'bg-red-500/25 text-red-200' : 'bg-amber-500/25 text-amber-200'
+                          }`}>
                           {alert.severity === 'red' ? 'Crítico' : 'Advertencia'}
                         </span>
                       </div>
@@ -675,15 +668,14 @@ export function IotPage() {
                       <td className="px-4 py-3 font-mono text-xs text-slate-400">{sensor.arduinoId}</td>
                       <td className="px-4 py-3 font-mono">{sensor.value}</td>
                       <td className="px-4 py-3">
-                        <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${
-                          sensor.value === '---'
+                        <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold ${sensor.value === '---'
                             ? 'bg-slate-500/10 text-slate-400'
                             : sensor.tone === 'red'
-                            ? 'bg-red-500/10 text-red-300'
-                            : sensor.tone === 'amber'
-                            ? 'bg-amber-500/10 text-amber-300'
-                            : 'bg-emerald-500/10 text-emerald-300'
-                        }`}>
+                              ? 'bg-red-500/10 text-red-300'
+                              : sensor.tone === 'amber'
+                                ? 'bg-amber-500/10 text-amber-300'
+                                : 'bg-emerald-500/10 text-emerald-300'
+                          }`}>
                           {sensor.value === '---' ? 'Inactivo' : sensor.status}
                         </span>
                       </td>
@@ -715,9 +707,8 @@ export function IotPage() {
                           <div className="flex items-center gap-2">
                             <span className={`h-2.5 w-2.5 rounded-full ${isActive ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'}`}></span>
                             <span className="font-mono text-xs font-bold text-slate-500">{arduino.id}</span>
-                            <span className={`text-[9px] uppercase font-black px-2 py-0.5 rounded ${
-                              isActive ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
-                            }`}>
+                            <span className={`text-[9px] uppercase font-black px-2 py-0.5 rounded ${isActive ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
+                              }`}>
                               {isActive ? 'Activo' : 'Inactivo'}
                             </span>
                           </div>
@@ -734,11 +725,10 @@ export function IotPage() {
                           {/* Botón Encender / Apagar */}
                           <button
                             onClick={() => toggleArduinoStatus(arduino.id)}
-                            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all border ${
-                              isActive
+                            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all border ${isActive
                                 ? 'border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20'
                                 : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'
-                            }`}
+                              }`}
                           >
                             {isActive ? '🔴 Desactivar' : '🟢 Activar'}
                           </button>
@@ -869,18 +859,18 @@ export function IotPage() {
           </div>
 
           {/* Modelo Arduino 3D Interactivo */}
-          <PageSection title="Hardware Inspector: Placa Arduino Uno R3" subtitle="Modelo interactivo 3D del microcontrolador físico">
+          <PageSection title="Prototipo Físico IoT: Aula 19 — Plantas Felizes II" subtitle="Modelo interactivo 3D del microcontrolador conectado al cultivo">
             <div className="relative h-[320px] w-full overflow-hidden rounded-2xl border border-white/8 bg-[#1e1e2f] shadow-lg">
               <iframe
-                src="https://sketchfab.com/models/6b856b3e945c478a9c4033c4a22be1a4/embed?ui_theme=dark&ui_hint=0&autostart=0"
-                title="Arduino Uno 3D Model"
-                allow="autoplay; fullscreen; vr"
+                src="https://sketchfab.com/models/72e2f71f57e94935b04325bb7775bfc7/embed?ui_theme=dark&ui_hint=0&autostart=0"
+                title="Aula 19 - Plantas Felizes II"
+                allow="autoplay; fullscreen; xr-spatial-tracking"
                 allowFullScreen
                 className="h-full w-full border-0"
               />
             </div>
             <div className="mt-3 text-xs text-slate-400">
-              💡 <strong>Inspección Virtual 3D:</strong> Haz clic, arrastra para rotar, o usa el scroll del mouse para hacer zoom sobre el modelo tridimensional de la placa Arduino. Examina la distribución exacta de los pines digitales (PWM), pines analógicos (A0-A5), puerto USB tipo B y el chip ATMega328P de montaje.
+              💡 <strong>Inspección Virtual 3D:</strong> Explora esta maqueta interactiva creada por <strong>Robótica Paraná</strong> que muestra exactamente cómo se conecta una placa Arduino Uno R3 en un protoboard para medir la humedad de suelo de una planta en tiempo real. Arrastra para rotar en 360 grados y haz zoom para ver el cableado físico.
             </div>
           </PageSection>
         </div>
@@ -936,7 +926,7 @@ export function IotPage() {
 
               <PageSection title="Código Arduino Básico" subtitle="Sketch para lectura de humedad">
                 <pre className="overflow-x-auto rounded-xl bg-black/40 p-4 font-mono text-[11px] text-emerald-400 border border-white/5 max-h-[220px]">
-{`const int sensorPin = A0; 
+                  {`const int sensorPin = A0; 
 int sensorValue = 0;
 
 void setup() {
