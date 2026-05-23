@@ -61,7 +61,7 @@ export function SettingsPage() {
       id: "gemini",
       name: "Google Gemini 2.5 Flash", 
       desc: "Diagnóstico automático de plagas y salud vegetal por visión computacional.", 
-      icon: "fa-sparkles", 
+      icon: "fa-magic", 
       status: "connected",
       color: "emerald",
       docsUrl: "https://ai.google.dev/gemini-api"
@@ -521,7 +521,11 @@ export function SettingsPage() {
                     >
                       <div className="space-y-3">
                         <div className="flex justify-between items-start">
-                          <div className={`h-10 w-10 rounded-xl bg-${item.color}-500/10 border border-${item.color}-500/20 flex items-center justify-center text-${item.color}-400 text-base`}>
+                          <div className={`h-10 w-10 rounded-xl flex items-center justify-center text-base border ${
+                            item.color === "emerald" 
+                              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" 
+                              : "bg-amber-500/10 border-amber-500/20 text-amber-400"
+                          }`}>
                             <i className={`fas ${item.icon}`}></i>
                           </div>
                           
