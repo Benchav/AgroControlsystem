@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { PageSection } from '../components/layout/PageSection';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 
 interface Arduino {
   id: string;
@@ -184,6 +185,19 @@ export function IotPage() {
   // Estado de simulación
   const [isSimulating, setIsSimulating] = useState<boolean>(true);
 
+  // Historial de Humedad para Recharts
+  const [humidityHistory, setHumidityHistory] = useState<{ time: string; value: number }[]>(() => {
+    const now = new Date();
+    return Array.from({ length: 6 }).map((_, idx) => {
+      const minutesAgo = 5 - idx;
+      const t = new Date(now.getTime() - minutesAgo * 60000);
+      return {
+        time: `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}`,
+        value: 50 + Math.floor(Math.random() * 20),
+      };
+    });
+  });
+
   // Estado del formulario de nuevo Arduino
   const [newArdId, setNewArdId] = useState('');
   const [newArdName, setNewArdName] = useState('');
@@ -212,16 +226,19 @@ export function IotPage() {
     if (!isSimulating) return;
 
     const interval = setInterval(() => {
-      setSensors((prevSensors) =>
-        prevSensors.map((sensor) => {
+      let updatedAvgHumidity = 0;
+      let humidityCount = 0;
+
+      setSensors((prevSensors) => {
+        const nextSensors = prevSensors.map((sensor) => {
           // Solo actualizamos sensores asociados a Arduinos activos
           const parentArd = arduinos.find((a) => a.id === sensor.arduinoId);
           if (parentArd && parentArd.status === 'inactive') {
             return {
               ...sensor,
               value: '---',
-              status: 'Crítico',
-              tone: 'red',
+              status: 'Crítico' as const,
+              tone: 'red' as const,
             };
           }
 
@@ -231,6 +248,8 @@ export function IotPage() {
           if (sensor.type === 'Humedad') {
             delta = (Math.random() - 0.5) * 4; // Fluctúa +/- 2%
             newValue = Math.max(0, Math.min(100, sensor.numericValue + delta));
+            updatedAvgHumidity += newValue;
+            humidityCount++;
           } else if (sensor.type === 'Temperatura') {
             delta = (Math.random() - 0.5) * 0.8; // Fluctúa +/- 0.4°C
             newValue = Math.max(10, Math.min(50, sensor.numericValue + delta));
@@ -290,8 +309,25 @@ export function IotPage() {
             status,
             tone,
           };
-        })
-      );
+        });
+
+        // Actualizar el historial del promedio de humedad con la nueva fluctuación
+        if (humidityCount > 0) {
+          const finalAvg = Math.round(updatedAvgHumidity / humidityCount);
+          const t = new Date();
+          const timeStr = `${t.getHours().toString().padStart(2, '0')}:${t.getMinutes().toString().padStart(2, '0')}:${t.getSeconds().toString().padStart(2, '0')}`;
+          
+          setHumidityHistory((prevHistory) => {
+            const nextHistory = [...prevHistory, { time: timeStr, value: finalAvg }];
+            if (nextHistory.length > 10) {
+              nextHistory.shift();
+            }
+            return nextHistory;
+          });
+        }
+
+        return nextSensors;
+      });
     }, 3000);
 
     return () => clearInterval(interval);
@@ -485,6 +521,30 @@ export function IotPage() {
       {/* CONTENIDO DE PESTAÑA: MONITOREO */}
       {activeTab === 'monitor' && (
         <div className="space-y-6">
+          {/* Gráfico de Historial en Tiempo Real de Humedad */}
+          <PageSection title="Telemetría de Humedad en Tiempo Real" subtitle="Fluctuación del promedio de humedad del suelo en parcelas monitoreadas">
+            <div className="h-[240px] w-full rounded-2xl bg-white/[0.01] p-2 border border-white/5">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={humidityHistory}>
+                  <defs>
+                    <linearGradient id="colorHumidity" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="time" stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#64748b" fontSize={10} tickLine={false} axisLine={false} domain={[30, 90]} />
+                  <Tooltip 
+                    contentStyle={{ backgroundColor: '#1e1e2f', borderColor: 'rgba(255,255,255,0.08)', borderRadius: '12px' }}
+                    labelStyle={{ color: '#94a3b8', fontSize: '11px' }}
+                    itemStyle={{ color: '#10b981', fontSize: '13px', fontWeight: 'bold' }}
+                  />
+                  <Area type="monotone" dataKey="value" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorHumidity)" name="Humedad Promedio" />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </PageSection>
+
           {/* Tarjetas Principales (Grid rápido) */}
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {sensors.map((sensor) => (
@@ -604,173 +664,191 @@ export function IotPage() {
 
       {/* CONTENIDO DE PESTAÑA: ADMINISTRACIÓN ARDUINO */}
       {activeTab === 'arduino' && (
-        <div className="grid gap-6 lg:grid-cols-3">
-          {/* Listado de Arduinos */}
-          <div className="space-y-4 lg:col-span-2">
-            <PageSection title="Placas de Desarrollo Conectadas" subtitle="Control de hardware IoT y telemetría de campo">
-              <div className="space-y-4">
-                {arduinos.map((arduino) => {
-                  const isActive = arduino.status === 'active';
-                  return (
-                    <div
-                      key={arduino.id}
-                      className="rounded-2xl border border-white/8 bg-white/[0.02] p-5 flex flex-col justify-between md:flex-row md:items-center gap-4 hover:border-white/12 transition-all"
-                    >
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className={`h-2.5 w-2.5 rounded-full ${isActive ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'}`}></span>
-                          <span className="font-mono text-xs font-bold text-slate-500">{arduino.id}</span>
-                          <span className={`text-[9px] uppercase font-black px-2 py-0.5 rounded ${
-                            isActive ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
-                          }`}>
-                            {isActive ? 'Activo' : 'Inactivo'}
-                          </span>
+        <div className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-3">
+            {/* Listado de Arduinos */}
+            <div className="space-y-4 lg:col-span-2">
+              <PageSection title="Placas de Desarrollo Conectadas" subtitle="Control de hardware IoT y telemetría de campo">
+                <div className="space-y-4">
+                  {arduinos.map((arduino) => {
+                    const isActive = arduino.status === 'active';
+                    return (
+                      <div
+                        key={arduino.id}
+                        className="rounded-2xl border border-white/8 bg-white/[0.02] p-5 flex flex-col justify-between md:flex-row md:items-center gap-4 hover:border-white/12 transition-all"
+                      >
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-2">
+                            <span className={`h-2.5 w-2.5 rounded-full ${isActive ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-red-500 shadow-[0_0_8px_#ef4444]'}`}></span>
+                            <span className="font-mono text-xs font-bold text-slate-500">{arduino.id}</span>
+                            <span className={`text-[9px] uppercase font-black px-2 py-0.5 rounded ${
+                              isActive ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'
+                            }`}>
+                              {isActive ? 'Activo' : 'Inactivo'}
+                            </span>
+                          </div>
+                          <h3 className="text-md font-bold text-white">{arduino.name}</h3>
+                          <p className="text-xs text-slate-400">{arduino.description}</p>
+                          <div className="flex gap-4 pt-1 text-[10px] text-slate-500">
+                            <span>📍 {arduino.location}</span>
+                            <span>⚡ {arduino.baudRate} baudios</span>
+                            <span>🕒 {arduino.frequency}s de lectura</span>
+                          </div>
                         </div>
-                        <h3 className="text-md font-bold text-white">{arduino.name}</h3>
-                        <p className="text-xs text-slate-400">{arduino.description}</p>
-                        <div className="flex gap-4 pt-1 text-[10px] text-slate-500">
-                          <span>📍 {arduino.location}</span>
-                          <span>⚡ {arduino.baudRate} baudios</span>
-                          <span>🕒 {arduino.frequency}s de lectura</span>
-                        </div>
-                      </div>
 
-                      <div className="flex items-center gap-3 self-end md:self-center">
-                        {/* Botón Encender / Apagar */}
-                        <button
-                          onClick={() => toggleArduinoStatus(arduino.id)}
-                          className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all border ${
-                            isActive
-                              ? 'border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20'
-                              : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'
-                          }`}
-                        >
-                          {isActive ? '🔴 Desactivar' : '🟢 Activar'}
-                        </button>
-                        {/* Botón Eliminar */}
-                        <button
-                          onClick={() => handleDeleteArduino(arduino.id)}
-                          className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-500/30 transition-all"
-                        >
-                          Eliminar
-                        </button>
+                        <div className="flex items-center gap-3 self-end md:self-center">
+                          {/* Botón Encender / Apagar */}
+                          <button
+                            onClick={() => toggleArduinoStatus(arduino.id)}
+                            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all border ${
+                              isActive
+                                ? 'border-red-500/30 bg-red-500/10 text-red-300 hover:bg-red-500/20'
+                                : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20'
+                            }`}
+                          >
+                            {isActive ? '🔴 Desactivar' : '🟢 Activar'}
+                          </button>
+                          {/* Botón Eliminar */}
+                          <button
+                            onClick={() => handleDeleteArduino(arduino.id)}
+                            className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-semibold text-slate-400 hover:bg-red-500/10 hover:text-red-300 hover:border-red-500/30 transition-all"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
                       </div>
+                    );
+                  })}
+                </div>
+              </PageSection>
+            </div>
+
+            {/* Formulario Agregar Arduino */}
+            <div className="space-y-4">
+              <PageSection title="Registrar Placa Arduino" subtitle="Vincular nuevo nodo al ecosistema">
+                <form onSubmit={handleAddArduino} className="space-y-4">
+                  {formError && (
+                    <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-300">
+                      {formError}
                     </div>
-                  );
-                })}
-              </div>
-            </PageSection>
-          </div>
-
-          {/* Formulario Agregar Arduino */}
-          <div className="space-y-4">
-            <PageSection title="Registrar Placa Arduino" subtitle="Vincular nuevo nodo al ecosistema">
-              <form onSubmit={handleAddArduino} className="space-y-4">
-                {formError && (
-                  <div className="rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-300">
-                    {formError}
-                  </div>
-                )}
-
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">ID del Dispositivo *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ej. ARD-UNO-04"
-                    value={newArdId}
-                    onChange={(e) => setNewArdId(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white placeholder-slate-500 focus:border-emerald-500/50 focus:outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Nombre de la Placa *</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Ej. Arduino de Riego Central"
-                    value={newArdName}
-                    onChange={(e) => setNewArdName(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white placeholder-slate-500 focus:border-emerald-500/50 focus:outline-none"
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Ubicación</label>
-                    <select
-                      value={newArdLoc}
-                      onChange={(e) => setNewArdLoc(e.target.value)}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white focus:border-emerald-500/50 focus:outline-none"
-                    >
-                      <option value="Parcela Norte" className="bg-slate-900 text-white">Parcela Norte</option>
-                      <option value="Parcela Sur" className="bg-slate-900 text-white">Parcela Sur</option>
-                      <option value="Sector 2A" className="bg-slate-900 text-white">Sector 2A</option>
-                      <option value="Zona Crítica" className="bg-slate-900 text-white">Zona Crítica</option>
-                    </select>
-                  </div>
+                  )}
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Baudios (Serial)</label>
-                    <select
-                      value={newArdBaud}
-                      onChange={(e) => setNewArdBaud(Number(e.target.value))}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white focus:border-emerald-500/50 focus:outline-none"
-                    >
-                      <option value={9600} className="bg-slate-900 text-white">9600 bps</option>
-                      <option value={19200} className="bg-slate-900 text-white">19200 bps</option>
-                      <option value={115200} className="bg-slate-900 text-white">115200 bps</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Frecuencia (seg.)</label>
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">ID del Dispositivo *</label>
                     <input
-                      type="number"
-                      min={1}
-                      max={120}
-                      value={newArdFreq}
-                      onChange={(e) => setNewArdFreq(Number(e.target.value))}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white focus:border-emerald-500/50 focus:outline-none"
+                      type="text"
+                      required
+                      placeholder="Ej. ARD-UNO-04"
+                      value={newArdId}
+                      onChange={(e) => setNewArdId(e.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white placeholder-slate-500 focus:border-emerald-500/50 focus:outline-none"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Estado Inicial</label>
-                    <select
-                      value={newArdStatus}
-                      onChange={(e) => setNewArdStatus(e.target.value as 'active' | 'inactive')}
-                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white focus:border-emerald-500/50 focus:outline-none"
-                    >
-                      <option value="active" className="bg-slate-900 text-white">Activo</option>
-                      <option value="inactive" className="bg-slate-900 text-white">Inactivo</option>
-                    </select>
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Nombre de la Placa *</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="Ej. Arduino de Riego Central"
+                      value={newArdName}
+                      onChange={(e) => setNewArdName(e.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white placeholder-slate-500 focus:border-emerald-500/50 focus:outline-none"
+                    />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Descripción corta</label>
-                  <textarea
-                    placeholder="Detalles sobre su propósito u orientación de sensores..."
-                    rows={3}
-                    value={newArdDesc}
-                    onChange={(e) => setNewArdDesc(e.target.value)}
-                    className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white placeholder-slate-500 focus:border-emerald-500/50 focus:outline-none"
-                  />
-                </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Ubicación</label>
+                      <select
+                        value={newArdLoc}
+                        onChange={(e) => setNewArdLoc(e.target.value)}
+                        className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white focus:border-emerald-500/50 focus:outline-none"
+                      >
+                        <option value="Parcela Norte" className="bg-slate-900 text-white">Parcela Norte</option>
+                        <option value="Parcela Sur" className="bg-slate-900 text-white">Parcela Sur</option>
+                        <option value="Sector 2A" className="bg-slate-900 text-white">Sector 2A</option>
+                        <option value="Zona Crítica" className="bg-slate-900 text-white">Zona Crítica</option>
+                      </select>
+                    </div>
 
-                <button
-                  type="submit"
-                  className="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 py-3 text-sm font-black text-white transition-all duration-200 hover:brightness-110 active:scale-95 shadow-md shadow-emerald-500/20"
-                >
-                  ➕ Registrar Arduino
-                </button>
-              </form>
-            </PageSection>
+                    <div>
+                      <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Baudios (Serial)</label>
+                      <select
+                        value={newArdBaud}
+                        onChange={(e) => setNewArdBaud(Number(e.target.value))}
+                        className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white focus:border-emerald-500/50 focus:outline-none"
+                      >
+                        <option value={9600} className="bg-slate-900 text-white">9600 bps</option>
+                        <option value={19200} className="bg-slate-900 text-white">19200 bps</option>
+                        <option value={115200} className="bg-slate-900 text-white">115200 bps</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Frecuencia (seg.)</label>
+                      <input
+                        type="number"
+                        min={1}
+                        max={120}
+                        value={newArdFreq}
+                        onChange={(e) => setNewArdFreq(Number(e.target.value))}
+                        className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white focus:border-emerald-500/50 focus:outline-none"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Estado Inicial</label>
+                      <select
+                        value={newArdStatus}
+                        onChange={(e) => setNewArdStatus(e.target.value as 'active' | 'inactive')}
+                        className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white focus:border-emerald-500/50 focus:outline-none"
+                      >
+                        <option value="active" className="bg-slate-900 text-white">Activo</option>
+                        <option value="inactive" className="bg-slate-900 text-white">Inactivo</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Descripción corta</label>
+                    <textarea
+                      placeholder="Detalles sobre su propósito u orientación de sensores..."
+                      rows={3}
+                      value={newArdDesc}
+                      onChange={(e) => setNewArdDesc(e.target.value)}
+                      className="w-full rounded-xl border border-white/10 bg-white/5 p-3 text-sm text-white placeholder-slate-500 focus:border-emerald-500/50 focus:outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 py-3 text-sm font-black text-white transition-all duration-200 hover:brightness-110 active:scale-95 shadow-md shadow-emerald-500/20"
+                  >
+                    ➕ Registrar Arduino
+                  </button>
+                </form>
+              </PageSection>
+            </div>
           </div>
+
+          {/* Modelo Arduino 3D Interactivo */}
+          <PageSection title="Hardware Inspector: Placa Arduino Uno R3" subtitle="Modelo interactivo 3D del microcontrolador físico">
+            <div className="relative h-[320px] w-full overflow-hidden rounded-2xl border border-white/8 bg-[#1e1e2f] shadow-lg">
+              <iframe
+                src="https://sketchfab.com/models/6b856b3e945c478a9c4033c4a22be1a4/embed?ui_theme=dark&ui_hint=0&autostart=0"
+                title="Arduino Uno 3D Model"
+                allow="autoplay; fullscreen; vr"
+                allowFullScreen
+                className="h-full w-full border-0"
+              />
+            </div>
+            <div className="mt-3 text-xs text-slate-400">
+              💡 <strong>Inspección Virtual 3D:</strong> Haz clic, arrastra para rotar, o usa el scroll del mouse para hacer zoom sobre el modelo tridimensional de la placa Arduino. Examina la distribución exacta de los pines digitales (PWM), pines analógicos (A0-A5), puerto USB tipo B y el chip ATMega328P de montaje.
+            </div>
+          </PageSection>
         </div>
       )}
 
@@ -780,11 +858,11 @@ export function IotPage() {
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Reproductor de Video */}
             <div className="lg:col-span-2 space-y-4">
-              <PageSection title="Videotutorial: Configuración de Sensor de Humedad con Arduino" subtitle="Guía de cableado paso a paso">
+              <PageSection title="Videotutorial: Configuración e Instalación del Sensor" subtitle="Guía práctica y explicativa">
                 <div className="aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black">
                   <iframe
                     className="w-full h-full"
-                    src="https://www.youtube.com/embed/8v_gqZpT06Q"
+                    src="https://www.youtube.com/embed/4iUKqnasR6s"
                     title="Configuración de Sensor de Humedad con Arduino"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
