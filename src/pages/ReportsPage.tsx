@@ -523,6 +523,16 @@ export function ReportsPage() {
     catch { return fallbackAlerts; }
   }, []);
 
+  // Cargar umbrales dinámicos desde localStorage
+  const systemSettings = useMemo(() => {
+    try {
+      const saved = localStorage.getItem('ac_settings');
+      return saved ? JSON.parse(saved) : { humidityThreshold: 40, temperatureThreshold: 30, phThreshold: 6.0 };
+    } catch {
+      return { humidityThreshold: 40, temperatureThreshold: 30, phThreshold: 6.0 };
+    }
+  }, []);
+
   const days = PERIOD_DAYS[period];
 
   // Historiales memoizados por período
@@ -646,7 +656,7 @@ export function ReportsPage() {
     {
       label: 'Humedad Promedio', value: `${avgHumidity}%`, icon: 'fa-tint', color: '#38bdf8',
       sub: `${activeSensors.filter(s => s.type === 'Humedad').length} sensores activos`,
-      progress: avgHumidity, progressMax: 100, thresholds: { ok: 60, warn: 40 },
+      progress: avgHumidity, progressMax: 100, thresholds: { ok: systemSettings.humidityThreshold + 15, warn: systemSettings.humidityThreshold },
     },
     {
       label: 'Arduinos Activos', value: `${activeArduinos}/${arduinos.length}`, icon: 'fa-microchip', color: '#a78bfa',
@@ -792,8 +802,8 @@ export function ReportsPage() {
                   <XAxis dataKey="day" stroke="#475569" fontSize={9} tickLine={false} axisLine={false} />
                   <YAxis stroke="#475569" fontSize={9} tickLine={false} axisLine={false} domain={[20, 100]} />
                   <Tooltip content={<CustomTooltip />} />
-                  <ReferenceLine y={60} stroke="#38bdf8" strokeDasharray="4 2" strokeOpacity={0.3} label={{ value: 'Óptimo', position: 'right', fill: '#38bdf8', fontSize: 9 }} />
-                  <ReferenceLine y={40} stroke="#ef4444" strokeDasharray="4 2" strokeOpacity={0.3} label={{ value: 'Crítico', position: 'right', fill: '#ef4444', fontSize: 9 }} />
+                  <ReferenceLine y={systemSettings.humidityThreshold + 15} stroke="#38bdf8" strokeDasharray="4 2" strokeOpacity={0.3} label={{ value: 'Óptimo', position: 'right', fill: '#38bdf8', fontSize: 9 }} />
+                  <ReferenceLine y={systemSettings.humidityThreshold} stroke="#ef4444" strokeDasharray="4 2" strokeOpacity={0.3} label={{ value: 'Crítico', position: 'right', fill: '#ef4444', fontSize: 9 }} />
                   <Area type="monotone" dataKey="Humedad" stroke="#38bdf8" strokeWidth={2.5} fillOpacity={1} fill="url(#ghum2)" name="Humedad" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -813,7 +823,7 @@ export function ReportsPage() {
                   <XAxis dataKey="day" stroke="#475569" fontSize={9} tickLine={false} axisLine={false} />
                   <YAxis stroke="#475569" fontSize={9} tickLine={false} axisLine={false} domain={[10, 45]} />
                   <Tooltip content={<CustomTooltip />} />
-                  <ReferenceLine y={32} stroke="#ef4444" strokeDasharray="4 2" strokeOpacity={0.3} label={{ value: 'Estrés', position: 'right', fill: '#ef4444', fontSize: 9 }} />
+                  <ReferenceLine y={systemSettings.temperatureThreshold} stroke="#ef4444" strokeDasharray="4 2" strokeOpacity={0.3} label={{ value: 'Estrés', position: 'right', fill: '#ef4444', fontSize: 9 }} />
                   <Area type="monotone" dataKey="Temperatura" stroke="#f59e0b" strokeWidth={2.5} fillOpacity={1} fill="url(#gtemp2)" name="Temperatura" />
                 </AreaChart>
               </ResponsiveContainer>
