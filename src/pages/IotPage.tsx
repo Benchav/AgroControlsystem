@@ -862,7 +862,7 @@ export function IotPage() {
                 <div className="aspect-video w-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black">
                   <iframe
                     className="w-full h-full"
-                    src="https://www.youtube.com/embed/4iUKqnasR6s"
+                    src="https://www.youtube.com/embed/4iUKqnasR6s?autoplay=1&mute=1&loop=1&playlist=4iUKqnasR6s"
                     title="Configuración de Sensor de Humedad con Arduino"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
