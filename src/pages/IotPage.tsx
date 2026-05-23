@@ -549,8 +549,7 @@ export function IotPage() {
       </div>
 
       {/* CONTENIDO DE PESTAÑA: MONITOREO */}
-      {activeTab === 'monitor' && (
-        <div className="space-y-6">
+      <div className={activeTab === 'monitor' ? 'space-y-6' : 'hidden'}>
           {/* Gráfico de Historial en Tiempo Real de Humedad */}
           <PageSection title="Telemetría de Humedad en Tiempo Real" subtitle="Fluctuación del promedio de humedad del suelo en parcelas monitoreadas">
             <div className="h-[240px] w-full rounded-2xl bg-white/[0.01] p-2 border border-white/5">
@@ -685,12 +684,10 @@ export function IotPage() {
               </table>
             </div>
           </PageSection>
-        </div>
-      )}
+      </div>
 
       {/* CONTENIDO DE PESTAÑA: ADMINISTRACIÓN ARDUINO */}
-      {activeTab === 'arduino' && (
-        <div className="space-y-6">
+      <div className={activeTab === 'arduino' ? 'space-y-6' : 'hidden'}>
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Listado de Arduinos */}
             <div className="space-y-4 lg:col-span-2">
@@ -873,12 +870,10 @@ export function IotPage() {
               💡 <strong>Inspección Virtual 3D:</strong> Explora esta maqueta interactiva creada por <strong>Robótica Paraná</strong> que muestra exactamente cómo se conecta una placa Arduino Uno R3 en un protoboard para medir la humedad de suelo de una planta en tiempo real. Arrastra para rotar en 360 grados y haz zoom para ver el cableado físico.
             </div>
           </PageSection>
-        </div>
-      )}
+      </div>
 
       {/* CONTENIDO DE PESTAÑA: TUTORIALES Y GUÍAS */}
-      {activeTab === 'tutorials' && (
-        <div className="space-y-6">
+      <div className={activeTab === 'tutorials' ? 'space-y-6' : 'hidden'}>
           <div className="grid gap-6 lg:grid-cols-3">
             {/* Reproductor de Video */}
             <div className="lg:col-span-2 space-y-4">
@@ -950,7 +945,6 @@ void loop() {
             </div>
           </div>
         </div>
-      )}
-    </div>
-  );
-}
+      </div>
+    );
+  }
