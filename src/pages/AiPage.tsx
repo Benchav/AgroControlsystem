@@ -43,12 +43,6 @@ export function AiPage() {
   }, [history]);
 
   useEffect(() => {
-    return () => {
-      if (previewUrl) URL.revokeObjectURL(previewUrl);
-    };
-  }, [previewUrl]);
-
-  useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm.trim().toLowerCase());
     }, 800);
@@ -60,7 +54,7 @@ export function AiPage() {
     item.fileName.toLowerCase().includes(debouncedSearch),
   );
 
-  const handleFile = (file: File | null) => {
+  const handleFile = async (file: File | null) => {
     if (!file) return;
 
     if (!file.type.startsWith("image/")) {
@@ -68,13 +62,18 @@ export function AiPage() {
       return;
     }
 
-    if (previewUrl) URL.revokeObjectURL(previewUrl);
-
     setErrorMessage(null);
     setSelectedFile(file);
-    setPreviewUrl(URL.createObjectURL(file));
     setResult(null);
     setDisplayResult(null);
+
+    const reader = new FileReader();
+
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+    };
+
+    reader.readAsDataURL(file);
   };
 
   const analyze = async () => {
@@ -95,6 +94,7 @@ export function AiPage() {
           fileName: selectedFile.name,
           resultText: diagnosis.text,
           createdAt,
+          imageUrl: previewUrl ?? "",
         },
         ...current,
       ]);
@@ -255,8 +255,12 @@ export function AiPage() {
                   ) : null}
                 </div>
               ) : (
-                <div className="flex h-[240px] items-center justify-center px-6 text-center text-sm text-white ">
-                  Aún no has seleccionado una imagen.
+                <div className="flex h-[240px] items-center justify-center text-center text-sm text-white ">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/6/60/No-Image-Placeholder-banner.svg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original"
+                    alt="upload image"
+                    className="h-full w-full object-cover"
+                  />
                 </div>
               )}
             </div>
@@ -295,99 +299,77 @@ export function AiPage() {
               </div>
             ) : null}
 
-            <div className="h-full rounded-[14px] border border-white/8 bg-black/60 backdrop-blur p-5">
-              <div className="text-sm font-semibold text-white">
-                Informe Gemini
-              </div>
-              <div className="mt-1 text-xs text-slate-400">
-                Reporte profesional estructurado
+            <div className="h-full rounded-[14px] border border-black/40 bg-black/60 backdrop-blur overflow-hidden">
+              <div className="p-5">
+                <div className="text-sm font-semibold text-white">
+                  Resultado del análisis con Gemini
+                </div>
+                <div className="mt-1 text-xs text-slate-400">
+                  Reporte profesional estructurado
+                </div>
               </div>
 
               {report ? (
                 <div
-                  className={`report-shell mt-4 space-y-3 ${displayResult ? "report-shell--visible" : "report-shell--hidden"}`}
+                  className={`report-shell mt-4 p-5 space-y-3 ${displayResult ? "report-shell--visible" : "report-shell--hidden"}`}
                 >
-                  <div className="rounded-[14px] border border-white/8 bg-black/20 p-4">
+                  <div className="rounded-[14px] border border-black/50 bg-black/50 p-4 flex flex-col gap-2">
                     <div className="text-xs uppercase tracking-[0.2em] text-white/80">
-                      Tipo de Resultado
+                      ✔️ Tipo de Resultado:
                     </div>
-                    <div className="mt-2 text-xl font-semibold text-white">
+                    <div className="mt-2 text-sm  text-white">
                       {report.resultado}
                     </div>
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-[14px] border border-white/8 bg-black/20 p-4">
-                      <div className="text-xs uppercase tracking-[0.2em] text-white/80">
-                        Cultivo probable
-                      </div>
-                      <div className="mt-2 text-sm text-white">
-                        {report.cultivo}
-                      </div>
-                    </div>
-                    <div className="rounded-[14px] border border-white/8 bg-black/20 p-4">
-                      <div className="text-xs uppercase tracking-[0.2em] text-white/80">
-                        Problema probable
-                      </div>
-                      <div className="mt-2 text-sm text-white">
-                        {report.problema}
-                      </div>
-                    </div>
-                    <div className="rounded-[14px] border border-white/8 bg-black/20 p-4 sm:col-span-2">
-                      <div className="text-xs uppercase tracking-[0.2em] text-white/80">
-                        Causa probable
-                      </div>
-                      <div className="mt-2 text-sm text-white">
-                        {report.causa}
-                      </div>
-                    </div>
-                    <div className="rounded-[14px] border border-white/8 bg-black/20 p-4">
-                      <div className="text-xs uppercase tracking-[0.2em] text-white/80">
-                        Confianza
-                      </div>
-                      <div className="mt-2 text-sm text-white">
-                        {report.confianza}
-                      </div>
-                    </div>
-                    <div className="rounded-[14px] border border-white/8 bg-black/20 p-4">
-                      <div className="text-xs uppercase tracking-[0.2em] text-white/80">
-                        Seguimiento
-                      </div>
-                      <div className="mt-2 text-sm text-white">
-                        {report.seguimiento}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="rounded-[14px] border border-white/8 bg-black/20 p-4">
                     <div className="text-xs uppercase tracking-[0.2em] text-white/80">
-                      Resumen clínico
+                      ✔️ Cultivo probable:
+                    </div>
+                    <div className="mt-2 text-sm text-white">
+                      {report.cultivo}
+                    </div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-white/80">
+                      ✔️ Problema probable
+                    </div>
+                    <div className="mt-2 text-sm text-white">
+                      {report.problema}
+                    </div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-white/80">
+                      ✔️ Causa probable
+                    </div>
+                    <div className="mt-2 text-sm text-white">
+                      {report.causa}
+                    </div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-white/80">
+                      ✔️ Confianza
+                    </div>
+                    <div className="mt-2 text-sm text-white">
+                      {report.confianza}
+                    </div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-white/80">
+                      ✔️ Seguimiento
+                    </div>
+                    <div className="mt-2 text-sm text-white">
+                      {report.seguimiento}
+                    </div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-white/80">
+                      ✔️ Resumen clínico
                     </div>
                     <div className="mt-2 text-sm leading-7 text-white">
                       {report.resumen}
                     </div>
-                  </div>
-
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    <div className="rounded-[14px] border border-white/8 bg-black/20 p-4">
-                      <div className="text-xs uppercase tracking-[0.2em] text-white/80">
-                        Por qué sucede
-                      </div>
-                      <div className="mt-2 text-sm leading-7 text-white">
-                        {report.porQueSucede}
-                      </div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-white/80">
+                      ✔️ Por qué sucede
                     </div>
-                    <div className="rounded-[14px] border border-white/8 bg-black/20 p-4">
-                      <div className="text-xs uppercase tracking-[0.2em] text-white/80">
-                        Manejo sugerido
-                      </div>
-                      <div className="mt-2 text-sm leading-7 text-white">
-                        {report.manejoSugerido}
-                      </div>
+                    <div className="mt-2 text-sm leading-7 text-white">
+                      {report.porQueSucede}
+                    </div>
+                    <div className="text-xs uppercase tracking-[0.2em] text-white/80">
+                      ✔️ Manejo sugerido
+                    </div>
+                    <div className="mt-2 text-sm leading-7 text-white">
+                      {report.manejoSugerido}
                     </div>
                   </div>
-
-                  <div className="rounded-[14px] border border-white/8 bg-black/20 p-4">
+                  <div className="rounded-[14px] border border-black/40 bg-black/40 p-4">
                     <div className="text-xs uppercase tracking-[0.2em] text-white/80">
                       Recomendaciones
                     </div>
@@ -403,7 +385,7 @@ export function AiPage() {
                     </ul>
                   </div>
 
-                  <div className="rounded-[14px] border border-white/8 bg-black/20 p-4">
+                  <div className="rounded-[14px] border border-black/40 bg-black/40 p-4">
                     <div className="text-xs uppercase tracking-[0.2em] text-white/80">
                       Cómo mejorar la salud
                     </div>
@@ -413,22 +395,22 @@ export function AiPage() {
                   </div>
                 </div>
               ) : (
-                <div className="flex flex-col items-center justify-center report-placeholder mt-4 min-h-[320px] rounded-[14px] border border-white/8 bg-black/20 p-4 text-sm leading-7 text-slate-200 whitespace-pre-wrap">
+                <div className="flex flex-col items-center justify-center report-placeholder h-full mt-4 rounded-b-[14px] bg-black/20 text-sm leading-7 text-slate-200 whitespace-pre-wrap overflow-hidden">
                   <img
-                    src="/report.svg"
+                    src="https://img.freepik.com/vector-premium/ilustracion-vectorial-sobre-concepto-no-resultado-datos-o-documento-o-archivo-no-encontrado_675567-5773.jpg"
                     alt="report image"
-                    className="h-[200px]"
+                    className="h-full w-full object-cover"
                   />
-                  {isAnalyzing
+                  {/* {isAnalyzing
                     ? "Generando informe técnico..."
-                    : "Aquí aparecerá el informe de diagnóstico una vez analices la imagen."}
+                    : "Aquí aparecerá el informe de diagnóstico una vez analices la imagen."} */}
                 </div>
               )}
             </div>
           </div>
         </div>
       </PageSection>
-
+      {/* seccion de historial de análisis realizados */}
       <PageSection
         title="Historial de análisis"
         subtitle="Últimos resultados guardados"
@@ -456,24 +438,28 @@ export function AiPage() {
         </div>
 
         {filteredHistory.length ? (
-          <div className=" text-sm text-slate-300 grid grid-cols-4 gap-4">
+          <div className="text-sm text-slate-300 grid grid-cols-4 gap-4">
             {filteredHistory.map((item) => (
               <div
                 key={item.id}
                 className="rounded-2xl border border-white/6 bg-black/20 p-4"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <div className="font-semibold text-white">
-                    {item.fileName}
-                  </div>
-                  <div className="text-xs text-white">
-                    {formatLongTime(item.createdAt)}
-                  </div>
+                  <img
+                    src={item.imageUrl}
+                    alt={item.fileName}
+                    className="mb-3 h-48 w-full rounded-xl object-cover"
+                  />
                 </div>
-                <div className="mt-2 whitespace-pre-wrap text-slate-300">
+                <div className="flex flex-row text-xs text-white w-full justify-between">
+                  <strong>{item.fileName}</strong>
+
+                  <span>{formatLongTime(item.createdAt)}</span>
+                </div>
+                <div className="mt-2 text-slate-300 w-full whitespace-pre-wrap line-clamp-3">
                   {item.resultText}
                 </div>
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-3 flex flex-wrap gap-2 ">
                   <button
                     type="button"
                     onClick={() => downloadDiagnosisItem(item)}

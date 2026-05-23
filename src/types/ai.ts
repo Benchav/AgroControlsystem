@@ -7,6 +7,7 @@ export type ScanHistoryItem = {
   fileName: string;
   resultText: string;
   createdAt: number;
+  imageUrl: string;
 };
 
 export type ReportSections = {
