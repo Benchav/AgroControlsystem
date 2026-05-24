@@ -7,20 +7,32 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['pwa-192.svg', 'pwa-512.svg'],
+      includeAssets: [
+        'Logo.png',
+        'pwa-192.svg',
+        'pwa-512.svg',
+        'fondo.jpg',
+      ],
       workbox: {
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         globIgnores: ['**/spline-runtime-*.js', '**/physics-*.js'],
+        navigateFallback: 'index.html',
+        navigateFallbackAllowlist: [/^\/$/, /^\/app(\/.*)?$/],
       },
       manifest: {
-        name: 'Agro Control',
+        name: 'Agro Control — Smart Farm Platform',
         short_name: 'Agro Control',
-        description: 'Smart farm platform with IoT, AI, marketplace and 3D visualization.',
+        description:
+          'Plataforma de agricultura inteligente con IoT, diagnóstico IA, marketplace y visualización 3D.',
         theme_color: '#1e1e2f',
         background_color: '#1e1e2f',
         display: 'standalone',
+        orientation: 'any',
         scope: '/',
         start_url: '/',
+        id: '/',
+        categories: ['agriculture', 'productivity', 'utilities'],
+        prefer_related_applications: false,
         icons: [
           {
             src: '/pwa-192.svg',
@@ -31,6 +43,23 @@ export default defineConfig({
             src: '/pwa-512.svg',
             sizes: '512x512',
             type: 'image/svg+xml',
+          },
+          {
+            src: '/pwa-192.svg',
+            sizes: '192x192',
+            type: 'image/svg+xml',
+            purpose: 'maskable',
+          },
+          {
+            src: '/Logo.png',
+            sizes: '512x512',
+            type: 'image/png',
+          },
+          {
+            src: '/Logo.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'maskable',
           },
         ],
       },
