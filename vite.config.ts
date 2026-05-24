@@ -18,6 +18,7 @@ export default defineConfig({
         globIgnores: ['**/spline-runtime-*.js', '**/physics-*.js'],
         navigateFallback: 'index.html',
         navigateFallbackAllowlist: [/^\/$/, /^\/app(\/.*)?$/],
+        disableDevLogs: true,
       },
       manifest: {
         name: 'Agro Control — Smart Farm Platform',
