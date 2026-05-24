@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const STORAGE_KEY_INSTALLED = 'pwa-install-completed';
 const SESSION_KEY_DISMISSED = 'pwa-install-dismissed';
 
 interface BeforeInstallPromptEvent extends Event {
@@ -12,7 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 export interface PWAInstallState {
   /** true cuando el navegador ofrece la instalación y no fue descartada en esta sesión */
   canInstall: boolean;
-  /** true cuando la app ya corre en modo standalone / twa / minimal-ui */
+  /** true cuando la app se está ejecutando actualmente en modo standalone */
   isInstalled: boolean;
   /** Dispara el prompt nativo de instalación */
   promptInstall: () => Promise<void>;
@@ -25,25 +24,24 @@ export function usePWAInstall(): PWAInstallState {
   const [canInstall, setCanInstall] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
 
-  // ─── Detectar si la app ya corre en modo standalone ──────────────
+  // ─── Detectar si la app corre actualmente en modo standalone ─────
   useEffect(() => {
     const isStandalone =
       window.matchMedia('(display-mode: standalone)').matches ||
       window.matchMedia('(display-mode: minimal-ui)').matches ||
       (window.navigator as any).standalone === true; // Safari iOS
 
-    if (isStandalone || localStorage.getItem(STORAGE_KEY_INSTALLED) === 'true') {
+    if (isStandalone) {
       setIsInstalled(true);
       return;
     }
 
-    // Escuchar cambios por si el usuario instala mientras la app está abierta
+    // Escuchar si la ventana cambia de modo (ej. si se instala y se abre)
     const mql = window.matchMedia('(display-mode: standalone)');
     const handleChange = (e: MediaQueryListEvent) => {
       if (e.matches) {
         setIsInstalled(true);
         setCanInstall(false);
-        localStorage.setItem(STORAGE_KEY_INSTALLED, 'true');
       }
     };
     mql.addEventListener('change', handleChange);
@@ -51,15 +49,18 @@ export function usePWAInstall(): PWAInstallState {
   }, []);
 
   // ─── Capturar el evento beforeinstallprompt ─────────────────────
+  // Dejamos que el navegador sea la ÚNICA fuente de verdad.
+  // Si la app está instalada en el sistema operativo, el navegador no disparará 'beforeinstallprompt'.
+  // Si el usuario desinstala la app, el navegador volverá a disparar 'beforeinstallprompt' automáticamente.
   useEffect(() => {
     if (isInstalled) return;
 
     const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevenir que el navegador muestre su propio mini-infobar
+      // Prevenir el mini-infobar nativo de Chrome
       e.preventDefault();
       deferredPrompt.current = e as BeforeInstallPromptEvent;
 
-      // Si el usuario ya descartó el banner en ESTA sesión, no volver a mostrarlo
+      // Si ya la descartó en esta pestaña/sesión, no mostrar de inmediato
       if (sessionStorage.getItem(SESSION_KEY_DISMISSED) === 'true') {
         return;
       }
@@ -71,7 +72,6 @@ export function usePWAInstall(): PWAInstallState {
       setIsInstalled(true);
       setCanInstall(false);
       deferredPrompt.current = null;
-      localStorage.setItem(STORAGE_KEY_INSTALLED, 'true');
       sessionStorage.removeItem(SESSION_KEY_DISMISSED);
     };
 
@@ -94,7 +94,6 @@ export function usePWAInstall(): PWAInstallState {
 
     if (outcome === 'accepted') {
       setIsInstalled(true);
-      localStorage.setItem(STORAGE_KEY_INSTALLED, 'true');
       sessionStorage.removeItem(SESSION_KEY_DISMISSED);
     }
 
