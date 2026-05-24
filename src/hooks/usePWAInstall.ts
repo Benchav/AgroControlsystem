@@ -1,7 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-const SESSION_KEY_DISMISSED = 'pwa-install-dismissed';
-
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
   readonly userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
@@ -9,13 +7,13 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export interface PWAInstallState {
-  /** true cuando el navegador ofrece la instalación y no fue descartada en esta sesión */
+  /** true cuando el navegador ofrece la instalación y no fue descartada en esta carga de página */
   canInstall: boolean;
   /** true cuando la app se está ejecutando actualmente en modo standalone */
   isInstalled: boolean;
   /** Dispara el prompt nativo de instalación */
   promptInstall: () => Promise<void>;
-  /** Descarta el banner solo para esta sesión */
+  /** Descarta el banner para esta carga de página (se restablece al recargar) */
   dismiss: () => void;
 }
 
@@ -23,6 +21,7 @@ export function usePWAInstall(): PWAInstallState {
   const deferredPrompt = useRef<BeforeInstallPromptEvent | null>(null);
   const [canInstall, setCanInstall] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [isDismissed, setIsDismissed] = useState(false);
 
   // ─── Detectar si la app corre actualmente en modo standalone ─────
   useEffect(() => {
@@ -49,19 +48,15 @@ export function usePWAInstall(): PWAInstallState {
   }, []);
 
   // ─── Capturar el evento beforeinstallprompt ─────────────────────
-  // Dejamos que el navegador sea la ÚNICA fuente de verdad.
-  // Si la app está instalada en el sistema operativo, el navegador no disparará 'beforeinstallprompt'.
-  // Si el usuario desinstala la app, el navegador volverá a disparar 'beforeinstallprompt' automáticamente.
   useEffect(() => {
     if (isInstalled) return;
 
     const handleBeforeInstallPrompt = (e: Event) => {
-      // Prevenir el mini-infobar nativo de Chrome
       e.preventDefault();
       deferredPrompt.current = e as BeforeInstallPromptEvent;
 
-      // Si ya la descartó en esta pestaña/sesión, no mostrar de inmediato
-      if (sessionStorage.getItem(SESSION_KEY_DISMISSED) === 'true') {
+      // Si ya la descartó en esta carga de página, no volver a mostrar
+      if (isDismissed) {
         return;
       }
 
@@ -72,7 +67,7 @@ export function usePWAInstall(): PWAInstallState {
       setIsInstalled(true);
       setCanInstall(false);
       deferredPrompt.current = null;
-      sessionStorage.removeItem(SESSION_KEY_DISMISSED);
+      setIsDismissed(false);
     };
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -82,7 +77,7 @@ export function usePWAInstall(): PWAInstallState {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       window.removeEventListener('appinstalled', handleAppInstalled);
     };
-  }, [isInstalled]);
+  }, [isInstalled, isDismissed]);
 
   // ─── Disparar el prompt nativo ──────────────────────────────────
   const promptInstall = useCallback(async () => {
@@ -94,17 +89,17 @@ export function usePWAInstall(): PWAInstallState {
 
     if (outcome === 'accepted') {
       setIsInstalled(true);
-      sessionStorage.removeItem(SESSION_KEY_DISMISSED);
+      setIsDismissed(false);
     }
 
     setCanInstall(false);
     deferredPrompt.current = null;
   }, []);
 
-  // ─── Descartar el banner (solo esta sesión) ─────────────────────
+  // ─── Descartar el banner (se restablece al refrescar) ───────────
   const dismiss = useCallback(() => {
     setCanInstall(false);
-    sessionStorage.setItem(SESSION_KEY_DISMISSED, 'true');
+    setIsDismissed(true);
   }, []);
 
   return { canInstall, isInstalled, promptInstall, dismiss };
