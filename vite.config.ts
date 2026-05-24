@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: [
         'Logo.png',
-        'pwa-192.svg',
-        'pwa-512.svg',
+        'Logo-192.png',
+        'Logo-512.png',
         'fondo.jpg',
       ],
       workbox: {
@@ -35,23 +35,23 @@ export default defineConfig({
         prefer_related_applications: false,
         icons: [
           {
-            src: '/Logo.png',
+            src: '/Logo-192.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: '/Logo.png',
+            src: '/Logo-512.png',
             sizes: '512x512',
             type: 'image/png',
           },
           {
-            src: '/Logo.png',
+            src: '/Logo-192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'maskable',
           },
           {
-            src: '/Logo.png',
+            src: '/Logo-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
