@@ -1,13 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-/**
- * Cooldown en milisegundos antes de volver a mostrar el banner
- * después de que el usuario lo descartó. (7 días)
- */
-const DISMISS_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
-
-const STORAGE_KEY_DISMISSED = 'pwa-install-dismissed-at';
 const STORAGE_KEY_INSTALLED = 'pwa-install-completed';
+const SESSION_KEY_DISMISSED = 'pwa-install-dismissed';
 
 interface BeforeInstallPromptEvent extends Event {
   readonly platforms: string[];
@@ -16,13 +10,13 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 export interface PWAInstallState {
-  /** true cuando el navegador ofrece la instalación y no fue descartada recientemente */
+  /** true cuando el navegador ofrece la instalación y no fue descartada en esta sesión */
   canInstall: boolean;
   /** true cuando la app ya corre en modo standalone / twa / minimal-ui */
   isInstalled: boolean;
   /** Dispara el prompt nativo de instalación */
   promptInstall: () => Promise<void>;
-  /** Descarta el banner y registra cooldown */
+  /** Descarta el banner solo para esta sesión */
   dismiss: () => void;
 }
 
@@ -65,32 +59,28 @@ export function usePWAInstall(): PWAInstallState {
       e.preventDefault();
       deferredPrompt.current = e as BeforeInstallPromptEvent;
 
-      // Verificar si el usuario lo descartó recientemente
-      const dismissedAt = localStorage.getItem(STORAGE_KEY_DISMISSED);
-      if (dismissedAt) {
-        const elapsed = Date.now() - parseInt(dismissedAt, 10);
-        if (elapsed < DISMISS_COOLDOWN_MS) {
-          return; // Aún en cooldown, no mostrar
-        }
-        localStorage.removeItem(STORAGE_KEY_DISMISSED);
+      // Si el usuario ya descartó el banner en ESTA sesión, no volver a mostrarlo
+      if (sessionStorage.getItem(SESSION_KEY_DISMISSED) === 'true') {
+        return;
       }
 
       setCanInstall(true);
     };
 
-    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
-
-    // Si el usuario instala desde el propio banner del navegador
-    window.addEventListener('appinstalled', () => {
+    const handleAppInstalled = () => {
       setIsInstalled(true);
       setCanInstall(false);
       deferredPrompt.current = null;
       localStorage.setItem(STORAGE_KEY_INSTALLED, 'true');
-      localStorage.removeItem(STORAGE_KEY_DISMISSED);
-    });
+      sessionStorage.removeItem(SESSION_KEY_DISMISSED);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
     };
   }, [isInstalled]);
 
@@ -105,17 +95,17 @@ export function usePWAInstall(): PWAInstallState {
     if (outcome === 'accepted') {
       setIsInstalled(true);
       localStorage.setItem(STORAGE_KEY_INSTALLED, 'true');
-      localStorage.removeItem(STORAGE_KEY_DISMISSED);
+      sessionStorage.removeItem(SESSION_KEY_DISMISSED);
     }
 
     setCanInstall(false);
     deferredPrompt.current = null;
   }, []);
 
-  // ─── Descartar el banner ────────────────────────────────────────
+  // ─── Descartar el banner (solo esta sesión) ─────────────────────
   const dismiss = useCallback(() => {
     setCanInstall(false);
-    localStorage.setItem(STORAGE_KEY_DISMISSED, Date.now().toString());
+    sessionStorage.setItem(SESSION_KEY_DISMISSED, 'true');
   }, []);
 
   return { canInstall, isInstalled, promptInstall, dismiss };
