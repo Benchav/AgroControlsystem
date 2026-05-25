@@ -23,8 +23,10 @@ export function IotPage() {
   const [isSimulating, setIsSimulating] = useState<boolean>(true);
 
   // Estados cargados desde LocalStorage (hooks)
-  const { arduinos, addArduino, toggleArduinoStatus, deleteArduino } = useArduinos();
-  const { sensors, addSensor, removeSensorsByArduinoId, humidityHistory } = useSensors({ isSimulating, arduinos });
+  const { arduinos, addArduino, toggleArduinoStatus, deleteArduino } =
+    useArduinos();
+  const { sensors, addSensor, removeSensorsByArduinoId, humidityHistory } =
+    useSensors({ isSimulating, arduinos });
   const { alerts, resolveAlert } = useAlerts();
 
   // Historial de Humedad manejado por useSensors
