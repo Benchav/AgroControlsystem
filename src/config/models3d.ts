@@ -2,7 +2,12 @@ import { Models3dItem } from '../entities/3d_object_model';
 
 export const models3d: Models3dItem[] = [
   {
-    title: 'Diseño de heno',
+    title: 'Diseño de Porcino',
+    author: 'Oscar',
+    modelPath: "/3d-objects/cerdo.glb",
+  },
+  {
+    title: 'Diseño de Heno',
     author: 'Oscar',
     modelPath: "/3d-objects/heno.glb",
   },
