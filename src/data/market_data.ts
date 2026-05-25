@@ -100,7 +100,7 @@ export const mockMarketItems: MarketItem[] = [
     status: "pendiente",
     category: "alimentos",
     imageUrl: [
-      "https://carrefourar.vtexassets.com/arquivos/ids/799900/2372243000009_02.jpg?v=639064301521200000",
+      "https://clickabasto.com/cdn/shop/products/cebolla_blanca_2_1024x1024.jpg?v=1554353178",
       "https://agrofertas.co/images/detailed/10/plantula_cebolla_blanca.jpg",
       "https://s3.ppllstatics.com/diariovasco/www/multimedia/2024/05/08/onion-RlsgTtfuasHlKSVNGU6wzAL-1200x840@Diario%20Vasco.jpg",
     ],
