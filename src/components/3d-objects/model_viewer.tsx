@@ -1,20 +1,27 @@
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Environment, useGLTF } from '@react-three/drei';
-import { Suspense } from 'react';
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, Environment, useGLTF } from "@react-three/drei";
+import { Suspense } from "react";
+import { useMemo } from "react";
+import { SkeletonUtils } from "three-stdlib";
 
 type Props = {
   modelPath: string;
+  interactive?: boolean;
 };
 
 function Model({ modelPath }: Props) {
   const gltf = useGLTF(modelPath);
 
-  return <primitive object={gltf.scene} scale={3} />;
+  const scene = useMemo(() => {
+    return SkeletonUtils.clone(gltf.scene);
+  }, [gltf.scene]);
+
+  return <primitive object={scene} scale={3} />;
 }
 
-export function ModelViewer({ modelPath }: Props) {
+export function ModelViewer({ modelPath, interactive = false }: Props) {
   return (
-    <div className="h-[400px] w-full rounded-2xl overflow-hidden bg-black">
+    <div className="h-full w-full rounded-2xl overflow-hidden bg-black">
       <Canvas camera={{ position: [0, 2, 5], fov: 45 }}>
         <ambientLight intensity={1} />
 
@@ -26,11 +33,7 @@ export function ModelViewer({ modelPath }: Props) {
           <Environment preset="city" />
         </Suspense>
 
-        <OrbitControls
-          enablePan
-          enableZoom
-          enableRotate
-        />
+        {interactive && <OrbitControls enablePan enableZoom enableRotate />}
       </Canvas>
     </div>
   );
