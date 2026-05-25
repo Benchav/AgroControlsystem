@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Arduino } from "../entities/arduino_model";
 import { Sensor } from "../entities/sensor_model";
-import { Alert } from "../entities/alert_model";
 
 import IotHeader from "../components/iot/IotHeader";
 import StatsGrid from "../components/iot/StatsGrid";
