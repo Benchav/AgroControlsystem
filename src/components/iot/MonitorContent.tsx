@@ -74,9 +74,9 @@ export const MonitorContent: React.FC<Props> = ({ humidityHistory, sensors, aler
               .map((alert) => (
                 <div
                   key={alert.id}
-                  className={`flex items-start gap-4 rounded-2xl border p-4 transition-all duration-200 hover:bg-white/[0.02] ${alert.severity === 'red'
-                      ? 'border-red-400/15 bg-red-500/20'
-                      : 'border-amber-400/15 bg-amber-500/20'
+                  className={`flex items-start gap-4 rounded-2xl border p-4 transition-all duration-200 ${alert.severity === 'red'
+                      ? 'border-red-400/15 bg-red-500/20 hover:bg-red-500/50'
+                      : 'border-amber-400/15 bg-amber-500/20 hover:bg-amber-500/50'
                     }`}
                 >
                   <i className={`${alert.emoji}`} style={{ fontSize: "20px" }} />
