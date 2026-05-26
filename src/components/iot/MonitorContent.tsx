@@ -96,9 +96,9 @@ export const MonitorContent: React.FC<Props> = ({ humidityHistory, sensors, aler
       </PageSection>
 
       <PageSection title="Todos los sensores" subtitle="Inventario y lecturas detalladas de hardware">
-        <div className="overflow-x-auto rounded-2xl border border-white/8">
+        <div className="overflow-x-auto rounded-[10px] border border-white/8">
           <table className="w-full border-collapse text-left min-w-[600px]">
-            <thead className="bg-white/[0.03] text-[10px] uppercase tracking-[0.2em] text-slate-500">
+            <thead className="bg-blue-600/40 text-[10px] uppercase tracking-[0.2em] text-white font-semibold">
               <tr>
                 <th className="px-4 py-3 font-semibold">Sensor</th>
                 <th className="px-4 py-3 font-semibold">Tipo</th>
