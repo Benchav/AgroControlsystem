@@ -239,57 +239,109 @@ export function ReportsPage() {
       {/* ── Encabezado con controles ── */}
       <div className="flex flex-col justify-between gap-4 md:flex-row md:items-start">
         <div>
-          <p className="text-sm text-slate-400">Centro de Inteligencia Agrícola · Datos sincronizados en tiempo real</p>
           <h1 className="mt-1 text-2xl font-black tracking-tight text-white">Sistema de Reportes</h1>
+          <p className="text-sm text-slate-400">Centro de Inteligencia Agrícola · Datos sincronizados en tiempo real</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           {/* Selector de período */}
-          <div className="flex rounded-xl border border-white/8 bg-white/[0.03] p-1">
+          <div className="flex rounded-xl  p-1">
             {(Object.keys(PERIOD_DAYS) as Period[]).map((p) => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
-                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${period === p ? 'bg-emerald-500/20 text-emerald-300' : 'text-slate-400 hover:text-slate-200'}`}
+                className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition-all duration-200 ${period === p ? 'bg-emerald-500/40 text-emerald-300' : 'text-slate-400 hover:text-slate-200'}`}
               >
                 {PERIOD_LABELS[p]}
               </button>
             ))}
           </div>
+          <div className="group relative">
+            <button
+              className="flex items-center gap-2 rounded-xl border border-blue-500/50 bg-blue-500/50 px-4 py-2 text-xs font-semibold text-white transition-all duration-300 "
+            >
+              <i className="fas fa-download" />
+              Exportar
+              <i className="fas fa-chevron-down text-[10px]" />
+            </button>
 
-          {/* Botón Excel */}
-          <button
-            onClick={handleExcel}
-            className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-semibold transition-all duration-300 ${exportFlash === 'excel' ? 'border-emerald-500/40 bg-emerald-500/15 text-emerald-300 scale-95' : 'border-white/10 bg-white/5 text-slate-300 hover:border-emerald-500/30 hover:bg-emerald-500/10 hover:text-emerald-300'}`}
-          >
-            <i className={`fas ${exportFlash === 'excel' ? 'fa-check' : 'fa-file-excel'}`} />
-            {exportFlash === 'excel' ? '¡Descargado!' : 'Excel'}
-          </button>
+            {/* Tooltip / Dropdown */}
+            <div
+              className="
+                pointer-events-none absolute right-0 top-full z-50
+                w-44 rounded-2xl border border-white/10
+                bg-[#0f172a]/95 p-2 opacity-0 shadow-2xl
+                backdrop-blur-xl transition-all duration-200
+                group-hover:pointer-events-auto
+                group-hover:translate-y-0
+                group-hover:opacity-100
+              "
+            >
+              {/* Excel */}
+              <button
+                onClick={handleExcel}
+                className={`flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium transition-all ${exportFlash === 'excel'
+                  ? 'bg-emerald-500/15 text-emerald-300'
+                  : 'text-slate-300 hover:bg-emerald-500/10 hover:text-emerald-300'
+                  }`}
+              >
+                <i
+                  className={`fas ${exportFlash === 'excel'
+                    ? 'fa-check'
+                    : 'fa-file-excel'
+                    }`}
+                />
+                {exportFlash === 'excel'
+                  ? '¡Descargado!'
+                  : 'Descargar Excel'}
+              </button>
 
-          {/* Botón PDF */}
-          <button
-            onClick={handlePDF}
-            className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-semibold transition-all duration-300 ${exportFlash === 'pdf' ? 'border-red-500/40 bg-red-500/15 text-red-300 scale-95' : 'border-white/10 bg-white/5 text-slate-300 hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-300'}`}
-          >
-            <i className={`fas ${exportFlash === 'pdf' ? 'fa-check' : 'fa-file-pdf'}`} />
-            {exportFlash === 'pdf' ? '¡Generado!' : 'PDF'}
-          </button>
+              {/* PDF */}
+              <button
+                onClick={handlePDF}
+                className={`mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium transition-all ${exportFlash === 'pdf'
+                  ? 'bg-red-500/15 text-red-300'
+                  : 'text-slate-300 hover:bg-red-500/10 hover:text-red-300'
+                  }`}
+              >
+                <i
+                  className={`fas ${exportFlash === 'pdf'
+                    ? 'fa-check'
+                    : 'fa-file-pdf'
+                    }`}
+                />
+                {exportFlash === 'pdf'
+                  ? '¡Generado!'
+                  : 'Generar PDF'}
+              </button>
 
-          {/* Botón CSV rápido */}
-          <button
-            onClick={() => handleCSV('telemetria', multiHistory)}
-            className={`flex items-center gap-2 rounded-xl border px-4 py-2 text-xs font-semibold transition-all duration-300 ${exportFlash?.toString().startsWith('csv') ? 'border-sky-500/40 bg-sky-500/15 text-sky-300 scale-95' : 'border-white/10 bg-white/5 text-slate-300 hover:border-sky-500/30 hover:bg-sky-500/10 hover:text-sky-300'}`}
-          >
-            <i className={`fas ${exportFlash?.toString().startsWith('csv') ? 'fa-check' : 'fa-download'}`} />
-            {exportFlash?.toString().startsWith('csv') ? '¡CSV listo!' : 'CSV'}
-          </button>
+              {/* CSV */}
+              <button
+                onClick={() => handleCSV('telemetria', multiHistory)}
+                className={`mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-2 text-xs font-medium transition-all ${exportFlash?.toString().startsWith('csv')
+                  ? 'bg-sky-500/15 text-sky-300'
+                  : 'text-slate-300 hover:bg-sky-500/10 hover:text-sky-300'
+                  }`}
+              >
+                <i
+                  className={`fas ${exportFlash?.toString().startsWith('csv')
+                    ? 'fa-check'
+                    : 'fa-download'
+                    }`}
+                />
+                {exportFlash?.toString().startsWith('csv')
+                  ? '¡CSV listo!'
+                  : 'Descargar CSV'}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* ── KPI Grid ── */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {kpiGrid.map((kpi) => (
-          <div key={kpi.label} className="group rounded-[28px] border border-white/8 bg-white/[0.03] p-5 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-white/15 hover:bg-white/[0.05]">
+          <div key={kpi.label} className="group rounded-[14px] border border-white/8 bg-white/[0.03] p-5 shadow-lg backdrop-blur-md transition-all duration-300 hover:border-white/15 hover:bg-white/[0.05]">
             <div className="flex items-start justify-between">
               <div className="flex h-10 w-10 items-center justify-center rounded-2xl" style={{ background: `${kpi.color}18` }}>
                 <i className={`fas ${kpi.icon} text-sm`} style={{ color: kpi.color }} />
@@ -687,6 +739,6 @@ export function ReportsPage() {
         </PageSection>
       </div>
 
-    </div>
+    </div >
   );
 }
