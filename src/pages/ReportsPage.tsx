@@ -200,10 +200,10 @@ export function ReportsPage() {
   };
 
   const tabs = [
-    { key: 'overview' as const, label: 'Resumen Ejecutivo', icon: '📊' },
-    { key: 'sensors' as const, label: 'Análisis de Sensores', icon: '🔬' },
-    { key: 'parcelas' as const, label: 'Reporte por Parcela', icon: '🌾' },
-    { key: 'alertas' as const, label: 'Historial de Alertas', icon: '🚨' },
+    { key: 'overview' as const, label: 'Resumen Ejecutivo', icon: 'fas fa-file' },
+    { key: 'sensors' as const, label: 'Análisis de Sensores', icon: 'fas fa-temperature-half' },
+    { key: 'parcelas' as const, label: 'Reporte por Parcela', icon: 'fas fa-folder' },
+    { key: 'alertas' as const, label: 'Historial de Alertas', icon: 'fas fa-bell' },
   ];
 
   // KPI grid data
@@ -362,9 +362,9 @@ export function ReportsPage() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex items-center gap-1.5 rounded-t-lg px-4 py-2.5 text-xs font-semibold transition-all duration-200 border-b-2 ${activeTab === tab.key ? 'border-emerald-500 text-white' : 'border-transparent text-slate-400 hover:text-slate-200'}`}
+            className={`flex items-center gap-1.5 rounded-t-lg px-4 py-2.5 text-xs font-semibold transition-all duration-200  ${activeTab === tab.key ? 'bg-blue-500/50 text-white' : ' text-slate-400 hover:text-slate-200'}`}
           >
-            <span>{tab.icon}</span>
+            <i className={`${tab.icon} text-sm`} />
             {tab.label}
           </button>
         ))}
@@ -385,8 +385,8 @@ export function ReportsPage() {
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={multiHistory}>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                <XAxis dataKey="day" stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
-                <YAxis stroke="#475569" fontSize={10} tickLine={false} axisLine={false} />
+                <XAxis dataKey="day" stroke="#ffffff" fontSize={10} tickLine={false} axisLine={false} />
+                <YAxis stroke="#ffffff" fontSize={10} tickLine={false} axisLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <Line type="monotone" dataKey="Humedad" stroke="#38bdf8" strokeWidth={2.5} dot={false} name="Humedad" />
                 <Line type="monotone" dataKey="Temperatura" stroke="#f59e0b" strokeWidth={2.5} dot={false} name="Temperatura" />
@@ -395,7 +395,7 @@ export function ReportsPage() {
             </ResponsiveContainer>
           </div>
           <div className="mt-3 flex justify-end">
-            <button onClick={() => handleCSV('telemetria', multiHistory)} className="text-xs text-slate-500 hover:text-emerald-400 flex items-center gap-1 transition-colors">
+            <button onClick={() => handleCSV('telemetria', multiHistory)} className="text-xs text-white hover:text-emerald-400 flex items-center gap-1 transition-colors">
               <i className="fas fa-download text-[10px]" /> Exportar telemetría como CSV
             </button>
           </div>
@@ -412,8 +412,8 @@ export function ReportsPage() {
                       <stop offset="95%" stopColor="#38bdf8" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="day" stroke="#475569" fontSize={9} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#475569" fontSize={9} tickLine={false} axisLine={false} domain={[20, 100]} />
+                  <XAxis dataKey="day" stroke="#ffffff" fontSize={9} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#ffffff" fontSize={9} tickLine={false} axisLine={false} domain={[20, 100]} />
                   <Tooltip content={<CustomTooltip />} />
                   <ReferenceLine y={systemSettings.humidityThreshold + 15} stroke="#38bdf8" strokeDasharray="4 2" strokeOpacity={0.3} label={{ value: 'Óptimo', position: 'right', fill: '#38bdf8', fontSize: 9 }} />
                   <ReferenceLine y={systemSettings.humidityThreshold} stroke="#ef4444" strokeDasharray="4 2" strokeOpacity={0.3} label={{ value: 'Crítico', position: 'right', fill: '#ef4444', fontSize: 9 }} />
@@ -433,8 +433,8 @@ export function ReportsPage() {
                       <stop offset="95%" stopColor="#f59e0b" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <XAxis dataKey="day" stroke="#475569" fontSize={9} tickLine={false} axisLine={false} />
-                  <YAxis stroke="#475569" fontSize={9} tickLine={false} axisLine={false} domain={[10, 45]} />
+                  <XAxis dataKey="day" stroke="#ffffff" fontSize={9} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#ffffff" fontSize={9} tickLine={false} axisLine={false} domain={[10, 45]} />
                   <Tooltip content={<CustomTooltip />} />
                   <ReferenceLine y={systemSettings.temperatureThreshold} stroke="#ef4444" strokeDasharray="4 2" strokeOpacity={0.3} label={{ value: 'Estrés', position: 'right', fill: '#ef4444', fontSize: 9 }} />
                   <Area type="monotone" dataKey="Temperatura" stroke="#f59e0b" strokeWidth={2.5} fillOpacity={1} fill="url(#gtemp2)" name="Temperatura" />
@@ -460,9 +460,9 @@ export function ReportsPage() {
             </div>
             <div className="mt-5 grid grid-cols-3 gap-3">
               {alertDistribution.map((item) => (
-                <div key={item.name} className="rounded-2xl border border-white/6 bg-white/[0.02] p-3 text-center">
+                <div key={item.name} className="rounded-2xl bg-black/50 p-3 text-center">
                   <div className="text-2xl font-black" style={{ color: item.color }}>{item.value}</div>
-                  <div className="mt-0.5 text-[10px] text-slate-500">{item.name}</div>
+                  <div className="mt-0.5 text-[10px] text-white/80">{item.name}</div>
                 </div>
               ))}
             </div>
@@ -472,9 +472,10 @@ export function ReportsPage() {
             <div className="h-[200px]">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={sensorTypeData} layout="vertical">
-                  <XAxis type="number" stroke="#475569" fontSize={9} tickLine={false} axisLine={false} />
-                  <YAxis dataKey="type" type="category" stroke="#475569" fontSize={9} tickLine={false} axisLine={false} width={70} />
-                  <Tooltip content={<CustomTooltip />} />
+                  <XAxis type="number" stroke="#ffffff" fontSize={9} tickLine={false} axisLine={false} />
+                  <YAxis dataKey="type" type="category" stroke="#ffffff" fontSize={9} tickLine={false} axisLine={false} width={70} />
+                  {/* fondo de color de la barra al hacer hover cambiar color de la propiedad cursor */}
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(16,185,129,0.08)' }}/>
                   <Bar dataKey="count" fill="#10b981" radius={[0, 6, 6, 0]} name="Cantidad" />
                 </BarChart>
               </ResponsiveContainer>
@@ -496,8 +497,8 @@ export function ReportsPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" />
-                <XAxis dataKey="day" stroke="#475569" fontSize={9} tickLine={false} axisLine={false} />
-                <YAxis stroke="#475569" fontSize={9} tickLine={false} axisLine={false} />
+                <XAxis dataKey="day" stroke="#ffffff" fontSize={9} tickLine={false} axisLine={false} />
+                <YAxis stroke="#ffffff" fontSize={9} tickLine={false} axisLine={false} />
                 <Tooltip content={<CustomTooltip />} />
                 <ReferenceLine y={1000} stroke="#f59e0b" strokeDasharray="4 2" strokeOpacity={0.5} label={{ value: 'Límite seguro', position: 'right', fill: '#f59e0b', fontSize: 9 }} />
                 <Area type="monotone" dataKey="CO2" stroke="#a78bfa" strokeWidth={2.5} fillOpacity={1} fill="url(#gco2)" name="CO₂ (ppm)" />
@@ -509,13 +510,13 @@ export function ReportsPage() {
         <PageSection title="Inventario Completo de Sensores" subtitle="Lecturas actuales y estado de todos los nodos">
           <div className="mb-3 flex justify-end">
             <button onClick={() => handleCSV('sensores', sensors.map(s => ({ id: s.id, nombre: s.name, tipo: s.type, ubicacion: s.location, lectura: s.value, estado: s.status, arduino: s.arduinoId })))}
-              className="text-xs text-slate-500 hover:text-emerald-400 flex items-center gap-1 transition-colors">
+              className="text-xs text-white hover:text-emerald-400 flex items-center gap-1 transition-colors">
               <i className="fas fa-download text-[10px]" /> Exportar tabla CSV
             </button>
           </div>
           <div className="overflow-x-auto rounded-2xl border border-white/8">
             <table className="w-full border-collapse text-left min-w-[720px]">
-              <thead className="bg-white/[0.03] text-[10px] uppercase tracking-[0.2em] text-slate-500">
+              <thead className="bg-blue-500/50 text-[10px] uppercase tracking-[0.2em] text-white">
                 <tr>
                   {['ID', 'Nombre', 'Tipo', 'Ubicación', 'Placa Arduino', 'Lectura actual', 'Estado', 'Salud'].map((h) => (
                     <th key={h} className="px-4 py-3 font-semibold">{h}</th>
