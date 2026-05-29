@@ -475,7 +475,7 @@ export function ReportsPage() {
                   <XAxis type="number" stroke="#ffffff" fontSize={9} tickLine={false} axisLine={false} />
                   <YAxis dataKey="type" type="category" stroke="#ffffff" fontSize={9} tickLine={false} axisLine={false} width={70} />
                   {/* fondo de color de la barra al hacer hover cambiar color de la propiedad cursor */}
-                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(16,185,129,0.08)' }}/>
+                  <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(16,185,129,0.08)' }} />
                   <Bar dataKey="count" fill="#10b981" radius={[0, 6, 6, 0]} name="Cantidad" />
                 </BarChart>
               </ResponsiveContainer>
@@ -567,17 +567,26 @@ export function ReportsPage() {
           {parcelaData.map((p) => {
             const healthColor = p.saludPct >= 80 ? '#10b981' : p.saludPct >= 60 ? '#f59e0b' : '#ef4444';
             return (
-              <div key={p.parcela} className="rounded-[28px] border border-white/8 bg-white/[0.03] p-6 shadow-md transition-all duration-300 hover:border-white/15 hover:shadow-lg">
+              <div key={p.parcela} className="rounded-[14px] border border-white/8 bg-white/[0.03] p-6 shadow-md transition-all duration-300 hover:scale-105 hover:bg-emerald-500/15 hover:shadow-lg backdrop-blur" onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor =
+                  p.saludPct >= 80
+                    ? 'rgba(16,185,129,0.15)'
+                    : p.saludPct >= 60
+                      ? 'rgba(245,158,11,0.15)'
+                      : 'rgba(239,68,68,0.15)';
+              }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)';
+                }}>
                 <div className="flex items-start justify-between">
                   <div>
-                    <div className="text-[10px] uppercase tracking-widest text-slate-500">Parcela</div>
                     <h3 className="mt-1 text-base font-black text-white">{p.parcela}</h3>
                   </div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl" style={{ background: `${healthColor}18` }}>
-                    <span className="text-lg font-black" style={{ color: healthColor }}>{p.saludPct}%</span>
+                  <div className="flex px-4 py-1 items-center justify-center rounded-full" style={{ background: `${healthColor}18` }}>
+                    <span className="text-md font-black" style={{ color: healthColor }}>{p.saludPct}%</span>
                   </div>
                 </div>
-                <div className="mt-4 text-[10px] uppercase tracking-widest text-slate-600 mb-1">Índice de salud</div>
+                <div className="mt-4 text-[10px] uppercase tracking-widest text-white mb-1">Índice de salud</div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-white/5">
                   <div className="h-full rounded-full transition-all duration-700" style={{ width: `${p.saludPct}%`, background: healthColor }} />
                 </div>
@@ -588,8 +597,8 @@ export function ReportsPage() {
                     { label: 'pH Suelo', value: p.ph > 0 ? p.ph.toString() : 'N/A', icon: '⚗️', color: '#a78bfa' },
                     { label: 'Sensores', value: p.sensores.toString(), icon: '📡', color: '#10b981' },
                   ].map((m) => (
-                    <div key={m.label} className="rounded-xl border border-white/6 bg-white/[0.02] p-2.5">
-                      <div className="flex items-center gap-1 text-[10px] text-slate-500"><span>{m.icon}</span>{m.label}</div>
+                    <div key={m.label} className="rounded-xl border border-white/20 bg-black/50 p-2.5">
+                      <div className="flex items-center gap-1 text-[10px] text-white/80"><span>{m.icon}</span>{m.label}</div>
                       <div className="mt-1 text-lg font-black" style={{ color: m.color }}>{m.value}</div>
                     </div>
                   ))}
@@ -616,7 +625,7 @@ export function ReportsPage() {
                 <Radar name="Salud %" dataKey="Salud" stroke="#10b981" fill="#10b981" fillOpacity={0.15} strokeWidth={2} />
                 <Radar name="Humedad %" dataKey="Humedad" stroke="#38bdf8" fill="#38bdf8" fillOpacity={0.1} strokeWidth={2} />
                 <Tooltip content={<CustomTooltip />} />
-                <Legend formatter={(v) => <span className="text-xs text-slate-400">{v}</span>} />
+                <Legend formatter={(v) => <span className="text-xs text-white">{v}</span>} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
@@ -624,13 +633,13 @@ export function ReportsPage() {
 
         <PageSection title="Tabla Comparativa de Parcelas" subtitle="Resumen ejecutivo de fertilidad por zona de cultivo">
           <div className="mb-3 flex justify-end">
-            <button onClick={() => handleCSV('parcelas', parcelaData)} className="text-xs text-slate-500 hover:text-emerald-400 flex items-center gap-1 transition-colors">
+            <button onClick={() => handleCSV('parcelas', parcelaData)} className="text-xs text-white hover:text-emerald-400 flex items-center gap-1 transition-colors">
               <i className="fas fa-download text-[10px]" /> Exportar CSV
             </button>
           </div>
           <div className="overflow-x-auto rounded-2xl border border-white/8">
             <table className="w-full border-collapse text-left min-w-[600px]">
-              <thead className="bg-white/[0.03] text-[10px] uppercase tracking-[0.2em] text-slate-500">
+              <thead className="bg-blue-600/50 text-[10px] uppercase tracking-[0.2em] text-white">
                 <tr>
                   {['Parcela', 'Salud', 'Humedad', 'Temperatura', 'pH', 'Sensores', 'Estado'].map((h) => (
                     <th key={h} className="px-4 py-3 font-semibold">{h}</th>
