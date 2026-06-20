@@ -144,7 +144,7 @@ export function SettingsPage() {
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto pb-10 ">
       {/* Encabezado General Superior */}
-      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center border-b border-white/5 pb-5 top-0 sticky z-50">
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center border-b border-white/5 pb-5 top-0 sticky z-50 backdrop-blur-xl">
         <div>
           <h1 className="mt-1 text-2xl font-black tracking-tight text-white flex items-center gap-2.5">
             Ajustes de Sistema
@@ -160,10 +160,10 @@ export function SettingsPage() {
       </div>
 
       {/* DISEÑO ESTRUCTURADO: Menú Lateral de Sub-Ajustes + Panel de Contenido */}
-      <div className="grid gap-6 lg:grid-cols-12 items-start mt-28 z-20">
+      <div className="grid gap-6 lg:grid-cols-12 items-start">
 
         {/* NAVEGACIÓN LATERAL (3 Columnas) */}
-        <div className="lg:col-span-3 sticky top-6 space-y-4">
+        <div className="lg:col-span-3 lg:sticky lg:top-24 self-start space-y-4">
 
           <div className="rounded-[14px] border border-white/8 bg-slate-950/40 backdrop-blur-xl p-4 shadow-xl">
             {/* Header del Menú - Mini Perfil Resumen */}
