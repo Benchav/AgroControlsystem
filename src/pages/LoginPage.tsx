@@ -341,7 +341,7 @@ export const LoginPage = () => {
 
                   <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/[0.05] p-4 text-sm leading-6 text-slate-300">
                     Tu cuenta quedara pendiente hasta completar la verificacion por correo. Esto evita accesos y registros incompletos.
-                  />
+                  </div>
                 </div>
 
                 <button
