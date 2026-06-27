@@ -1,5 +1,5 @@
 # Documentacion de Autenticacion de Dos Factores (2FA)
-
+ 
 Este documento detalla la arquitectura, el flujo y las implementaciones realizadas para el sistema de autenticacion de dos factores (2FA) en la plataforma Agro Control, incluyendo tanto el frontend (React) como el backend de soporte.
 
 ## 1. Arquitectura General
