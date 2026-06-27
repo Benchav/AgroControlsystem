@@ -11,7 +11,7 @@ export function ModelGrid({ models }: Props) {
       {models.map((model) => (
         <ModelCard
           key={model.title}
-          {...model}
+          model3d={model}
         />
       ))}
     </div>

@@ -1,17 +1,13 @@
 import { useState } from "react";
-
 import { ModelViewer } from "./model_viewer";
+import { Models3dItem } from "../../entities/3d_object_model";
 
 type Props = {
-  title: string;
-  author: string;
-  modelPath: string;
+  model3d: Models3dItem;
 };
 
 export function ModelCard({
-  title,
-  author,
-  modelPath,
+  model3d
 }: Props) {
   const [visible, setVisible] = useState(false);
 
@@ -23,19 +19,20 @@ export function ModelCard({
         {/* PREVIEW NO INTERACTIVA */}
         <div className="pointer-events-none">
           <ModelViewer
-            modelPath={modelPath}
+            modelPath={model3d.modelPath}
             interactive={false}
+            model3d={model3d}
           />
         </div>
 
         <div className="mt-4 flex items-center justify-between">
           <div>
             <h3 className="text-white font-semibold">
-              {title}
+              {model3d.title}
             </h3>
 
             <p className="text-sm text-slate-400">
-              {author}
+              {model3d.author}
             </p>
           </div>
 
@@ -110,8 +107,9 @@ export function ModelCard({
 
             {/* VIEWER INTERACTIVO */}
             <ModelViewer
-              modelPath={modelPath}
+              modelPath={model3d.modelPath}
               interactive={true}
+              model3d={model3d}
             />
           </div>
         </div>
