@@ -3,17 +3,14 @@ import {
   CircleMarker,
   MapContainer,
   Polygon,
-  Popup,
   TileLayer,
   Tooltip,
 } from "react-leaflet";
-import type { LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import { FeatureGroup } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import type { Parcel, ParcelStatus } from "../../entities/parcel_model";
-import { initialParcels } from "../../data/parcels";
 import { FitBounds } from "../../utils/fitBounds";
 import { SoilMetricsPanel } from "../../utils/soil_metrics_panel";
 import { useModels3d } from "../../hooks/useModels3d";
@@ -21,19 +18,28 @@ import * as turf from "@turf/turf";
 
 const mapCenter: [number, number] = [14.0711, -87.1989];
 
-export function FarmInteractiveMap({
-  dynamicParcels,
-  setDynamicParcels,
-  selectedParcelId,
-  setSelectedParcelId,
-}: {
+interface FarmInteractiveMapProps {
   dynamicParcels: Parcel[];
-  setDynamicParcels: React.Dispatch<React.SetStateAction<Parcel[]>>;
+  onCreateParcel: (newParcel: Parcel) => void;
+  onUpdateParcel: (params: { id: string; updatedParcel: Parcel }) => void;
+  onDeleteParcel: (id: string) => void;
   selectedParcelId: string;
   setSelectedParcelId: React.Dispatch<React.SetStateAction<string>>;
-}) {
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
-  const [editingParcel, setEditingParcel] = useState<Parcel | null>(initialParcels[0]);
+  isEditorOpen: boolean;
+  setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export function FarmInteractiveMap({
+  dynamicParcels,
+  onCreateParcel,
+  onUpdateParcel,
+  onDeleteParcel,
+  selectedParcelId,
+  setSelectedParcelId,
+  isEditorOpen,
+  setIsEditorOpen,
+}: FarmInteractiveMapProps) {
+  const [editingParcel, setEditingParcel] = useState<Parcel | null>(null);
   const { models: crops } = useModels3d();
 
   const selectedParcel = useMemo(
@@ -43,7 +49,16 @@ export function FarmInteractiveMap({
     [selectedParcelId, dynamicParcels],
   );
 
-  const updateParcel = (field: keyof Parcel | string, value: any) => {
+  // Sincronizar el editor local cuando cambia la parcela seleccionada 
+  //en el otro componente en el padre
+  useEffect(() => {
+    if (selectedParcel) {
+      setEditingParcel(selectedParcel);
+    }
+  }, [selectedParcel]);
+
+  // Actualiza SOLO el borrador del modal mientras el usuario escribe
+  const handleFieldChange = (field: keyof Parcel | string, value: any) => {
     if (!editingParcel) return;
 
     let updatedParcel: Parcel = {
@@ -72,20 +87,21 @@ export function FarmInteractiveMap({
     }
 
     setEditingParcel(updatedParcel);
+  };
 
-    setDynamicParcels((prev) =>
-      prev.map((parcel) =>
-        parcel.id === updatedParcel.id ? updatedParcel : parcel,
-      ),
-    );
+  // Confirmar los cambios y enviarlos al hook asíncrono
+  const handleSaveChanges = () => {
+    if (!editingParcel) return;
+    onUpdateParcel({ id: editingParcel.id, updatedParcel: editingParcel });
+    setIsEditorOpen(false);
   };
 
   const handleDeleteParcel = () => {
     if (!editingParcel) return;
 
-    const remainingParcels = dynamicParcels.filter((p) => p.id !== editingParcel.id);
-    setDynamicParcels(remainingParcels);
+    onDeleteParcel(editingParcel.id);
 
+    const remainingParcels = dynamicParcels.filter((p) => p.id !== editingParcel.id);
     if (remainingParcels.length > 0) {
       setSelectedParcelId(remainingParcels[0].id);
     } else {
@@ -95,16 +111,6 @@ export function FarmInteractiveMap({
     setIsEditorOpen(false);
   };
 
-  useEffect(() => {
-    const currentParcel = dynamicParcels.find(
-      (parcel) => parcel.id === selectedParcelId,
-    );
-    if (currentParcel) {
-      setEditingParcel(currentParcel);
-    }
-  }, [selectedParcelId, dynamicParcels]);
-
-  // Utilidad para formatear la fecha a un string YYYY-MM-DD aceptado por el input date
   const formatDateForInput = (dateValue: any) => {
     if (!dateValue) return "";
     const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
@@ -120,7 +126,7 @@ export function FarmInteractiveMap({
               Mapa interactivo del terreno
             </div>
             <div className="text-sm text-slate-400">
-              Pan, zoom, click por parcela y lectura en vivo
+              zoom, click por parcela y lectura en vivo
             </div>
           </div>
           <div className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300">
@@ -217,7 +223,7 @@ export function FarmInteractiveMap({
 
                     const polygonGeoJSON = turf.polygon([coordinates]);
                     const areaInSquareMeters = turf.area(polygonGeoJSON);
-                    
+
                     // Convertimos metros cuadrados a Hectáreas (1 ha = 10,000 m²)
                     const areaInHectares = areaInSquareMeters / 10000;
                     // Lo dejamos formateado con 2 decimales (ej: "3.45 ha")
@@ -237,7 +243,7 @@ export function FarmInteractiveMap({
                       soilHistory: [{ time: "0", humidity: 0, fertility: 0 }],
                     };
 
-                    setDynamicParcels((prev) => [...prev, newParcel]);
+                    onCreateParcel(newParcel);
                     setSelectedParcelId(newParcel.id);
                     setEditingParcel(newParcel);
                   }
@@ -323,7 +329,7 @@ export function FarmInteractiveMap({
                   type="text"
                   className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:outline-emerald-500"
                   value={editingParcel.name}
-                  onChange={(e) => updateParcel("name", e.target.value)}
+                  onChange={(e) => handleFieldChange("name", e.target.value)}
                 />
               </div>
 
@@ -334,7 +340,7 @@ export function FarmInteractiveMap({
                     type="number"
                     className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white focus:outline-emerald-500"
                     value={editingParcel.area.replace(" ha", "")}
-                    onChange={(e) => updateParcel("area", `${e.target.value} ha`)}
+                    onChange={(e) => handleFieldChange("area", `${e.target.value} ha`)}
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">ha</span>
                 </div>
@@ -347,7 +353,7 @@ export function FarmInteractiveMap({
                     type="number"
                     className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white focus:outline-emerald-500"
                     value={editingParcel.humidity.replace("%", "")}
-                    onChange={(e) => updateParcel("humidity", `${e.target.value}%`)}
+                    onChange={(e) => handleFieldChange("humidity", `${e.target.value}%`)}
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">%</span>
                 </div>
@@ -360,7 +366,7 @@ export function FarmInteractiveMap({
                     type="number"
                     className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white focus:outline-emerald-500"
                     value={editingParcel.fertility.replace("%", "")}
-                    onChange={(e) => updateParcel("fertility", `${e.target.value}%`)}
+                    onChange={(e) => handleFieldChange("fertility", `${e.target.value}%`)}
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">%</span>
                 </div>
@@ -373,7 +379,7 @@ export function FarmInteractiveMap({
                     type="number"
                     className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white focus:outline-emerald-500"
                     value={editingParcel.temperature.replace("°C", "")}
-                    onChange={(e) => updateParcel("temperature", `${e.target.value}°C`)}
+                    onChange={(e) => handleFieldChange("temperature", `${e.target.value}°C`)}
                   />
                   <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">°C</span>
                 </div>
@@ -386,8 +392,16 @@ export function FarmInteractiveMap({
                   value={editingParcel.statusTone}
                   onChange={(e) => {
                     const tone = e.target.value as ParcelStatus;
-                    updateParcel("statusTone", tone);
-                    updateParcel("status", tone === "critico" ? "Crítico" : tone === "atencion" ? "Atención" : "Óptimo");
+                    const statusText = tone === "critico" ? "Crítico" : tone === "atencion" ? "Atención" : "Óptimo";
+
+                    // Actualizamos ambos campos al mismo tiempo compartiendo el estado actual
+                    if (editingParcel) {
+                      setEditingParcel({
+                        ...editingParcel,
+                        statusTone: tone,
+                        status: statusText
+                      });
+                    }
                   }}
                 >
                   <option value="optimo">🟢 Óptimo</option>
@@ -404,7 +418,7 @@ export function FarmInteractiveMap({
                   value={formatDateForInput((editingParcel as any).sowingDate)}
                   onChange={(e) => {
                     const dateVal = e.target.value ? new Date(e.target.value) : undefined;
-                    updateParcel("sowingDate", dateVal);
+                    handleFieldChange("sowingDate", dateVal);
                   }}
                 />
               </div>
@@ -416,7 +430,7 @@ export function FarmInteractiveMap({
                   placeholder="Ej: 5 toneladas, 500kg"
                   className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:outline-emerald-500"
                   value={(editingParcel as any).expectedProduction || ""}
-                  onChange={(e) => updateParcel("expectedProduction", e.target.value)}
+                  onChange={(e) => handleFieldChange("expectedProduction", e.target.value)}
                 />
               </div>
 
@@ -425,7 +439,7 @@ export function FarmInteractiveMap({
                 <select
                   className="w-full rounded-xl border border-white/10 bg-[#0b1814] px-4 py-3 text-white focus:outline-emerald-500"
                   value={(editingParcel as any).cropId || ""}
-                  onChange={(e) => updateParcel("cropId", e.target.value)}
+                  onChange={(e) => handleFieldChange("cropId", e.target.value)}
                 >
                   <option value="">Ninguno / Sin asignar</option>
                   {crops.map((crop) => (
@@ -458,13 +472,7 @@ export function FarmInteractiveMap({
                 </button>
 
                 <button
-                  onClick={() => {
-                    setDynamicParcels((prev) =>
-                      prev.map((parcel) => (parcel.id === editingParcel.id ? editingParcel : parcel)),
-                    );
-                    setSelectedParcelId(editingParcel.id);
-                    setIsEditorOpen(false);
-                  }}
+                  onClick={handleSaveChanges}
                   className="flex-1 sm:flex-none rounded-2xl bg-emerald-500 px-6 py-3 font-semibold text-white hover:bg-emerald-400"
                 >
                   Guardar cambios

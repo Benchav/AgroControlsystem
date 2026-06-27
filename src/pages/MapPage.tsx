@@ -1,14 +1,25 @@
 import { FarmInteractiveMap } from "../components/map/FarmInteractiveMap";
-import { initialParcels } from "../data/parcels";
 import { ParcelStatusTabs } from "../components/map/ParcelStatusTabs";
 import { Parcel } from "../entities/parcel_model";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useParcels } from "../hooks/useParcels";
 
 export function MapPage() {
-  const [parcels, setParcels] = useState<Parcel[]>(initialParcels);
-  const [selectedParcelId, setSelectedParcelId] = useState(
-    initialParcels[0].id,
-  );
+  const { parcels, createParcel, updateParcel, deleteParcel, isLoading } = useParcels();
+
+  const [selectedParcelId, setSelectedParcelId] = useState("");
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+
+  useEffect(() => {
+    if (parcels.length > 0 && !selectedParcelId) {
+      setSelectedParcelId(parcels[0].id);
+    }
+  }, [parcels, selectedParcelId]);
+
+  if (isLoading) {
+    return <div className="text-white p-4">Cargando parcelas...</div>;
+  }
+
   return (
     <div className="space-y-4">
       <p className="text-sm text-slate-400">
@@ -17,12 +28,19 @@ export function MapPage() {
 
       <FarmInteractiveMap
         dynamicParcels={parcels}
-        setDynamicParcels={setParcels}
+        onCreateParcel={createParcel}
+        onUpdateParcel={updateParcel}
+        onDeleteParcel={deleteParcel}
         selectedParcelId={selectedParcelId}
         setSelectedParcelId={setSelectedParcelId}
+        isEditorOpen={isEditorOpen}
+        setIsEditorOpen={setIsEditorOpen}
       />
 
-      <ParcelStatusTabs parcels={parcels}  />
+      <ParcelStatusTabs parcels={parcels}
+        selectedParcelId={selectedParcelId}
+        setSelectedParcelId={setSelectedParcelId}
+        setIsEditorOpen={setIsEditorOpen} />
     </div>
   );
 }
