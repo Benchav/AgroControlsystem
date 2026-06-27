@@ -3,6 +3,7 @@ import { navigation } from "../../config/navigation";
 import { cn } from "../../lib/cn";
 import { useEffect, useState, type ReactNode } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
 
 type AppShellProps = {
   profile: UserProfile;
@@ -43,6 +44,7 @@ export function AppShell({ profile }: AppShellProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { logout } = useAuth();
 
   const [, , routePage = 'dashboard'] = location.pathname.split('/');
   const currentPage = routePage as AppPageId;
@@ -226,9 +228,21 @@ export function AppShell({ profile }: AppShellProps) {
             <button
               type="button"
               onClick={() => handleNavigate("settings")}
+              title="Configuración"
               className="flex h-7 w-7 items-center justify-center rounded-[6px] border border-white/10 bg-transparent text-slate-400 transition hover:border-white/20 hover:text-emerald-300"
             >
               <i className="fas fa-cog" />
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                logout();
+                navigate('/login');
+              }}
+              title="Cerrar sesión"
+              className="flex h-7 w-7 items-center justify-center rounded-[6px] border border-white/10 bg-transparent text-slate-400 transition hover:border-white/20 hover:text-red-400"
+            >
+              <i className="fas fa-sign-out-alt" />
             </button>
           </div>
         </aside>

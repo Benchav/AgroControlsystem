@@ -10,23 +10,29 @@ import { MapPage } from '../pages/MapPage';
 import { ReportsPage } from '../pages/ReportsPage';
 import { SettingsPage } from '../pages/SettingsPage';
 import { Models3dPage } from '../pages/Models3dPage';
-import type { UserProfile } from '../types/app';
-
-const defaultProfile: UserProfile = {
-  name: 'Juan Rodríguez',
-  email: 'juan@agrocontrol.io',
-  org: 'Finca La Esperanza',
-};
+import { LoginPage } from '../pages/LoginPage';
+import { ProtectedRoute } from '../components/layout/ProtectedRoute';
+import { useAuth } from '../contexts/AuthContext';
 
 function AppLayout() {
-  return <AppShell profile={defaultProfile} />;
+  const { user } = useAuth();
+  
+  // Si no hay usuario (caso raro porque ProtectedRoute lo previene), usamos un fallback temporal
+  const profile = user || { name: 'Invitado', email: '', org: '' };
+
+  return <AppShell profile={profile} />;
 }
 
 export function AppRouter() {
   return (
     <Routes>
       <Route path="/" element={<LandingPage />} />
-      <Route path="/app" element={<AppLayout />}>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/app" element={
+        <ProtectedRoute>
+          <AppLayout />
+        </ProtectedRoute>
+      }>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="iot" element={<IotPage />} />
