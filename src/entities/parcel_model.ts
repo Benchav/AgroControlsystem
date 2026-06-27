@@ -5,13 +5,16 @@ export type Parcel = {
   name: string;
   area: string;
   status: string;
-  statusTone: ParcelStatus;
+  statusTone: ParcelStatus; //rojo, verde o amarillo
   humidity: string;
   fertility: string;
   temperature: string;
-  bounds: LatLngExpression[];
-  center: LatLngExpression;
-  soilHistory?: SoilHistoryPoint[];
+  bounds: LatLngExpression[]; //coordenadas
+  center: LatLngExpression; //punto centrico
+  soilHistory?: SoilHistoryPoint[]; //historial del suelo
+  cropId?:string; //tipo de cultivo
+  sowingDate?:Date; //fecha de siembra
+  expectedProduction?:string; //produccion esperada
 };
 
 export type ParcelStatus = "optimo" | "atencion" | "critico";
