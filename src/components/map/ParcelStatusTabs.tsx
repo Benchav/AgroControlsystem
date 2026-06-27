@@ -60,7 +60,7 @@ export function ParcelStatusTabs({ parcels, selectedParcelId, setSelectedParcelI
             <div
               key={parcel.id}
               onClick={() => setSelectedParcelId(parcel.id)}
-              className={`group relative rounded-[14px] border p-4 backdrop-blur cursor-pointer transition-all duration-300 hover:border-white/30 ${toneStyles} ${isSelected ? "ring-2 ring-white/50 border-white/20 scale-[1.02] shadow-xl" : ""
+              className={`group relative flex flex-col rounded-[14px] border p-4 backdrop-blur cursor-pointer transition-all duration-300 hover:border-white/30 ${toneStyles} ${isSelected ? "ring-2 ring-white/50 border-white/20 scale-[1.02] shadow-xl" : ""
                 }`}
             >
               <div className="flex items-start justify-between mb-4">
@@ -79,7 +79,7 @@ export function ParcelStatusTabs({ parcels, selectedParcelId, setSelectedParcelI
               </div>
 
               {/* Botón CRUD integrado directo en la tarjeta */}
-              <div className="mt-2 flex gap-2">
+              <div className="mt-auto pt-2 flex gap-2">
                 <button
                   onClick={(e) => {
                     e.stopPropagation(); // Evita re-seleccionar la tarjeta innecesariamente
