@@ -33,7 +33,7 @@ export function Models3dPage() {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="flex flex-col gap-4 p-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-white">Modelos 3D Disponibles</h1>
