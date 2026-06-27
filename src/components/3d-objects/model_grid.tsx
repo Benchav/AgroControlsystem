@@ -15,7 +15,7 @@ export function ModelGrid({ models, onEditClick, onDeleteClick }: Props) {
           <ModelCard model3d={model} />
           
           {/* Botonera de acciones rápida sobre el Card */}
-          <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/80 backdrop-blur-sm p-1.5 rounded-lg shadow-md">
+          <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 bg-white/70 backdrop-blur-sm p-1.5 rounded-lg shadow-md">
             <button 
               onClick={() => onEditClick(model)}
               className="px-2 py-1 text-xs font-semibold text-blue-600 hover:bg-blue-50 rounded"

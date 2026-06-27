@@ -13,12 +13,12 @@ export function Models3dPage() {
   const [selectedModel, setSelectedModel] = useState<Models3dItem | null>(null);
 
   const handleOpenCreateModal = () => {
-    setSelectedModel(null); // Al estar nulo, el modal sabe que es un registro nuevo
+    setSelectedModel(null); // como esta nulo , el modal va entender que es nuevo modelo
     setIsModalOpen(true);
   };
 
   const handleOpenEditModal = (model: Models3dItem) => {
-    setSelectedModel(model); // Al pasarle datos, el modal sabe que va a editar
+    setSelectedModel(model); // como le pasamos datos el modal sabe que hayq eu editar
     setIsModalOpen(true);
   };
 
@@ -27,7 +27,7 @@ export function Models3dPage() {
       // Si estábamos editando, ejecutamos el update usando el título viejo como ID
       updateModel({ title: selectedModel.title, updatedItem: data });
     } else {
-      // Si no, es una creación limpia
+      // Si no es editar, es una creación limpia
       createModel(data);
     }
   };
@@ -37,7 +37,7 @@ export function Models3dPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-white">Modelos 3D Disponibles</h1>
-          <p className="text-sm text-slate-500">Administración de assets y métricas agrícolas en memoria local</p>
+          <p className="text-sm text-slate-500">Administración de assets y métricas agrícolas </p>
         </div>
         <button 
           onClick={handleOpenCreateModal}
@@ -58,7 +58,7 @@ export function Models3dPage() {
         />
       )}
 
-      {/* Modal único reutilizable */}
+      {/* Modal reutilizable */}
       <ModelFormModal 
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
