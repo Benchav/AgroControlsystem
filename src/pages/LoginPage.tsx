@@ -9,18 +9,15 @@ export const LoginPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, isAuthenticated } = useAuth();
+  const from = location.state?.from?.pathname || '/app/dashboard';
   
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/app/dashboard', { replace: true });
+      navigate(from, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
-  
-  const from = location.state?.from?.pathname || '/app/dashboard';
+  }, [from, isAuthenticated, navigate]);
 
   const [view, setView] = useState<AuthState>('login');
-  
-  // Form state
   const [name, setName] = useState('');
   const [org, setOrg] = useState('');
   const [email, setEmail] = useState('');
@@ -30,6 +27,29 @@ export const LoginPage = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const authHighlights = [
+    { label: '24/7', description: 'Telemetria continua' },
+    { label: 'IA', description: 'Diagnostico visual asistido' },
+    { label: '2FA', description: 'Acceso con verificacion segura' },
+  ];
+
+  const authMetrics = [
+    { value: '24', label: 'sensores en linea' },
+    { value: '12 km', label: 'terreno monitoreado' },
+    { value: '+4', label: 'modulos integrados' },
+  ];
+
+  const switchView = (nextView: AuthState) => {
+    setError('');
+    setLoading(false);
+
+    if (nextView !== 'verify') {
+      setCode('');
+    }
+
+    setView(nextView);
+  };
+
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -37,7 +57,7 @@ export const LoginPage = () => {
 
     try {
       await requestLogin2FA(email, password);
-      setView('verify');
+      switchView('verify');
     } catch (err: any) {
       setError(err.message || 'Error al iniciar sesión');
     } finally {
@@ -52,7 +72,7 @@ export const LoginPage = () => {
 
     try {
       await requestRegister(name, org, email, password);
-      setView('verify');
+      switchView('verify');
     } catch (err: any) {
       setError(err.message || 'Error al crear la cuenta');
     } finally {
@@ -79,105 +99,164 @@ export const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-950 font-sans text-white overflow-hidden selection:bg-emerald-500/30">
-      
-      {/* Lado Izquierdo: Visual (Oculto en móviles muy pequeños) */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-gray-900 overflow-hidden items-center justify-center p-12">
-        {/* Gradientes abstractos de fondo */}
-        <div className="absolute top-[-10%] left-[-20%] w-[70%] h-[70%] bg-emerald-600/20 rounded-full blur-[120px] mix-blend-screen animate-pulse duration-10000"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] bg-teal-500/20 rounded-full blur-[100px] mix-blend-screen"></div>
-        
-        {/* Patrón de malla (Grid) sutil */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-50"></div>
+    <div className="relative min-h-screen overflow-hidden bg-[#020617] text-white selection:bg-emerald-500/30">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(16,185,129,0.2),transparent_32%),radial-gradient(circle_at_bottom_right,rgba(45,212,191,0.12),transparent_28%)]" />
+      <div className="absolute inset-0 opacity-40 [background-image:linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:40px_40px]" />
 
-        <div className="relative z-10 max-w-lg">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center mb-8 shadow-2xl shadow-emerald-500/20 border border-white/10">
-            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-            </svg>
+      <div className="relative z-10 grid min-h-screen lg:grid-cols-[1.1fr_0.9fr]">
+        <section className="flex flex-col justify-between px-6 py-8 sm:px-10 lg:px-14 lg:py-12">
+          <div className="flex items-center justify-between gap-4">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-left backdrop-blur transition hover:border-white/20 hover:bg-white/[0.06]"
+            >
+              <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-[0_0_24px_rgba(16,185,129,0.2)]">
+                <img src="/Logo.png" alt="Agro Control" className="h-full w-full" />
+              </div>
+              <div>
+                <div className="text-base font-extrabold tracking-tight text-white">Agro Control</div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.35em] text-emerald-300">
+                  Smart Farm Platform
+                </div>
+              </div>
+            </button>
+
+            <div className="hidden items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/[0.08] px-4 py-2 text-[11px] font-medium text-emerald-300 sm:flex">
+              <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.75)]" />
+              Sistema activo
+            </div>
           </div>
-          <h1 className="text-5xl font-bold tracking-tight mb-6 leading-tight">
-            El futuro de tu <br/>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">
-              campo conectado.
-            </span>
-          </h1>
-          <p className="text-gray-400 text-lg leading-relaxed">
-            Monitoreo IoT, diagnóstico visual con IA y gestión de parcelas en una plataforma única de alto rendimiento.
-          </p>
-          
-          <div className="mt-12 flex items-center gap-4 text-sm text-gray-500 font-medium">
-            <div className="flex -space-x-3">
-              {[1,2,3].map(i => (
-                <div key={i} className="w-10 h-10 rounded-full border-2 border-gray-900 bg-gray-800 flex items-center justify-center text-xs">
-                  A{i}
+
+          <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col justify-center py-12 lg:mx-0 lg:py-0">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.32em] text-white">
+              <span className="h-2 w-2 rounded-full bg-emerald-300" />
+              Acceso seguro para operacion en campo
+            </div>
+
+            <h1 className="mt-6 max-w-2xl text-4xl font-black leading-[0.95] tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Gestiona tu operacion agricola con una entrada
+              <span className="text-emerald-400"> clara, segura y profesional.</span>
+            </h1>
+
+            <p className="mt-6 max-w-xl text-base leading-7 text-slate-300 sm:text-lg">
+              Accede al monitoreo IoT, diagnostico con IA y control operativo desde una interfaz alineada al nivel del producto.
+            </p>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              {authHighlights.map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm text-slate-200 backdrop-blur"
+                >
+                  <span className="font-semibold text-white">{item.label}</span>
+                  <span className="ml-2 text-slate-400">{item.description}</span>
                 </div>
               ))}
             </div>
-            <p>Únete a +2,000 fincas innovadoras</p>
+
+            <div className="mt-10 grid gap-4 sm:grid-cols-3">
+              {authMetrics.map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-[18px] border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl"
+                >
+                  <div className="text-3xl font-black tracking-tight text-white">{item.value}</div>
+                  <div className="mt-1 text-xs uppercase tracking-[0.2em] text-slate-400">{item.label}</div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-10 rounded-[22px] border border-white/10 bg-slate-950/40 p-5 backdrop-blur-xl">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.28em] text-emerald-300">
+                    Flujo recomendado
+                  </div>
+                  <div className="mt-2 text-xl font-bold text-white">Autenticacion con doble verificacion</div>
+                </div>
+                <div className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-[11px] font-semibold text-emerald-300">
+                  2FA habilitado
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                {[
+                  'Ingresa tus credenciales.',
+                  'Valida el PIN enviado a tu correo.',
+                  'Entra al panel con tu sesion protegida.',
+                ].map((step, index) => (
+                  <div key={step} className="rounded-2xl border border-white/8 bg-white/[0.03] p-4">
+                    <div className="text-sm font-semibold text-emerald-300">0{index + 1}</div>
+                    <p className="mt-2 text-sm leading-6 text-slate-300">{step}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      {/* Lado Derecho: Formulario Glassmorphism */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 relative">
-        {/* Círculo sutil en el fondo para móviles */}
-        <div className="lg:hidden absolute top-[10%] right-[10%] w-[300px] h-[300px] bg-emerald-500/10 rounded-full blur-[80px]"></div>
+        <section className="flex items-center justify-center px-6 py-8 sm:px-10 lg:px-8 lg:py-12">
+          <div className="w-full max-w-lg rounded-[28px] border border-white/10 bg-slate-950/65 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl sm:p-8">
+            <div className="mb-8 flex items-start justify-between gap-4">
+              <div>
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-300">
+                  {view === 'login' && 'Inicio de sesion'}
+                  {view === 'register' && 'Registro'}
+                  {view === 'verify' && 'Verificacion'}
+                </div>
+                <h2 className="text-3xl font-bold tracking-tight">
+                  {view === 'login' && 'Bienvenido de nuevo'}
+                  {view === 'register' && 'Crea tu cuenta'}
+                  {view === 'verify' && 'Verificacion de seguridad'}
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-slate-400">
+                  {view === 'login' && 'Accede a tu panel operativo con credenciales seguras y continuidad visual del sistema.'}
+                  {view === 'register' && 'Configura tu cuenta para centralizar sensores, parcelas e inteligencia operativa.'}
+                  {view === 'verify' && `Ingresamos al paso final. Confirma el PIN enviado a ${email}.`}
+                </p>
+              </div>
 
-        <div className="w-full max-w-md relative z-10 transition-all duration-500 ease-out">
-          
-          {/* Header del formulario */}
-          <div className="mb-10 lg:text-left text-center">
-            <h2 className="text-3xl font-bold tracking-tight mb-2">
-              {view === 'login' && 'Bienvenido de nuevo'}
-              {view === 'register' && 'Crea tu cuenta'}
-              {view === 'verify' && 'Verificación de Seguridad'}
-            </h2>
-            <p className="text-gray-400">
-              {view === 'login' && 'Ingresa tus credenciales para continuar.'}
-              {view === 'register' && 'Comienza a gestionar tu campo inteligentemente.'}
-              {view === 'verify' && `Hemos enviado un PIN a ${email}`}
-            </p>
-          </div>
+              <div className="hidden rounded-2xl border border-white/10 bg-white/[0.04] p-3 text-slate-300 sm:flex">
+                <i className="fas fa-shield-alt text-lg text-emerald-300" />
+              </div>
+            </div>
 
-          {/* Manejo de errores */}
           {error && (
-            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 flex items-start gap-3 animate-in fade-in slide-in-from-top-2">
-              <svg className="w-5 h-5 text-red-400 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="mb-6 flex items-start gap-3 rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
+              <svg className="mt-0.5 h-5 w-5 shrink-0 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
               <p className="text-red-300 text-sm">{error}</p>
             </div>
           )}
 
-          {/* Vistas dinámicas */}
           <div className="relative">
-            {/* LOGIN */}
             {view === 'login' && (
-              <form onSubmit={handleLoginSubmit} className="space-y-5 animate-in fade-in zoom-in-95 duration-300">
-                <div className="space-y-4">
+              <form onSubmit={handleLoginSubmit} className="space-y-5">
+                <div className="space-y-4 rounded-[22px] border border-white/8 bg-white/[0.03] p-5">
                   <div className="group">
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 group-focus-within:text-emerald-400 transition-colors">Correo Electrónico</label>
+                    <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400 transition-colors group-focus-within:text-emerald-300">Correo electronico</label>
                     <input
                       type="email"
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-4 py-3.5 bg-gray-900/50 border border-gray-800 rounded-xl focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-white placeholder-gray-600 transition-all outline-none"
+                      className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40 focus:bg-white/[0.06] focus:ring-4 focus:ring-emerald-500/10"
                       placeholder="usuario@ejemplo.com"
                     />
                   </div>
                   <div className="group">
-                    <div className="flex justify-between items-center mb-2">
-                      <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider group-focus-within:text-emerald-400 transition-colors">Contraseña</label>
-                      <a href="#" className="text-xs text-emerald-500 hover:text-emerald-400 transition-colors">¿Olvidaste tu contraseña?</a>
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <label className="block text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400 transition-colors group-focus-within:text-emerald-300">Contrasena</label>
+                      <span className="text-xs text-slate-500">Recuperacion disponible proximamente</span>
                     </div>
                     <input
                       type="password"
                       required
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full px-4 py-3.5 bg-gray-900/50 border border-gray-800 rounded-xl focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-white placeholder-gray-600 transition-all outline-none"
+                      className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40 focus:bg-white/[0.06] focus:ring-4 focus:ring-emerald-500/10"
                       placeholder="••••••••"
                     />
                   </div>
@@ -186,7 +265,7 @@ export const LoginPage = () => {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 mt-6 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-medium rounded-xl shadow-lg shadow-emerald-900/20 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:pointer-events-none"
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 py-4 font-semibold text-white shadow-[0_16px_36px_rgba(16,185,129,0.28)] transition hover:brightness-110 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-70"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -195,72 +274,80 @@ export const LoginPage = () => {
                   )}
                 </button>
 
-                <p className="text-center text-sm text-gray-500 mt-8">
+                <p className="mt-6 text-center text-sm text-slate-500">
                   ¿No tienes una cuenta?{' '}
-                  <button type="button" onClick={() => setView('register')} className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
+                  <button type="button" onClick={() => switchView('register')} className="font-medium text-emerald-300 transition-colors hover:text-emerald-200">
                     Regístrate aquí
                   </button>
                 </p>
               </form>
             )}
 
-            {/* REGISTER */}
             {view === 'register' && (
-              <form onSubmit={handleRegisterSubmit} className="space-y-5 animate-in fade-in zoom-in-95 duration-300">
-                <div className="grid grid-cols-2 gap-4">
+              <form onSubmit={handleRegisterSubmit} className="space-y-5">
+                <div className="space-y-4 rounded-[22px] border border-white/8 bg-white/[0.03] p-5">
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="group">
+                      <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400 transition-colors group-focus-within:text-emerald-300">Nombre</label>
+                      <input
+                        type="text"
+                        required
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40 focus:bg-white/[0.06] focus:ring-4 focus:ring-emerald-500/10"
+                        placeholder="Juan Perez"
+                      />
+                    </div>
+                    <div className="group">
+                      <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400 transition-colors group-focus-within:text-emerald-300">Finca u organizacion</label>
+                      <input
+                        type="text"
+                        required
+                        value={org}
+                        onChange={(e) => setOrg(e.target.value)}
+                        className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40 focus:bg-white/[0.06] focus:ring-4 focus:ring-emerald-500/10"
+                        placeholder="Finca La Esperanza"
+                      />
+                    </div>
+                  </div>
+
                   <div className="group">
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 group-focus-within:text-emerald-400 transition-colors">Nombre</label>
+                    <label className="mb-2 block text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400 transition-colors group-focus-within:text-emerald-300">Correo electronico</label>
                     <input
-                      type="text"
+                      type="email"
                       required
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-3.5 bg-gray-900/50 border border-gray-800 rounded-xl focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-white placeholder-gray-600 transition-all outline-none"
-                      placeholder="Juan Pérez"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40 focus:bg-white/[0.06] focus:ring-4 focus:ring-emerald-500/10"
+                      placeholder="juan@agrocontrol.io"
                     />
                   </div>
+
                   <div className="group">
-                    <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 group-focus-within:text-emerald-400 transition-colors">Finca / Org</label>
+                    <div className="mb-2 flex items-center justify-between gap-3">
+                      <label className="block text-[11px] font-semibold uppercase tracking-[0.25em] text-slate-400 transition-colors group-focus-within:text-emerald-300">Contrasena</label>
+                      <span className="text-xs text-slate-500">Minimo 6 caracteres</span>
+                    </div>
                     <input
-                      type="text"
+                      type="password"
                       required
-                      value={org}
-                      onChange={(e) => setOrg(e.target.value)}
-                      className="w-full px-4 py-3.5 bg-gray-900/50 border border-gray-800 rounded-xl focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-white placeholder-gray-600 transition-all outline-none"
-                      placeholder="La Esperanza"
+                      minLength={6}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="w-full rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3.5 text-white outline-none transition placeholder:text-slate-500 focus:border-emerald-400/40 focus:bg-white/[0.06] focus:ring-4 focus:ring-emerald-500/10"
+                      placeholder="Define una contrasena segura"
                     />
                   </div>
-                </div>
-                
-                <div className="group">
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 group-focus-within:text-emerald-400 transition-colors">Correo Electrónico</label>
-                  <input
-                    type="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3.5 bg-gray-900/50 border border-gray-800 rounded-xl focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-white placeholder-gray-600 transition-all outline-none"
-                    placeholder="juan@agrocontrol.io"
-                  />
-                </div>
-                
-                <div className="group">
-                  <label className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 group-focus-within:text-emerald-400 transition-colors">Contraseña</label>
-                  <input
-                    type="password"
-                    required
-                    minLength={6}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3.5 bg-gray-900/50 border border-gray-800 rounded-xl focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-white placeholder-gray-600 transition-all outline-none"
-                    placeholder="Mínimo 6 caracteres"
+
+                  <div className="rounded-2xl border border-emerald-500/15 bg-emerald-500/[0.05] p-4 text-sm leading-6 text-slate-300">
+                    Tu cuenta quedara pendiente hasta completar la verificacion por correo. Esto evita accesos y registros incompletos.
                   />
                 </div>
 
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 mt-6 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-medium rounded-xl shadow-lg shadow-emerald-900/20 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:pointer-events-none"
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 py-4 font-semibold text-white shadow-[0_16px_36px_rgba(16,185,129,0.28)] transition hover:brightness-110 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-70"
                 >
                   {loading ? (
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -269,35 +356,42 @@ export const LoginPage = () => {
                   )}
                 </button>
 
-                <p className="text-center text-sm text-gray-500 mt-8">
+                <p className="mt-6 text-center text-sm text-slate-500">
                   ¿Ya tienes una cuenta?{' '}
-                  <button type="button" onClick={() => setView('login')} className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">
+                  <button type="button" onClick={() => switchView('login')} className="font-medium text-emerald-300 transition-colors hover:text-emerald-200">
                     Inicia sesión
                   </button>
                 </p>
               </form>
             )}
 
-            {/* VERIFY 2FA */}
             {view === 'verify' && (
-              <form onSubmit={handleVerifySubmit} className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-                <div className="text-center">
-                  <div className="mb-8">
+              <form onSubmit={handleVerifySubmit} className="space-y-6">
+                <div className="rounded-[22px] border border-white/8 bg-white/[0.03] p-5 text-center">
+                  <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-400/20 bg-emerald-500/10 text-emerald-300">
+                    <i className="fas fa-envelope-open-text text-xl" />
+                  </div>
+
+                  <div className="mx-auto mb-6 max-w-sm text-sm leading-6 text-slate-400">
+                    Introduce el codigo de 6 digitos enviado a <span className="font-medium text-slate-200">{email}</span> para finalizar el acceso.
+                  </div>
+
+                  <div className="mb-6">
                     <input
                       type="text"
                       required
                       maxLength={6}
                       value={code}
                       onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                      className="w-full max-w-[280px] mx-auto text-center tracking-[0.5em] text-3xl px-4 py-5 bg-gray-900/80 border-2 border-gray-800 rounded-2xl focus:ring-4 focus:ring-emerald-500/20 focus:border-emerald-500 text-emerald-400 placeholder-gray-700 transition-all outline-none font-mono font-bold shadow-inner"
+                      className="mx-auto w-full max-w-[280px] rounded-2xl border border-white/10 bg-white/[0.05] px-4 py-5 text-center font-mono text-3xl font-bold tracking-[0.5em] text-emerald-300 outline-none transition placeholder:text-slate-600 focus:border-emerald-400/40 focus:bg-white/[0.06] focus:ring-4 focus:ring-emerald-500/10"
                       placeholder="000000"
                     />
                   </div>
-                  
+
                   <button
                     type="submit"
                     disabled={loading || code.length !== 6}
-                    className="w-full py-4 bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white font-medium rounded-xl shadow-lg shadow-emerald-900/20 transition-all transform active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-70 disabled:pointer-events-none"
+                    className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 py-4 font-semibold text-white shadow-[0_16px_36px_rgba(16,185,129,0.28)] transition hover:brightness-110 active:scale-[0.99] disabled:pointer-events-none disabled:opacity-70"
                   >
                     {loading ? (
                       <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -305,23 +399,29 @@ export const LoginPage = () => {
                       'Verificar y Acceder'
                     )}
                   </button>
-                  
-                  <div className="mt-8 flex flex-col items-center gap-3">
-                    <button
-                      type="button"
-                      disabled={loading}
-                      onClick={() => setView('login')}
-                      className="text-sm text-gray-500 hover:text-white transition-colors"
-                    >
-                      Volver e intentar con otro correo
-                    </button>
+                  <div className="mt-6 rounded-2xl border border-white/8 bg-slate-950/50 p-4 text-left">
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-slate-500">Consejo</div>
+                    <p className="mt-2 text-sm leading-6 text-slate-400">
+                      Si no ves el mensaje, revisa spam o promociones antes de volver a solicitar acceso.
+                    </p>
                   </div>
+                </div>
+
+                <div className="flex flex-col items-center gap-3 text-center">
+                  <button
+                    type="button"
+                    disabled={loading}
+                    onClick={() => switchView('login')}
+                    className="text-sm text-slate-500 transition-colors hover:text-white"
+                  >
+                    Volver e intentar con otro correo
+                  </button>
                 </div>
               </form>
             )}
           </div>
-
         </div>
+        </section>
       </div>
     </div>
   );

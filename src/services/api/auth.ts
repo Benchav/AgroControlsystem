@@ -1,17 +1,28 @@
 const API_URL = import.meta.env.VITE_API_URL || 'https://twofactor-api.vercel.app/api/auth';
 
-// --- MOCK DATABASE EN LOCALSTORAGE ---
-const USERS_KEY = 'agro_mock_users';
+type MockUser = {
+  name: string;
+  org: string;
+  email: string;
+  password: string;
+};
 
-const getMockUsers = (): any[] => {
-  const usersStr = localStorage.getItem(USERS_KEY);
+const USERS_KEY = 'agro_mock_users';
+const PENDING_USERS_KEY = 'agro_mock_pending_users';
+
+const getStoredUsers = (key: string): MockUser[] => {
+  const usersStr = localStorage.getItem(key);
   return usersStr ? JSON.parse(usersStr) : [];
 };
 
-const saveMockUsers = (users: any[]) => {
-  localStorage.setItem(USERS_KEY, JSON.stringify(users));
+const saveStoredUsers = (key: string, users: MockUser[]) => {
+  localStorage.setItem(key, JSON.stringify(users));
 };
-// ---------------------------------------
+
+const getMockUsers = () => getStoredUsers(USERS_KEY);
+const saveMockUsers = (users: MockUser[]) => saveStoredUsers(USERS_KEY, users);
+const getPendingUsers = () => getStoredUsers(PENDING_USERS_KEY);
+const savePendingUsers = (users: MockUser[]) => saveStoredUsers(PENDING_USERS_KEY, users);
 
 export const requestLogin2FA = async (email: string, password: string) => {
   // 1. Validación en Mock DB
@@ -45,19 +56,14 @@ export const requestLogin2FA = async (email: string, password: string) => {
 };
 
 export const requestRegister = async (name: string, org: string, email: string, password: string) => {
-  // 1. Validación en Mock DB
   const users = getMockUsers();
-  const exists = users.find(u => u.email === email);
+  const pendingUsers = getPendingUsers();
+  const exists = users.find(u => u.email === email) || pendingUsers.find(u => u.email === email);
   
   if (exists) {
     throw new Error('El correo electrónico ya está registrado.');
   }
 
-  // Guardamos al usuario en la BD simulada local
-  users.push({ name, org, email, password });
-  saveMockUsers(users);
-
-  // 2. Llamamos al backend para iniciar el proceso de verificación por correo
   const response = await fetch(`${API_URL}/register`, {
     method: 'POST',
     headers: {
@@ -71,11 +77,12 @@ export const requestRegister = async (name: string, org: string, email: string, 
     throw new Error(errorData.error || 'Error al registrar la cuenta');
   }
 
+  savePendingUsers([...pendingUsers, { name, org, email, password }]);
+
   return response.json();
 };
 
 export const verify2FACode = async (email: string, code: string) => {
-  // Verificamos el código con el backend real
   const response = await fetch(`${API_URL}/verify-2fa`, {
     method: 'POST',
     headers: {
@@ -91,18 +98,23 @@ export const verify2FACode = async (email: string, code: string) => {
 
   const data = await response.json();
 
-  // Inyectar los datos reales del usuario desde nuestra Mock DB
-  if (data.success && data.user) {
+  if (data.success) {
     const users = getMockUsers();
-    const localUser = users.find(u => u.email === email);
+    const pendingUsers = getPendingUsers();
+    const pendingUser = pendingUsers.find((user) => user.email === email);
+
+    if (pendingUser && !users.some((user) => user.email === email)) {
+      saveMockUsers([...users, pendingUser]);
+      savePendingUsers(pendingUsers.filter((user) => user.email !== email));
+    }
+
+    const localUser = [...users, ...(pendingUser ? [pendingUser] : [])].find((user) => user.email === email);
     
     if (localUser) {
       data.user = {
-        id: email, // Usamos el email como ID para la simulación
         name: localUser.name,
         email: localUser.email,
-        role: 'admin', // Rol por defecto
-        organization: localUser.org
+        org: localUser.org,
       };
     }
   }
