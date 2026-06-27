@@ -17,6 +17,23 @@ export const requestLogin2FA = async (email: string, password: string) => {
   return response.json();
 };
 
+export const requestRegister = async (name: string, org: string, email: string, password: string) => {
+  const response = await fetch(`${API_URL}/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ name, org, email, password }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Error al registrar la cuenta');
+  }
+
+  return response.json();
+};
+
 export const verify2FACode = async (email: string, code: string) => {
   const response = await fetch(`${API_URL}/verify-2fa`, {
     method: 'POST',
