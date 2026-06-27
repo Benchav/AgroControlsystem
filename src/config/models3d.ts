@@ -2,6 +2,7 @@ import { Models3dItem } from '../entities/3d_object_model';
 
 export const models3d: Models3dItem[] = [
   {
+    id:"1",
     title: 'Diseño de Porcino',
     author: 'Oscar',
     modelPath: "/3d-objects/cerdo.glb",
@@ -15,6 +16,7 @@ export const models3d: Models3dItem[] = [
     currentPrice: 4500
   },
   {
+    id:"2",
     title: 'Diseño de Heno',
     author: 'Oscar',
     modelPath: "/3d-objects/heno.glb",
@@ -28,6 +30,7 @@ export const models3d: Models3dItem[] = [
     currentPrice: 120
   },
   {
+    id:"3",
     title: 'Diseño de Maíz',
     author: 'Joshua',
     modelPath: "/3d-objects/elote.glb",
@@ -41,6 +44,7 @@ export const models3d: Models3dItem[] = [
     currentPrice: 350
   },
   {
+    id:"4",
     title: 'Diseño de Girasol',
     author: 'Oscar',
     modelPath: "/3d-objects/girasol.glb",
@@ -54,6 +58,7 @@ export const models3d: Models3dItem[] = [
     currentPrice: 600
   },
   {
+    id:"5",
     title: 'Diseño de Macetera',
     author: 'Joshua',
     modelPath: "/3d-objects/macetera.glb",
@@ -67,6 +72,7 @@ export const models3d: Models3dItem[] = [
     currentPrice: 85
   },
   {
+    id:"6",
     title: 'Diseño de Arduino',
     author: 'Oscar',
     modelPath: "/3d-objects/panelSolar.glb",
@@ -80,6 +86,7 @@ export const models3d: Models3dItem[] = [
     currentPrice: 1200
   },
   {
+    id:"7",
     title: 'Diseño de Yuca',
     author: 'Joshua',
     modelPath: "/3d-objects/yuca.glb",
@@ -93,6 +100,7 @@ export const models3d: Models3dItem[] = [
     currentPrice: 280
   },
   {
+    id:"8",
     title: 'Diseño de Ayote',
     author: 'Oscar',
     modelPath: "/3d-objects/ayote.glb",
@@ -106,6 +114,7 @@ export const models3d: Models3dItem[] = [
     currentPrice: 150
   },
   {
+    id:"9",
     title: 'Diseño de Cebolla',
     author: 'Joshua',
     modelPath: "/3d-objects/cebolla.glb",
@@ -119,6 +128,7 @@ export const models3d: Models3dItem[] = [
     currentPrice: 420
   },
   {
+    id:"10",
     title: 'Diseño de Chiltoma',
     author: 'Oscar',
     modelPath: "/3d-objects/chiltoma.glb",
@@ -132,6 +142,7 @@ export const models3d: Models3dItem[] = [
     currentPrice: 310
   },
   {
+    id:"11",
     title: 'Diseño de Tomate',
     author: 'Joshua',
     modelPath: "/3d-objects/tomate.glb",
@@ -145,6 +156,7 @@ export const models3d: Models3dItem[] = [
     currentPrice: 490
   },
   {
+    id:"12",
     title: 'Diseño de Zanahoria',
     author: 'Oscar',
     modelPath: "/3d-objects/zanahoria.glb",

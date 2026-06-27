@@ -25,7 +25,7 @@ export function Models3dPage() {
   const handleFormSubmit = (data: Models3dItem) => {
     if (selectedModel) {
       // Si estábamos editando, ejecutamos el update usando el título viejo como ID
-      updateModel({ title: selectedModel.title, updatedItem: data });
+      updateModel({ id: selectedModel.id, updatedItem: data });
     } else {
       // Si no es editar, es una creación limpia
       createModel(data);

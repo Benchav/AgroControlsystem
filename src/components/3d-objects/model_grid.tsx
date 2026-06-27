@@ -10,11 +10,11 @@ type Props = {
 
 export function ModelGrid({ models, onEditClick, onDeleteClick }: Props) {
   // Guardamos el título del modelo que se intenta eliminar
-  const [modelToDelete, setModelToDelete] = useState<string | null>(null);
+  const [modelToDelete, setModelToDelete] = useState<Models3dItem | null>(null);
 
   const handleDeleteConfirm = () => {
     if (modelToDelete) {
-      onDeleteClick(modelToDelete);
+      onDeleteClick(modelToDelete.id);
       setModelToDelete(null); // Cerramos el modal
     }
   };
@@ -35,7 +35,7 @@ export function ModelGrid({ models, onEditClick, onDeleteClick }: Props) {
                 Editar
               </button>
               <button 
-                onClick={() => setModelToDelete(model.title)} // Abrimos el modal guardando el título
+                onClick={() => setModelToDelete(model)} // Abrimos el modal guardando el título
                 className="px-2 py-1 text-xs font-semibold text-red-600 hover:bg-red-50 rounded"
               >
                 Eliminar
@@ -53,7 +53,7 @@ export function ModelGrid({ models, onEditClick, onDeleteClick }: Props) {
               ¿Confirmar eliminación?
             </h3>
             <p className="mt-2 text-sm text-black/80">
-              Estás a punto de eliminar <span className="font-semibold text-black">"{modelToDelete}"</span>. Esta acción no se puede deshacer.
+              Estás a punto de eliminar <span className="font-semibold text-black">"{modelToDelete.title}"</span>. Esta acción no se puede deshacer.
             </p>
             
             <div className="mt-6 flex justify-end gap-3">

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Models3dItem } from '../../entities/3d_object_model';
+import { generateId } from '../../utils/uuid';
 
 type Props = {
   isOpen: boolean;
@@ -13,6 +14,7 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit }: Props
     title: '', author: '', modelPath: '', nutritionalInfo: '',
     growthPeriod: '', waterRequirements: '', recommendedFertilizers: '',
     commonDiseases: '', parcels: [], estimatedProduction: '', currentPrice: 0,
+    id: generateId(),
   });
 
   useEffect(() => {
@@ -23,6 +25,7 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit }: Props
         title: '', author: '', modelPath: '', nutritionalInfo: '',
         growthPeriod: '', waterRequirements: '', recommendedFertilizers: '',
         commonDiseases: '', parcels: [], estimatedProduction: '', currentPrice: 0,
+        id: generateId(),
       });
     }
   }, [modelToEdit, isOpen]);
@@ -61,7 +64,7 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit }: Props
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-white">Título</label>
-              <input required name="title" value={formData.title} onChange={handleChange} disabled={!!modelToEdit} className="mt-1 block w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm focus:outline-emerald-500 disabled:bg-black" />
+              <input required name="title" value={formData.title} onChange={handleChange} className="mt-1 block w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm focus:outline-emerald-500 disabled:bg-black" />
             </div>
             <div>
               <label className="block text-sm font-medium text-white">Autor</label>

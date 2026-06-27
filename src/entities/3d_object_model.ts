@@ -1,4 +1,5 @@
 export type Models3dItem = {
+  id:string,
   title: string;
   author: string;
   modelPath: string;
