@@ -9,7 +9,7 @@ import { useParcels } from '../hooks/useParcels';
 
 export function Models3dPage() {
   const { models, isLoading, createModel, updateModel, deleteModel } = useModels3d();
-  const { parcels } = useParcels();
+  const { parcels, updateParcel } = useParcels();
   
   // Estados para controlar el Modal de Formulario
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -69,6 +69,7 @@ export function Models3dPage() {
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleFormSubmit}
         modelToEdit={selectedModel}
+        onUpdateParcel={updateParcel}
       />
     </div>
   );

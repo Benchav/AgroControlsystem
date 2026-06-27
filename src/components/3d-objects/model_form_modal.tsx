@@ -9,9 +9,10 @@ type Props = {
   onSubmit: (data: Models3dItem) => void;
   modelToEdit?: Models3dItem | null;
   availableParcels: Parcel[];
+  onUpdateParcel: (params: { id: string; updatedParcel: Parcel }) => void;
 };
 
-export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availableParcels = [] }: Props) {
+export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availableParcels = [], onUpdateParcel }: Props) {
   const [formData, setFormData] = useState<Models3dItem>({
     title: '', author: '', modelPath: '', nutritionalInfo: '',
     growthPeriod: '', waterRequirements: '', recommendedFertilizers: '',
@@ -24,9 +25,18 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
 
   useEffect(() => {
     if (modelToEdit) {
-      setFormData(modelToEdit);
+      // Limpiamos los IDs de parcelas guardados que ya no existen en el sistema actual
+      const validParcels = (modelToEdit.parcels ?? []).filter(parcelId => 
+        availableParcels.some(ap => ap.id === parcelId)
+      );
+
+      setFormData({
+        ...modelToEdit,
+        parcels: validParcels
+      });
     } else {
       setFormData({
+        ...formData,
         title: '', author: '', modelPath: '', nutritionalInfo: '',
         growthPeriod: '', waterRequirements: '', recommendedFertilizers: '',
         commonDiseases: '', parcels: [], estimatedProduction: '', currentPrice: 0,
@@ -34,7 +44,7 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
       });
     }
     setIsDropdownOpen(false);
-  }, [modelToEdit, isOpen]);
+  }, [modelToEdit, isOpen, availableParcels]); 
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -59,18 +69,13 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
   const toggleParcelSelection = (parcel: Parcel) => {
     setFormData((prev) => {
       const currentParcels = prev.parcels ?? [];
-      
-      // buscamos por nombre, ID de la parcela o coincidencia con cultivo
-      const isSelected = currentParcels.some(
-        (p) => p === parcel.name || p === parcel.id || String(parcel.cropId) === String(prev.id)
-      );
+      const isSelected = currentParcels.includes(parcel.id);
 
       let updatedParcels: string[];
       if (isSelected) {
-        //remover parcela
-        updatedParcels = currentParcels.filter((p) => p !== parcel.name && p !== parcel.id);
+        updatedParcels = currentParcels.filter((id) => id !== parcel.id);
       } else {
-        updatedParcels = [...currentParcels, parcel.name];
+        updatedParcels = [...currentParcels, parcel.id];
       }
 
       return { ...prev, parcels: updatedParcels };
@@ -79,18 +84,55 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
 
   const isParcelChecked = (parcel: Parcel) => {
     const currentParcels = formData.parcels ?? [];
-    return (
-      currentParcels.includes(parcel.name) || 
-      currentParcels.includes(parcel.id) || 
-      (parcel.cropId && modelToEdit && String(parcel.cropId) === String(modelToEdit.id))
-    );
+
+    if (currentParcels.includes(parcel.id)) {
+      return true;
+    }
+
+    if (parcel.cropId && formData.id && String(parcel.cropId) === String(formData.id)) {
+      const wasExplicitlyRemoved = !currentParcels.includes(parcel.id) && currentParcels.length > 0;
+      return !wasExplicitlyRemoved;
+    }
+
+    return false;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     onSubmit(formData);
+
+    availableParcels.forEach((parcel) => {
+      const currentParcels = formData.parcels ?? [];
+      const isSelected = currentParcels.includes(parcel.id);
+      const wasAssociated = parcel.cropId === formData.id;
+
+      if (isSelected && parcel.cropId !== formData.id) {
+        onUpdateParcel({
+          id: parcel.id,
+          updatedParcel: {
+            ...parcel,
+            cropId: formData.id
+          }
+        });
+      } else if (!isSelected && wasAssociated) {
+        onUpdateParcel({
+          id: parcel.id,
+          updatedParcel: {
+            ...parcel,
+            cropId: undefined
+          }
+        });
+      }
+    });
+
     onClose();
   };
+
+  // Obtenemos los nombres reales de las parcelas seleccionadas que si existen
+  const selectedParcelNames = (formData.parcels ?? [])
+    .map(id => availableParcels.find(ap => ap.id === id)?.name)
+    .filter(Boolean);
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 overflow-y-auto">
@@ -98,7 +140,7 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
         <h3 className="text-xl font-bold text-white mb-4">
           {modelToEdit ? 'Editar Modelo 3D' : 'Añadir Nuevo Modelo 3D'}
         </h3>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -154,15 +196,15 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
               <label className="block text-sm font-medium text-white mb-1">
                 Asociar Parcelas
               </label>
-              
+
               {/* Dropdown */}
               <div
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 className="w-full flex items-center justify-between rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm text-left cursor-pointer focus-within:outline-emerald-500 min-h-[38px]"
               >
                 <span className="truncate text-slate-300 max-w-[200px]">
-                  {formData.parcels && formData.parcels.length > 0
-                    ? `${formData.parcels.length} sel. (${formData.parcels.slice(0, 2).join(', ')}${formData.parcels.length > 2 ? '...' : ''})`
+                  {selectedParcelNames.length > 0
+                    ? `${selectedParcelNames.length} sel. (${selectedParcelNames.slice(0, 2).join(', ')}${selectedParcelNames.length > 2 ? '...' : ''})`
                     : 'Seleccionar parcelas...'}
                 </span>
                 <span className="text-xs text-slate-400 ml-2 transition-transform duration-200">
@@ -170,7 +212,7 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
                 </span>
               </div>
 
-              {/* Menú Desplegable con Scroll Interno Absoluto */}
+              {/* Menú Desplegable */}
               {isDropdownOpen && (
                 <div className="absolute left-0 right-0 bottom-full mb-1 z-50 rounded-lg border border-white/10 bg-[#0c221a] shadow-xl max-h-[220px] overflow-y-auto p-1 animate-in fade-in slide-in-from-bottom-2 duration-150">
                   {availableParcels.length === 0 ? (
@@ -182,18 +224,16 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
                         <div
                           key={parcel.id}
                           onClick={() => toggleParcelSelection(parcel)}
-                          className={`flex items-center justify-between px-3 py-2 text-xs rounded-md cursor-pointer transition-colors ${
-                            active 
-                              ? 'bg-emerald-600/30 text-emerald-300 font-medium' 
-                              : 'text-slate-300 hover:bg-white/5'
-                          }`}
+                          className={`flex items-center justify-between px-3 py-2 text-xs rounded-md cursor-pointer transition-colors ${active
+                            ? 'bg-emerald-600/30 text-emerald-300 font-medium'
+                            : 'text-slate-300 hover:bg-white/5'
+                            }`}
                         >
                           <span className="truncate">{parcel.name}</span>
-                          <div className={`w-4 h-4 rounded flex items-center justify-center border text-[9px] transition-all ${
-                            active 
-                              ? 'bg-emerald-500 border-emerald-400 text-white' 
-                              : 'border-white/20'
-                          }`}>
+                          <div className={`w-4 h-4 rounded flex items-center justify-center border text-[9px] transition-all ${active
+                            ? 'bg-emerald-500 border-emerald-400 text-white'
+                            : 'border-white/20'
+                            }`}>
                             {active && '✓'}
                           </div>
                         </div>
