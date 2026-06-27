@@ -17,6 +17,7 @@ import { initialParcels } from "../../data/parcels";
 import { FitBounds } from "../../utils/fitBounds";
 import { SoilMetricsPanel } from "../../utils/soil_metrics_panel";
 import { useModels3d } from "../../hooks/useModels3d";
+import * as turf from "@turf/turf";
 
 const mapCenter: [number, number] = [14.0711, -87.1989];
 
@@ -205,12 +206,27 @@ export function FarmInteractiveMap({
                 onCreated={(e) => {
                   const layer = e.layer;
                   if ("getLatLngs" in layer) {
-                    const latlngs = layer.getLatLngs()[0] as LatLngExpression[];
+                    // Leaflet Draw puede devolver arrays anidados dependiendo de la figura
+                    const rawLatLngs = layer.getLatLngs()[0];
+                    const latlngs = (Array.isArray(rawLatLngs) ? rawLatLngs : layer.getLatLngs()) as any[];
+
+                    // --- CÁLCULO DE ÁREA CON TURF ---
+                    // Turf requiere coordenadas en [Lng, Lat] y que el primer punto se repita al final
+                    const coordinates = latlngs.map((pt: any) => [pt.lng, pt.lat]);
+                    coordinates.push([latlngs[0].lng, latlngs[0].lat]);
+
+                    const polygonGeoJSON = turf.polygon([coordinates]);
+                    const areaInSquareMeters = turf.area(polygonGeoJSON);
+                    
+                    // Convertimos metros cuadrados a Hectáreas (1 ha = 10,000 m²)
+                    const areaInHectares = areaInSquareMeters / 10000;
+                    // Lo dejamos formateado con 2 decimales (ej: "3.45 ha")
+                    const formattedArea = `${areaInHectares.toFixed(2)} ha`;
 
                     const newParcel: Parcel = {
                       id: `parcel-${Date.now()}`,
                       name: `Nueva Parcela`,
-                      area: "Pendiente",
+                      area: formattedArea, // Aquí insertamos el área real calculada
                       status: "Óptimo",
                       statusTone: "optimo",
                       humidity: "--",
