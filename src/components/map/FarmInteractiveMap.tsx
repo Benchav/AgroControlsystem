@@ -92,7 +92,10 @@ export function FarmInteractiveMap({
   // Confirmar los cambios y enviarlos al hook asíncrono
   const handleSaveChanges = () => {
     if (!editingParcel) return;
+
+    // Guardar los cambios normales de la parcela 
     onUpdateParcel({ id: editingParcel.id, updatedParcel: editingParcel });
+
     setIsEditorOpen(false);
   };
 

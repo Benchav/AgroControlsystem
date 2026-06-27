@@ -11,7 +11,6 @@ export const models3d: Models3dItem[] = [
     waterRequirements: 'De 20 a 30 litros de agua limpia por día por animal.',
     recommendedFertilizers: 'No aplica',
     commonDiseases: 'Peste porcina, erisipela, problemas respiratorios.',
-    parcels: ['Parcela Ganadera A', 'Zona de Engorde 1'],
     estimatedProduction: '100 kg de carne en canal por unidad.',
     currentPrice: 4500
   },
@@ -25,7 +24,6 @@ export const models3d: Models3dItem[] = [
     waterRequirements: 'Moderado (depende de la lluvia estacional o riego por aspersión).',
     recommendedFertilizers: 'Nitrógeno y Fósforo tras cada corte para estimular el rebrote.',
     commonDiseases: 'Hongos por exceso de humedad durante el almacenamiento (Moho).',
-    parcels: ['Sector Forraje Norte', 'Almacén Central'],
     estimatedProduction: '150 pacas por hectárea por corte.',
     currentPrice: 120
   },
@@ -39,7 +37,6 @@ export const models3d: Models3dItem[] = [
     waterRequirements: '500 - 800 mm distribuidos a lo largo del ciclo, crítico en la floración.',
     recommendedFertilizers: 'Fertilizantes NPK (Nitrógeno, Fósforo, Potasio) y Zinc.',
     commonDiseases: 'Gusano cogollero, roya del maíz, carbón del maíz.',
-    parcels: ['Lote Maizales Sur', 'Parcela Experimental 2'],
     estimatedProduction: '4.5 toneladas por hectárea.',
     currentPrice: 350
   },
@@ -53,7 +50,6 @@ export const models3d: Models3dItem[] = [
     waterRequirements: 'Bajo a moderado; es una planta muy resistente a la sequía gracias a sus raíces profundas.',
     recommendedFertilizers: 'Rico en Potasio y Boro para mejorar el llenado de la semilla.',
     commonDiseases: 'Mildiu, podredumbre gris (Botrytis), mildiu polvoriento.',
-    parcels: ['Franja de Polinizadores', 'Lote Girasoles Este'],
     estimatedProduction: '2.2 toneladas de semilla por hectárea.',
     currentPrice: 600
   },
@@ -67,7 +63,6 @@ export const models3d: Models3dItem[] = [
     waterRequirements: 'Controlado (depende directamente de la planta que aloje).',
     recommendedFertilizers: 'Abono orgánico, humus de lombriz mezclado en el sustrato.',
     commonDiseases: 'Acumulación de sales o proliferación de hongos en la raíz por mal drenaje.',
-    parcels: ['Invernadero Central', 'Área de Plántulas'],
     estimatedProduction: 'Capacidad para 1 planta grande o 3 hortalizas pequeñas.',
     currentPrice: 85
   },
@@ -81,7 +76,6 @@ export const models3d: Models3dItem[] = [
     waterRequirements: 'Ninguno (Mantener completamente seco y protegido de la intemperie).',
     recommendedFertilizers: 'No aplica',
     commonDiseases: 'Corrosión por humedad, sobrecalentamiento, fallos por picos de voltaje.',
-    parcels: ['Estación Meteorológica', 'Tablero de Control Invernadero'],
     estimatedProduction: 'Monitoreo 24/7 de 4 sensores ambientales.',
     currentPrice: 1200
   },
@@ -95,7 +89,6 @@ export const models3d: Models3dItem[] = [
     waterRequirements: 'Moderado; muy tolerante a sequías una vez establecida.',
     recommendedFertilizers: 'Alto requerimiento de Potasio para el desarrollo de raíces tuberosas.',
     commonDiseases: 'Bacteriosis vascular de la yuca, mosca blanca, superatropamiento.',
-    parcels: ['Sector Tubérculos Oeste'],
     estimatedProduction: '12 toneladas por hectárea.',
     currentPrice: 280
   },
@@ -109,7 +102,6 @@ export const models3d: Models3dItem[] = [
     waterRequirements: 'Frecuente durante las primeras etapas y el desarrollo del fruto.',
     recommendedFertilizers: 'Materia orgánica (estiércol compuesto) y fertilizantes ricos en Fósforo.',
     commonDiseases: 'Cenicilla (Oídium), virosis transmitida por áfidos, mildiú velloso.',
-    parcels: ['Huerto Tradicional 3', 'Lote de Cucurbitáceas'],
     estimatedProduction: '15 toneladas por hectárea.',
     currentPrice: 150
   },
@@ -123,7 +115,6 @@ export const models3d: Models3dItem[] = [
     waterRequirements: 'Riego regular pero ligero; evitar encharcamientos para que no se pudra el bulbo.',
     recommendedFertilizers: 'Nitrógeno en las primeras fases; Azufre para acentuar el sabor y aroma.',
     commonDiseases: 'Mildiu de la cebolla, raíz rosada, trips.',
-    parcels: ['Bancales Sur 1', 'Bancales Sur 2'],
     estimatedProduction: '25 toneladas por hectárea.',
     currentPrice: 420
   },
@@ -137,7 +128,6 @@ export const models3d: Models3dItem[] = [
     waterRequirements: 'Constante y uniforme; el estrés hídrico provoca la caída de flores.',
     recommendedFertilizers: 'Equilibrio NPK, con especial énfasis en Calcio para evitar la podredumbre apical.',
     commonDiseases: 'Picudo del chile, cenicilla, marchitez por Phytophthora.',
-    parcels: ['Invernadero Norte - Sector B'],
     estimatedProduction: '18 toneladas por hectárea.',
     currentPrice: 310
   },
@@ -151,7 +141,6 @@ export const models3d: Models3dItem[] = [
     waterRequirements: 'Alto y regular; el riego por goteo es el más recomendado.',
     recommendedFertilizers: 'Fósforo al inicio, Potasio durante la fructificación y aportes de Calcio.',
     commonDiseases: 'Tizón temprano, tizón tardío, mosca blanca, virus del bronceado.',
-    parcels: ['Invernadero Norte - Sector A', 'Parcela Tomateras Ext.'],
     estimatedProduction: '30 toneladas por hectárea (en condiciones óptimas).',
     currentPrice: 490
   },
@@ -165,7 +154,6 @@ export const models3d: Models3dItem[] = [
     waterRequirements: 'Humedad constante para evitar que la raíz se agriete o se bifurque.',
     recommendedFertilizers: 'Bajo en Nitrógeno (para evitar exceso de follaje) y alto en Potasio.',
     commonDiseases: 'Mosca de la zanahoria, alternaria, nematodos del suelo.',
-    parcels: ['Bancales Este 4'],
     estimatedProduction: '20 toneladas por hectárea.',
     currentPrice: 220
   }

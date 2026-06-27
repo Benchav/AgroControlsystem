@@ -4,9 +4,12 @@ import { ModelSkeleton } from '../components/3d-objects/model_skeleton';
 import { ModelFormModal } from '../components/3d-objects/model_form_modal';
 import { useModels3d } from '../hooks/useModels3d';
 import { Models3dItem } from '../entities/3d_object_model';
+import { Parcel } from '../entities/parcel_model';
+import { useParcels } from '../hooks/useParcels';
 
 export function Models3dPage() {
   const { models, isLoading, createModel, updateModel, deleteModel } = useModels3d();
+  const { parcels } = useParcels();
   
   // Estados para controlar el Modal de Formulario
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -52,7 +55,8 @@ export function Models3dPage() {
         <ModelSkeleton />
       ) : (
         <ModelGrid 
-          models={models} 
+          models={models}
+          dynamicParcels={parcels} 
           onEditClick={handleOpenEditModal}
           onDeleteClick={deleteModel} 
         />
@@ -60,6 +64,7 @@ export function Models3dPage() {
 
       {/* Modal reutilizable */}
       <ModelFormModal 
+        availableParcels={parcels}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleFormSubmit}
