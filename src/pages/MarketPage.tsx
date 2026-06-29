@@ -32,6 +32,7 @@ export function MarketPage() {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<MarketItem | null>(null);
+  const [itemToDelete, setItemToDelete] = useState<MarketItem | null>(null);
 
   // Estado inicial del formulario
   const [formData, setFormData] = useState({
@@ -48,21 +49,20 @@ export function MarketPage() {
   });
 
   // Filtrado dinámico estricto según la categoría elegida en el formulario
-  // Filtrado dinámico adaptado estrictamente a tus datos reales de models3d
   const entitiesDropdownOptions = useMemo(() => {
-    // 1. Si la categoría del formulario es parcelas
+    // Si la categoría del formulario es parcelas
     if (formData.category === "parcelas") {
       return parcels.map(p => ({ id: p.id, label: `${p.name} (${p.area})` }));
     }
 
-    // 2. Si seleccionas "animales", filtramos por "animal" en tus datos
+    //  Si seleccionamos "animales", filtramos por "animal" 
     if (formData.category === "animales") {
       return models
         .filter(m => m.modelType === "animal")
         .map(m => ({ id: m.id, label: `${m.title} - por ${m.author}` }));
     }
 
-    // 3. Si seleccionas "alimentos", filtramos por "cultivo" que es como lo tienes guardado
+    //  Si seleccionamos "alimentos", filtramos por "cultivo" 
     if (formData.category === "alimentos") {
       return models
         .filter(m => m.modelType === "cultivo") // <-- Aquí mapeamos "alimentos" -> "cultivo"
@@ -111,7 +111,7 @@ export function MarketPage() {
     });
   }, [activeTab, search, marketItems]);
 
-  // --- LÓGICA DE CRUD & FORMULARIOS ---
+  //ABRIR CRUD DE CREAR
   const openCreateForm = () => {
     setEditingItem(null);
     setFormData({
@@ -147,14 +147,19 @@ export function MarketPage() {
     setIsFormOpen(true);
   };
 
-  const handleDelete = (id: string, e: React.MouseEvent) => {
+  const handleDeleteClick = (item: MarketItem, e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm("¿Estás seguro de que deseas eliminar o retirar esta subasta?")) {
-      deleteItem(id);
+    setItemToDelete(item);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (itemToDelete) {
+      deleteItem(itemToDelete.id);
+      setItemToDelete(null);
     }
   };
 
-  // Manejador del cambio de categoría con reseteo seguro de unidades
+  // Manejador del cambio de categoría con reseteo de unidades
   const handleCategoryChange = (category: MarketCategory) => {
     let defaultUnit = "Quintales";
     if (category === "animales") defaultUnit = "Cabezas";
@@ -396,7 +401,7 @@ export function MarketPage() {
         </div>
       </div>
 
-      {/* GRID DE PRODUCTOS */}
+      {/* COLECCION DE PRODUCTOS */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5 bg-black/20 backdrop-blur">
         {filteredItems.map((item) => (
           <div
@@ -414,7 +419,7 @@ export function MarketPage() {
               </button>
               <button
                 type="button"
-                onClick={(e) => handleDelete(item.id, e)}
+                onClick={(e) => handleDeleteClick(item, e)}
                 className="flex h-7 w-7 items-center justify-center rounded-lg bg-black/60 text-xs text-red-400 backdrop-blur-sm transition hover:bg-red-500 hover:text-white"
                 title="Eliminar subasta"
               >
@@ -705,6 +710,33 @@ export function MarketPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {itemToDelete && (
+        <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-slate-800 p-6 rounded-xl border border-slate-700 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-bold text-white mb-2">¿Eliminar subasta?</h3>
+            <p className="text-sm text-slate-400 mb-6">
+              Esta acción eliminará permanentemente la publicación <span className="text-emerald-400 font-semibold">"{itemToDelete.name}"</span> del mercado de subastas.
+            </p>
+            <div className="flex justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setItemToDelete(null)}
+                className="px-4 py-2 text-sm font-medium text-slate-300 hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteConfirm}
+                className="px-4 py-2 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              >
+                Sí, eliminar
+              </button>
+            </div>
           </div>
         </div>
       )}
