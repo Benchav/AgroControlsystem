@@ -40,6 +40,7 @@ export function FarmInteractiveMap({
   setIsEditorOpen,
 }: FarmInteractiveMapProps) {
   const [editingParcel, setEditingParcel] = useState<Parcel | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const { models: crops } = useModels3d();
 
   const selectedParcel = useMemo(
@@ -50,7 +51,7 @@ export function FarmInteractiveMap({
   );
 
   // Sincronizar el editor local cuando cambia la parcela seleccionada 
-  //en el otro componente en el padre
+  // en el otro componente en el padre
   useEffect(() => {
     if (selectedParcel) {
       setEditingParcel(selectedParcel);
@@ -111,6 +112,7 @@ export function FarmInteractiveMap({
       setSelectedParcelId("");
     }
 
+    setIsDeleteConfirmOpen(false);
     setIsEditorOpen(false);
   };
 
@@ -215,27 +217,22 @@ export function FarmInteractiveMap({
                 onCreated={(e) => {
                   const layer = e.layer;
                   if ("getLatLngs" in layer) {
-                    // Leaflet Draw puede devolver arrays anidados dependiendo de la figura
                     const rawLatLngs = layer.getLatLngs()[0];
                     const latlngs = (Array.isArray(rawLatLngs) ? rawLatLngs : layer.getLatLngs()) as any[];
 
-                    // --- CÁLCULO DE ÁREA CON TURF ---
-                    // Turf requiere coordenadas en [Lng, Lat] y que el primer punto se repita al final
                     const coordinates = latlngs.map((pt: any) => [pt.lng, pt.lat]);
                     coordinates.push([latlngs[0].lng, latlngs[0].lat]);
 
                     const polygonGeoJSON = turf.polygon([coordinates]);
                     const areaInSquareMeters = turf.area(polygonGeoJSON);
 
-                    // Convertimos metros cuadrados a Hectáreas (1 ha = 10,000 m²)
                     const areaInHectares = areaInSquareMeters / 10000;
-                    // Lo dejamos formateado con 2 decimales (ej: "3.45 ha")
                     const formattedArea = `${areaInHectares.toFixed(2)} ha`;
 
                     const newParcel: Parcel = {
                       id: `parcel-${Date.now()}`,
                       name: `Nueva Parcela`,
-                      area: formattedArea, // Aquí insertamos el área real calculada
+                      area: formattedArea,
                       status: "Óptimo",
                       statusTone: "optimo",
                       humidity: "--",
@@ -397,7 +394,6 @@ export function FarmInteractiveMap({
                     const tone = e.target.value as ParcelStatus;
                     const statusText = tone === "critico" ? "Crítico" : tone === "atencion" ? "Atención" : "Óptimo";
 
-                    // Actualizamos ambos campos al mismo tiempo compartiendo el estado actual
                     if (editingParcel) {
                       setEditingParcel({
                         ...editingParcel,
@@ -456,11 +452,7 @@ export function FarmInteractiveMap({
 
             <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-between">
               <button
-                onClick={() => {
-                  if (confirm(`¿Estás seguro de que quieres eliminar la parcela "${editingParcel.name}"?`)) {
-                    handleDeleteParcel();
-                  }
-                }}
+                onClick={() => setIsDeleteConfirmOpen(true)}
                 className="rounded-2xl bg-red-600/20 border border-red-500/30 px-6 py-3 font-semibold text-red-400 hover:bg-red-600 hover:text-white transition-colors order-3 sm:order-1"
               >
                 Eliminar Parcela
@@ -483,6 +475,34 @@ export function FarmInteractiveMap({
               </div>
             </div>
 
+          </div>
+        </div>
+      )}
+
+      {/* CONFIRMACIÓN DE ELIMINACIÓN */}
+      {isDeleteConfirmOpen && editingParcel && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="w-full max-w-md rounded-2xl border border-red-500/20 bg-[#0d0707] p-6 shadow-2xl">
+            <h3 className="text-xl font-bold text-red-400 mb-2">🚨 Confirmar acción</h3>
+            <p className="text-slate-300 text-sm leading-relaxed mb-6">
+              ¿Estás completamente seguro de que deseas eliminar la parcela{" "}
+              <span className="font-bold text-white">"{editingParcel.name}"</span>?
+              Esta acción no se puede deshacer y removerá los datos de monitoreo asociados.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setIsDeleteConfirmOpen(false)}
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/10"
+              >
+                Volver atrás
+              </button>
+              <button
+                onClick={handleDeleteParcel}
+                className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-500 transition-colors"
+              >
+                Sí, eliminar definitivamente
+              </button>
+            </div>
           </div>
         </div>
       )}
