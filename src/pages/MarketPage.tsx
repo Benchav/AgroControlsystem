@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { MarketCategory, MarketItem, MarketStatus } from "../entities/market_model";
 import { useMarket } from "../hooks/useMarket";
+import { useModels3d } from "../hooks/useModels3d";
+import { useParcels } from "../hooks/useParcels";
 
 export function MarketPage() {
   const {
@@ -11,6 +13,9 @@ export function MarketPage() {
     createItem,
     deleteItem
   } = useMarket();
+
+  const { models } = useModels3d();
+  const { parcels } = useParcels();
 
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [selectedImage, setSelectedImage] = useState("");
@@ -38,8 +43,34 @@ export function MarketPage() {
     status: "disponible" as MarketStatus,
     unit: "Quintales",
     lotSize: 1,
-    imageUrl: ""
+    imageUrl: "",
+    entityId: ""
   });
+
+  // Filtrado dinámico estricto según la categoría elegida en el formulario
+  // Filtrado dinámico adaptado estrictamente a tus datos reales de models3d
+  const entitiesDropdownOptions = useMemo(() => {
+    // 1. Si la categoría del formulario es parcelas
+    if (formData.category === "parcelas") {
+      return parcels.map(p => ({ id: p.id, label: `${p.name} (${p.area})` }));
+    }
+
+    // 2. Si seleccionas "animales", filtramos por "animal" en tus datos
+    if (formData.category === "animales") {
+      return models
+        .filter(m => m.modelType === "animal")
+        .map(m => ({ id: m.id, label: `${m.title} - por ${m.author}` }));
+    }
+
+    // 3. Si seleccionas "alimentos", filtramos por "cultivo" que es como lo tienes guardado
+    if (formData.category === "alimentos") {
+      return models
+        .filter(m => m.modelType === "cultivo") // <-- Aquí mapeamos "alimentos" -> "cultivo"
+        .map(m => ({ id: m.id, label: `${m.title} - por ${m.author}` }));
+    }
+
+    return [];
+  }, [formData.category, models, parcels]);
 
   const tabs = [
     {
@@ -70,11 +101,7 @@ export function MarketPage() {
 
   const filteredItems = useMemo(() => {
     return marketItems.filter((item) => {
-      // filtro por tab
-      const matchesCategory =
-        activeTab === "all" || item.category === activeTab;
-
-      // filtro por búsqueda
+      const matchesCategory = activeTab === "all" || item.category === activeTab;
       const matchesSearch =
         item.name.toLowerCase().includes(search.toLowerCase()) ||
         item.category.toLowerCase().includes(search.toLowerCase()) ||
@@ -96,13 +123,14 @@ export function MarketPage() {
       status: "disponible",
       unit: "Quintales",
       lotSize: 1,
-      imageUrl: ""
+      imageUrl: "",
+      entityId: ""
     });
     setIsFormOpen(true);
   };
 
   const openEditForm = (item: MarketItem, e: React.MouseEvent) => {
-    e.stopPropagation(); // Evita abrir la subasta al hacer clic en editar
+    e.stopPropagation();
     setEditingItem(item);
     setFormData({
       name: item.name,
@@ -113,15 +141,63 @@ export function MarketPage() {
       status: item.status,
       unit: item.unit || "Unidades",
       lotSize: item.lotSize || 1,
-      imageUrl: item.imageUrl ? item.imageUrl[0] : ""
+      imageUrl: item.imageUrl ? item.imageUrl[0] : "",
+      entityId: item.entityId || ""
     });
     setIsFormOpen(true);
   };
 
   const handleDelete = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation(); // Evita abrir la subasta al hacer clic en eliminar
+    e.stopPropagation();
     if (confirm("¿Estás seguro de que deseas eliminar o retirar esta subasta?")) {
       deleteItem(id);
+    }
+  };
+
+  // Manejador del cambio de categoría con reseteo seguro de unidades
+  const handleCategoryChange = (category: MarketCategory) => {
+    let defaultUnit = "Quintales";
+    if (category === "animales") defaultUnit = "Cabezas";
+    if (category === "parcelas") defaultUnit = "Hectáreas";
+
+    setFormData({
+      ...formData,
+      category,
+      entityId: "",
+      unit: defaultUnit
+    });
+  };
+
+  // Rellenar automáticamente campos al seleccionar un modelo o parcela
+  const handleEntitySelect = (entityId: string) => {
+    if (!entityId) {
+      setFormData(prev => ({ ...prev, entityId: "" }));
+      return;
+    }
+
+    if (formData.category === "parcelas") {
+      const targetParcel = parcels.find(p => p.id === entityId);
+      if (targetParcel) {
+        setFormData(prev => ({
+          ...prev,
+          entityId,
+          name: `Alquiler: ${targetParcel.name}`,
+          description: `Parcela con estado de fertilidad de ${targetParcel.fertility} y humedad del ${targetParcel.humidity}.`,
+          unit: "Lote"
+        }));
+      }
+    } else {
+      const targetModel = models.find(m => m.id === entityId);
+      if (targetModel) {
+        setFormData(prev => ({
+          ...prev,
+          entityId,
+          name: `${targetModel.title}`,
+          description: `${targetModel.estimatedProduction}. ${targetModel.growthPeriod}.`,
+          startingPrice: targetModel.currentPrice,
+          price: targetModel.currentPrice
+        }));
+      }
     }
   };
 
@@ -269,6 +345,7 @@ export function MarketPage() {
 
   return (
     <div className="space-y-4">
+      {/* HEADER */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white">Mercado de Subastas</h1>
@@ -285,6 +362,7 @@ export function MarketPage() {
         </button>
       </div>
 
+      {/* BUSCADOR Y TABS */}
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div className="relative w-full lg:max-w-md">
           <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-500" />
@@ -318,13 +396,13 @@ export function MarketPage() {
         </div>
       </div>
 
+      {/* GRID DE PRODUCTOS */}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5 bg-black/20 backdrop-blur">
         {filteredItems.map((item) => (
           <div
             key={item.id}
             className="relative rounded-[14px] border border-white/8 bg-white/[0.03] overflow-hidden group"
           >
-            {/* ACCIONES FLOTANTES: EDITAR Y ELIMINAR */}
             <div className="absolute top-2 right-2 z-10 flex gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
               <button
                 type="button"
@@ -345,19 +423,11 @@ export function MarketPage() {
             </div>
 
             <div className="flex h-36 items-center justify-center bg-black/20 text-5xl">
-              {item.imageUrl ? (
-                <img
-                  src={item.imageUrl[0]}
-                  alt={item.name}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <img
-                  src="https://media.istockphoto.com/id/1842732901/es/vector/icono-de-carga.jpg?s=612x612&w=0&k=20&c=t9fex0geQSSL-upo-wtzFNsG48KHFnJFkLQUeMQEh68="
-                  alt={item.name}
-                  className="h-full w-full object-cover"
-                />
-              )}
+              <img
+                src={item.imageUrl ? item.imageUrl[0] : "https://media.istockphoto.com/id/1842732901/es/vector/icono-de-carga.jpg?s=612x612&w=0&k=20&c=t9fex0geQSSL-upo-wtzFNsG48KHFnJFkLQUeMQEh68="}
+                alt={item.name}
+                className="h-full w-full object-cover"
+              />
             </div>
             <div className="flex p-2 flex-col items-start gap-2">
               <div className="mt-3 text-lg font-semibold text-white truncate w-full">
@@ -389,6 +459,7 @@ export function MarketPage() {
             </div>
           </div>
         ))}
+
         {!filteredItems.length && (
           <div className="rounded-[14px] border border-white/8 bg-white/[0.03] p-8 text-center text-slate-400 w-full col-span-full">
             No hay elementos registrados en esta categoría o coincidencia.
@@ -396,7 +467,7 @@ export function MarketPage() {
         )}
       </div>
 
-      {/* --- MODAL SUBASTA EN VIVO (Mantenido sin cambios de lógica) --- */}
+      {/* MODAL SUBASTA EN VIVO */}
       {auctionActive && selectedItem && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center overflow-hidden bg-black/90 backdrop-blur-md">
           <div className="relative w-[95vw] max-w-6xl max-h-[90vh] overflow-y-auto rounded-[28px] border border-white/10 bg-[#071510] p-6 shadow-2xl">
@@ -489,7 +560,7 @@ export function MarketPage() {
         </div>
       )}
 
-      {/* --- MODAL FORMULARIO: CREAR / EDITAR SUBASTA --- */}
+      {/* MODAL FORMULARIO: CREAR / EDITAR SUBASTA */}
       {isFormOpen && (
         <div className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="w-full max-w-xl rounded-2xl border border-white/10 bg-[#0c1914] p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
@@ -528,10 +599,10 @@ export function MarketPage() {
                   <label className="block mb-1 font-medium text-slate-200">Categoría</label>
                   <select
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value as MarketCategory })}
-                    className="w-full rounded-xl border border-white/10 bg-black/20 p-3 text-white outline-none focus:border-emerald-500"
+                    onChange={(e) => handleCategoryChange(e.target.value as MarketCategory)}
+                    className="w-full rounded-xl border border-white/10 bg-slate-900 p-3 text-white outline-none transition-colors duration-200 hover:bg-slate-800 focus:border-emerald-500"
                   >
-                    <option value="alimentos">Alimentos</option>
+                    <option value="alimentos">Alimentos (Cultivos)</option>
                     <option value="animales">Animales</option>
                     <option value="parcelas">Parcelas</option>
                   </select>
@@ -542,11 +613,35 @@ export function MarketPage() {
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value as MarketStatus })}
-                    className="w-full rounded-xl border border-white/10 bg-black/20 p-3 text-white outline-none focus:border-emerald-500"
+                    className="w-full rounded-xl border border-white/10 bg-slate-900 p-3 text-white outline-none transition-colors duration-200 hover:bg-slate-800 focus:border-emerald-500"
                   >
                     <option value="disponible">Disponible / Activa</option>
                     <option value="pendiente">Pendiente / Pausa</option>
                     <option value="no disponible">No disponible / Cerrada</option>
+                  </select>
+                </div>
+
+                <div className="col-span-2">
+                  <label className="block mb-1 font-medium text-slate-200">
+                    {formData.category === "parcelas" ? "Seleccionar Parcela" : `Vincular Modelo 3D (${formData.category})`}
+                  </label>
+                  <select
+                    value={formData.entityId}
+                    onChange={(e) => handleEntitySelect(e.target.value)}
+                    className="w-full rounded-xl border border-white/10 bg-slate-900 p-3 text-white outline-none transition-colors duration-200 hover:bg-slate-800 focus:border-emerald-500"
+                  >
+                    <option value="" className="bg-slate-950 text-white">
+                      -- Selección libre / Ninguno --
+                    </option>
+                    {entitiesDropdownOptions.map(option => (
+                      <option
+                        key={option.id}
+                        value={option.id}
+                        className="bg-slate-950 text-white checked:bg-emerald-600"
+                      >
+                        {option.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 

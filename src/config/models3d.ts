@@ -2,7 +2,7 @@ import { Models3dItem } from '../entities/3d_object_model';
 
 export const models3d: Models3dItem[] = [
   {
-    id:"1",
+    id: "1",
     title: 'Diseño de Porcino',
     author: 'Oscar',
     modelPath: "/3d-objects/cerdo.glb",
@@ -12,10 +12,11 @@ export const models3d: Models3dItem[] = [
     recommendedFertilizers: 'No aplica',
     commonDiseases: 'Peste porcina, erisipela, problemas respiratorios.',
     estimatedProduction: '100 kg de carne en canal por unidad.',
-    currentPrice: 4500
+    currentPrice: 4500,
+    modelType: "animal"
   },
   {
-    id:"2",
+    id: "2",
     title: 'Diseño de Heno',
     author: 'Oscar',
     modelPath: "/3d-objects/heno.glb",
@@ -25,10 +26,11 @@ export const models3d: Models3dItem[] = [
     recommendedFertilizers: 'Nitrógeno y Fósforo tras cada corte para estimular el rebrote.',
     commonDiseases: 'Hongos por exceso de humedad durante el almacenamiento (Moho).',
     estimatedProduction: '150 pacas por hectárea por corte.',
-    currentPrice: 120
+    currentPrice: 120,
+    modelType: "cultivo"
   },
   {
-    id:"3",
+    id: "3",
     title: 'Diseño de Maíz',
     author: 'Joshua',
     modelPath: "/3d-objects/elote.glb",
@@ -38,10 +40,11 @@ export const models3d: Models3dItem[] = [
     recommendedFertilizers: 'Fertilizantes NPK (Nitrógeno, Fósforo, Potasio) y Zinc.',
     commonDiseases: 'Gusano cogollero, roya del maíz, carbón del maíz.',
     estimatedProduction: '4.5 toneladas por hectárea.',
-    currentPrice: 350
+    currentPrice: 350,
+    modelType: "cultivo"
   },
   {
-    id:"4",
+    id: "4",
     title: 'Diseño de Girasol',
     author: 'Oscar',
     modelPath: "/3d-objects/girasol.glb",
@@ -51,10 +54,11 @@ export const models3d: Models3dItem[] = [
     recommendedFertilizers: 'Rico en Potasio y Boro para mejorar el llenado de la semilla.',
     commonDiseases: 'Mildiu, podredumbre gris (Botrytis), mildiu polvoriento.',
     estimatedProduction: '2.2 toneladas de semilla por hectárea.',
-    currentPrice: 600
+    currentPrice: 600,
+    modelType: "cultivo"
   },
   {
-    id:"5",
+    id: "5",
     title: 'Diseño de Macetera',
     author: 'Joshua',
     modelPath: "/3d-objects/macetera.glb",
@@ -64,10 +68,11 @@ export const models3d: Models3dItem[] = [
     recommendedFertilizers: 'Abono orgánico, humus de lombriz mezclado en el sustrato.',
     commonDiseases: 'Acumulación de sales o proliferación de hongos en la raíz por mal drenaje.',
     estimatedProduction: 'Capacidad para 1 planta grande o 3 hortalizas pequeñas.',
-    currentPrice: 85
+    currentPrice: 85,
+    modelType: "cultivo"
   },
   {
-    id:"6",
+    id: "6",
     title: 'Diseño de Arduino',
     author: 'Oscar',
     modelPath: "/3d-objects/panelSolar.glb",
@@ -77,10 +82,11 @@ export const models3d: Models3dItem[] = [
     recommendedFertilizers: 'No aplica',
     commonDiseases: 'Corrosión por humedad, sobrecalentamiento, fallos por picos de voltaje.',
     estimatedProduction: 'Monitoreo 24/7 de 4 sensores ambientales.',
-    currentPrice: 1200
+    currentPrice: 1200,
+    modelType: "cultivo"
   },
   {
-    id:"7",
+    id: "7",
     title: 'Diseño de Yuca',
     author: 'Joshua',
     modelPath: "/3d-objects/yuca.glb",
@@ -90,23 +96,25 @@ export const models3d: Models3dItem[] = [
     recommendedFertilizers: 'Alto requerimiento de Potasio para el desarrollo de raíces tuberosas.',
     commonDiseases: 'Bacteriosis vascular de la yuca, mosca blanca, superatropamiento.',
     estimatedProduction: '12 toneladas por hectárea.',
-    currentPrice: 280
+    currentPrice: 280,
+    modelType: "cultivo"
   },
   {
-    id:"8",
+    id: "8",
     title: 'Diseño de Ayote',
     author: 'Oscar',
     modelPath: "/3d-objects/ayote.glb",
-    nutritionalInfo: 'Bajo en calorías, alto en agua, fibra, beta-carotenos y vitaminas A y C.',
+    nutritionalInfo: 'Bajo en calorías, alto en agua, fibra, beta-carotenos y vitamins A y C.',
     growthPeriod: '90 - 110 días.',
     waterRequirements: 'Frecuente durante las primeras etapas y el desarrollo del fruto.',
     recommendedFertilizers: 'Materia orgánica (estiércol compuesto) y fertilizantes ricos en Fósforo.',
     commonDiseases: 'Cenicilla (Oídium), virosis transmitida por áfidos, mildiú velloso.',
     estimatedProduction: '15 toneladas por hectárea.',
-    currentPrice: 150
+    currentPrice: 150,
+    modelType: "cultivo"
   },
   {
-    id:"9",
+    id: "9",
     title: 'Diseño de Cebolla',
     author: 'Joshua',
     modelPath: "/3d-objects/cebolla.glb",
@@ -116,10 +124,11 @@ export const models3d: Models3dItem[] = [
     recommendedFertilizers: 'Nitrógeno en las primeras fases; Azufre para acentuar el sabor y aroma.',
     commonDiseases: 'Mildiu de la cebolla, raíz rosada, trips.',
     estimatedProduction: '25 toneladas por hectárea.',
-    currentPrice: 420
+    currentPrice: 420,
+    modelType: "cultivo"
   },
   {
-    id:"10",
+    id: "10",
     title: 'Diseño de Chiltoma',
     author: 'Oscar',
     modelPath: "/3d-objects/chiltoma.glb",
@@ -129,10 +138,11 @@ export const models3d: Models3dItem[] = [
     recommendedFertilizers: 'Equilibrio NPK, con especial énfasis en Calcio para evitar la podredumbre apical.',
     commonDiseases: 'Picudo del chile, cenicilla, marchitez por Phytophthora.',
     estimatedProduction: '18 toneladas por hectárea.',
-    currentPrice: 310
+    currentPrice: 310,
+    modelType: "cultivo"
   },
   {
-    id:"11",
+    id: "11",
     title: 'Diseño de Tomate',
     author: 'Joshua',
     modelPath: "/3d-objects/tomate.glb",
@@ -142,10 +152,11 @@ export const models3d: Models3dItem[] = [
     recommendedFertilizers: 'Fósforo al inicio, Potasio durante la fructificación y aportes de Calcio.',
     commonDiseases: 'Tizón temprano, tizón tardío, mosca blanca, virus del bronceado.',
     estimatedProduction: '30 toneladas por hectárea (en condiciones óptimas).',
-    currentPrice: 490
+    currentPrice: 490,
+    modelType: "cultivo"
   },
   {
-    id:"12",
+    id: "12",
     title: 'Diseño de Zanahoria',
     author: 'Oscar',
     modelPath: "/3d-objects/zanahoria.glb",
@@ -155,6 +166,7 @@ export const models3d: Models3dItem[] = [
     recommendedFertilizers: 'Bajo en Nitrógeno (para evitar exceso de follaje) y alto en Potasio.',
     commonDiseases: 'Mosca de la zanahoria, alternaria, nematodos del suelo.',
     estimatedProduction: '20 toneladas por hectárea.',
-    currentPrice: 220
+    currentPrice: 220,
+    modelType: "cultivo"
   }
 ];

@@ -11,4 +11,7 @@ export type Models3dItem = {
   parcels?: string[];
   estimatedProduction: string;
   currentPrice: number;
+  modelType?: ModelType;
 };
+
+export type ModelType = "animal" | "cultivo";
