@@ -17,7 +17,7 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
     title: '', author: '', modelPath: '', nutritionalInfo: '',
     growthPeriod: '', waterRequirements: '', recommendedFertilizers: '',
     commonDiseases: '', parcels: [], estimatedProduction: '', currentPrice: 0,
-    id: generateId(),
+    id: generateId(), modelType: 'cultivo',
   });
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -26,13 +26,14 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
   useEffect(() => {
     if (modelToEdit) {
       // Limpiamos los IDs de parcelas guardados que ya no existen en el sistema actual
-      const validParcels = (modelToEdit.parcels ?? []).filter(parcelId => 
+      const validParcels = (modelToEdit.parcels ?? []).filter(parcelId =>
         availableParcels.some(ap => ap.id === parcelId)
       );
 
       setFormData({
         ...modelToEdit,
-        parcels: validParcels
+        parcels: validParcels,
+        modelType: modelToEdit.modelType ?? 'cultivo',
       });
     } else {
       setFormData({
@@ -40,11 +41,11 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
         title: '', author: '', modelPath: '', nutritionalInfo: '',
         growthPeriod: '', waterRequirements: '', recommendedFertilizers: '',
         commonDiseases: '', parcels: [], estimatedProduction: '', currentPrice: 0,
-        id: generateId(),
+        id: generateId(), modelType: 'cultivo',
       });
     }
     setIsDropdownOpen(false);
-  }, [modelToEdit, isOpen, availableParcels]); 
+  }, [modelToEdit, isOpen, availableParcels]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -58,7 +59,7 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
 
   if (!isOpen) return null;
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -151,6 +152,19 @@ export function ModelFormModal({ isOpen, onClose, onSubmit, modelToEdit, availab
               <label className="block text-sm font-medium text-white">Autor</label>
               <input required name="author" value={formData.author} onChange={handleChange} className="mt-1 block w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm focus:outline-emerald-500 text-white" />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-white mb-1">Tipo de Registro</label>
+            <select
+              name="modelType"
+              value={formData.modelType}
+              onChange={handleChange}
+              className="block w-full rounded-md border border-white/10 bg-black/20 px-3 py-2 text-sm focus:outline-emerald-500 text-white cursor-pointer"
+            >
+              <option value="cultivo" className="bg-[#071510] text-white">Cultivo</option>
+              <option value="animal" className="bg-[#071510] text-white">Animal</option>
+            </select>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
