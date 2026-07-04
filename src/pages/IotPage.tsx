@@ -9,7 +9,7 @@ import MonitorContent from "../components/iot/MonitorContent";
 import ArduinoContent from "../components/iot/ArduinoContent";
 import TutorialsContent from "../components/iot/TutorialsContent";
 import useArduinos from "../hooks/useArduinos";
-import useSensors from "../hooks/useSensors";
+import useSensors from "../hooks/useSensorstodelete";
 import useAlerts from "../hooks/useAlerts";
 
 export function IotPage() {
