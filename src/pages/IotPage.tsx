@@ -9,8 +9,8 @@ import MonitorContent from "../components/iot/MonitorContent";
 import ArduinoContent from "../components/iot/ArduinoContent";
 import TutorialsContent from "../components/iot/TutorialsContent";
 import useArduinos from "../hooks/useArduinos";
-import useSensors from "../hooks/useSensorstodelete";
 import useAlerts from "../hooks/useAlerts";
+import useSensors from "../hooks/useSensors";
 
 export function IotPage() {
   // Pestaña activa
@@ -57,9 +57,9 @@ export function IotPage() {
   const avgHumidity =
     humiditySensors.length > 0
       ? Math.round(
-          humiditySensors.reduce((acc, curr) => acc + curr.numericValue, 0) /
-            humiditySensors.length,
-        )
+        humiditySensors.reduce((acc, curr) => acc + curr.numericValue, 0) /
+        humiditySensors.length,
+      )
       : 0;
 
   const activeAlertsCount = alerts.filter((a) => !a.resolved).length;

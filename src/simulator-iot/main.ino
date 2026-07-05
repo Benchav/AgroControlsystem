@@ -1,84 +1,90 @@
-#include <WiFi.h>
-#include <PubSubClient.h>
-#include <DHT.h>
+#include "DHT.h"
 
-// --- CONFIGURACIÓN ---
-#define DHTPIN 15          // Pin donde conectamos el sensor
-#define DHTTYPE DHT22      // Tipo de sensor
+#define DHTPIN 2          // Pin digital conectado al DHT22
+#define DHTTYPE DHTTYPE_22   // Sensor DHT 22
+
 DHT dht(DHTPIN, DHTTYPE);
 
-// ID ÚNICO DE ESTE ARDUINO (Cambiamos esto si creamos otro archivo para simular un segundo Arduino)
-const char* ARDUINO_ID = "ARD-MEGA-01"; 
-
-// Servidor MQTT Gratuito y Público
-const char* mqtt_server = "broker.hivemq.com";
-const char* mqtt_topic = "agro/proyecto/sensores";
-
-WiFiClient espClient;
-PubSubClient client(espClient);
+// Configuración alineada con el modelo initialArduinos
+const char* ARDUINO_ID = "ARD-UNO-02";
+const char* LOCATION = "Sector 2A";
+const unsigned long BAUD_RATE = 9600;
+const int FREQUENCY_SECONDS = 5; // Frecuencia de envío definida en tu modelo
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(BAUD_RATE);
   dht.begin();
-  
-  // Conectar al Wi-Fi virtual de Wokwi (siempre es Wokwi-GUEST sin contraseña)
-  Serial.print("Conectando a Wi-Fi...");
-  WiFi.begin("Wokwi-GUEST", "", 6);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("\n¡Conectado al Wi-Fi de Wokwi!");
-
-  client.setServer(mqtt_server, 1883);
-}
-
-void reconnect() {
-  while (!client.connected()) {
-    Serial.print("Intentando conexión MQTT...");
-    // Intentar conectar con un ID de cliente aleatorio
-    String clientId = "ESP32Client-" + String(random(0, 10000));
-    if (client.connect(clientId.c_str())) {
-      Serial.println("¡Conectado al Broker!");
-    } else {
-      Serial.print("Falló con estado: ");
-      Serial.print(client.state());
-      Serial.println(" Reintentando en 5 segundos...");
-      delay(5000);
-    }
-  }
 }
 
 void loop() {
-  if (!client.connected()) {
-    reconnect();
-  }
-  client.loop();
+  // Esperar el tiempo determinado por la frecuencia configurada (convertido a ms)
+  delay(FREQUENCY_SECONDS * 1000);
 
-  // Leer datos del sensor virtual
-  float humidity = dht.readHumidity();
-  float temperature = dht.readTemperature();
+  // Lectura de temperatura y humedad ambiental
+  float h = dht.readHumidity();
+  float t = dht.readTemperature();
 
-  // Validar que la lectura sea correcta
-  if (isnan(humidity) || isnan(temperature)) {
-    Serial.println("Error al leer el sensor DHT22");
-    delay(2000);
+  // Validar si la lectura falló
+  if (isnan(h) || isnan(t)) {
+    Serial.println(F("{\"error\": \"Fallo al leer el sensor DHT22\"}"));
     return;
   }
 
-  // Crear el string en formato JSON idéntico a tus entidades de React
-  String jsonPayload = "{";
-  jsonPayload += "\"arduinoId\":\"" + String(ARDUINO_ID) + "\",";
-  jsonPayload += "\"temperature\":" + String(temperature, 1) + ",";
-  jsonPayload += "\"humidity\":" + String(humidity, 0);
-  jsonPayload += "}";
+  // Lógica de negocio para determinar el estado (status y tone) según el modelo de tu interfaz
+  String t_status = "OK";
+  String t_tone = "emerald";
+  
+  if (t > 30.0 || t < 14.0) {
+    t_status = "Crítico";
+    t_tone = "red";
+  } else if (t > 26.0 || t < 18.0) {
+    t_status = "Atención";
+    t_tone = "amber";
+  }
 
-  Serial.print("Enviando datos: ");
-  Serial.println(jsonPayload);
+  String h_status = "OK";
+  String h_tone = "emerald";
 
-  // Publicar en internet
-  client.publish(mqtt_topic, jsonPayload.c_str());
+  if (h > 85.0 || h < 40.0) {
+    h_status = "Crítico";
+    h_tone = "red";
+  } else if (h > 75.0 || h < 50.0) {
+    h_status = "Atención";
+    h_tone = "amber";
+  }
 
-  // Esperar 3 segundos antes de la siguiente lectura
-  delay(3000);
+  // Estructura de salida JSON limpia lista para mapear con tu interfaz de Sensor en React
+  Serial.println(F("--- TELEMETRÍA AGRO CONTROL ---"));
+  
+  // Sensor 1: Temperatura
+  Serial.print(F("{\"id\":\"SEN-TEMP-02\",\"name\":\"Temperatura Invernadero\",\"type\":\"Temperatura\",\"value\":\""));
+  Serial.print(t, 1);
+  Serial.print(F("°C\",\"numericValue\":"));
+  Serial.print(t, 2);
+  Serial.print(F(",\"unit\":\"°C\",\"location\":\""));
+  Serial.print(LOCATION);
+  Serial.print(F("\",\"status\":\""));
+  Serial.print(t_status);
+  Serial.print(F("\",\"tone\":\""));
+  Serial.print(t_tone);
+  Serial.print(F("\",\"arduinoId\":\""));
+  Serial.print(ARDUINO_ID);
+  Serial.println(F("\"}"));
+
+  // Sensor 2: Humedad
+  Serial.print(F("{\"id\":\"SEN-HUM-02\",\"name\":\"Humedad Invernadero\",\"type\":\"Humedad Ambiental\",\"value\":\""));
+  Serial.print(h, 1);
+  Serial.print(F("%\",\"numericValue\":"));
+  Serial.print(h, 2);
+  Serial.print(F(",\"unit\":\"%\",\"location\":\""));
+  Serial.print(LOCATION);
+  Serial.print(F("\",\"status\":\""));
+  Serial.print(h_status);
+  Serial.print(F("\",\"tone\":\""));
+  Serial.print(h_tone);
+  Serial.print(F("\",\"arduinoId\":\""));
+  Serial.print(ARDUINO_ID);
+  Serial.println(F("\"}"));
+  
+  Serial.println(F("-------------------------------"));
 }
