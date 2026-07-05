@@ -1,27 +1,43 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Parcel } from '../entities/parcel_model';
 import { initialParcels } from '../data/parcels';
-// 1. Importa tu servicio de telemetría (ajusta la ruta según tu estructura)
 import { fetchRealLocationTelemetry } from '../services/telemetryService'; 
 
 let parcelsDb: Parcel[] = [...initialParcels];
 
 const PARCELS_QUERY_KEY = ['parcels'];
 
+// Función auxiliar para estimar fertilidad dinámica en base a humedad y cultivo
+const calculateEstimatedFertility = (baseFertilityString: string, currentMoisture: number, hasCrop: boolean): number => {
+  // Limpiamos el string (ej: "85%" -> 85)
+  const baseFertility = parseInt(baseFertilityString) || 70;
+  
+  let modifier = 0;
+  
+  // Penalización si el suelo está extremadamente seco o saturado
+  if (currentMoisture < 20) modifier -= 15;
+  else if (currentMoisture > 85) modifier -= 10;
+  else modifier += 5; // Estado de humedad óptimo mejora la actividad microbiana es decir fertilidad efectiva
+
+  // Si hay un cultivo sembrado, consume un extra de nutrientes de forma constante
+  if (hasCrop) modifier -= 4;
+
+  // Asegurar que el resultado se mantenga en el rango de porcentaje (0 - 100)
+  return Math.min(100, Math.max(0, baseFertility + modifier));
+};
+
 export const useParcels = () => {
   const queryClient = useQueryClient();
 
-  // 2. OBTENER TODAS LAS PARCELAS (Ahora enriquecidas con telemetría en tiempo real)
+  // OBTENER TODAS LAS PARCELAS
   const parcelsQuery = useQuery({
     queryKey: PARCELS_QUERY_KEY,
     queryFn: async (): Promise<Parcel[]> => {
-      await new Promise((resolve) => setTimeout(resolve, 150)); // Simular retraso de red base
+      await new Promise((resolve) => setTimeout(resolve, 150));
       
-      // Recorremos todas las parcelas y consultamos la API meteorológica en paralelo
       const enrichedParcels = await Promise.all(
         parcelsDb.map(async (parcel) => {
           try {
-            // Extraemos latitud y longitud de forma segura desde el 'center' (LatLngExpression)
             let lat = 0;
             let lon = 0;
 
@@ -33,44 +49,52 @@ export const useParcels = () => {
               lon = (parcel.center as any).lng ?? (parcel.center as any).lon ?? 0;
             }
 
-            // Si la parcela no tiene coordenadas válidas asignadas, devolvemos los datos por defecto
             if (lat === 0 && lon === 0) return parcel;
 
-            // Invocamos tu servicio externo enviándole las coordenadas de la parcela actual
             const telemetry = await fetchRealLocationTelemetry(lat, lon);
 
-            // Formateamos los strings para que coincidan con los tipos de datos de tu interfaz 'Parcel'
+            // Calculamos la fertilidad estimada en tiempo real
+            const estimatedFertilityValue = calculateEstimatedFertility(
+              parcel.fertility, 
+              telemetry.soilMoisture,
+              !!parcel.cropId
+            );
+
+            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
             return {
               ...parcel,
               temperature: `${telemetry.temperature.toFixed(1)}°C`,
               humidity: `${telemetry.humidity}%`,
-              // Opcional: Puedes ir alimentando de manera dinámica el histórico del suelo
+              // Actualizamos el string principal de fertilidad para la vista de tarjetas/mapa
+              fertility: `${estimatedFertilityValue}%`, 
+              
+              // Alimentamos el histórico con ambos datos reales/simulados
               soilHistory: parcel.soilHistory 
                 ? [
                     ...parcel.soilHistory,
                     {
-                      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                      time: currentTime,
                       humidity: telemetry.soilMoisture,
-                      fertility: parseInt(parcel.fertility) || 75 // Convierte tu string de fertilidad a número de respaldo
+                      fertility: estimatedFertilityValue
                     }
                   ]
-                : [{ time: "Actual", humidity: telemetry.soilMoisture, fertility: 75 }]
+                : [{ time: "Actual", humidity: telemetry.soilMoisture, fertility: estimatedFertilityValue }]
             };
           } catch (error) {
             console.error(`Error obteniendo telemetría satelital para la parcela "${parcel.name}":`, error);
-            return parcel; // En caso de error en una parcela, retorna sus datos locales sin tumbar la app
+            return parcel;
           }
         })
       );
 
       return enrichedParcels;
     },
-    // CONFIGURACIÓN DE RENDIMIENTO IMPORTANTE PARA TELEMETRÍA:
-    staleTime: 1000 * 60 * 5, // Los datos se consideran "frescos" por 5 minutos. Evita spamear la API en cada re-render.
-    refetchInterval: 1000 * 60 * 10, // Auto-refresca los datos satelitales en segundo plano cada 10 minutos.
+    staleTime: 1000 * 60 * 5, 
+    refetchInterval: 1000 * 60 * 10, 
   });
 
-  // 3. CREATE
+  //  CREATE
   const createParcelMutation = useMutation({
     mutationFn: async (newParcel: Parcel) => {
       parcelsDb.push(newParcel);
@@ -81,7 +105,7 @@ export const useParcels = () => {
     },
   });
 
-  // 4. UPDATE
+  // UPDATE
   const updateParcelMutation = useMutation({
     mutationFn: async ({ id, updatedParcel }: { id: string; updatedParcel: Parcel }) => {
       parcelsDb = parcelsDb.map((p) => (p.id === id ? updatedParcel : p));
@@ -92,7 +116,7 @@ export const useParcels = () => {
     },
   });
 
-  // 5. DELETE
+  //  DELETE
   const deleteParcelMutation = useMutation({
     mutationFn: async (id: string) => {
       parcelsDb = parcelsDb.filter((p) => p.id !== id);
@@ -103,7 +127,7 @@ export const useParcels = () => {
     },
   });
 
-  // 6. RELACIONAR / ASIGNAR CULTIVO (Model3D) A PARCELA
+  // RELACIONAR / ASIGNAR CULTIVO A PARCELA
   const assignCropMutation = useMutation({
     mutationFn: async ({ parcelId, cropTitle }: { parcelId: string; cropTitle: string | undefined }) => {
       parcelsDb = parcelsDb.map((p) => 
