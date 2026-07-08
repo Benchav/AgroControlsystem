@@ -1,19 +1,26 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Parcel } from '../entities/parcel_model';
-import { initialParcels } from '../data/parcels';
-import { fetchRealLocationTelemetry } from '../services/telemetryService'; 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Parcel } from "../entities/parcel_model";
+import { initialParcels } from "../data/parcels";
+import {
+  fetchParcel50DaysHistory,
+  fetchRealLocationTelemetry,
+} from "../services/telemetryService";
 
 let parcelsDb: Parcel[] = [...initialParcels];
 
-const PARCELS_QUERY_KEY = ['parcels'];
+const PARCELS_QUERY_KEY = ["parcels"];
 
 // Función auxiliar para estimar fertilidad dinámica en base a humedad y cultivo
-const calculateEstimatedFertility = (baseFertilityString: string, currentMoisture: number, hasCrop: boolean): number => {
+const calculateEstimatedFertility = (
+  baseFertilityString: string,
+  currentMoisture: number,
+  hasCrop: boolean,
+): number => {
   // Limpiamos el string (ej: "85%" -> 85)
   const baseFertility = parseInt(baseFertilityString) || 70;
-  
+
   let modifier = 0;
-  
+
   // Penalización si el suelo está extremadamente seco o saturado
   if (currentMoisture < 20) modifier -= 15;
   else if (currentMoisture > 85) modifier -= 10;
@@ -34,64 +41,76 @@ export const useParcels = () => {
     queryKey: PARCELS_QUERY_KEY,
     queryFn: async (): Promise<Parcel[]> => {
       await new Promise((resolve) => setTimeout(resolve, 150));
-      
-      const enrichedParcels = await Promise.all(
+
+      return await Promise.all(
         parcelsDb.map(async (parcel) => {
           try {
             let lat = 0;
             let lon = 0;
-
             if (Array.isArray(parcel.center)) {
               lat = parcel.center[0];
               lon = parcel.center[1];
-            } else if (parcel.center && typeof parcel.center === 'object') {
+            } else if (parcel.center && typeof parcel.center === "object") {
               lat = (parcel.center as any).lat ?? 0;
-              lon = (parcel.center as any).lng ?? (parcel.center as any).lon ?? 0;
+              lon =
+                (parcel.center as any).lng ?? (parcel.center as any).lon ?? 0;
             }
 
             if (lat === 0 && lon === 0) return parcel;
 
-            const telemetry = await fetchRealLocationTelemetry(lat, lon);
+            // LANZAMOS EN PARALELO: Telemetría actual + Histórico de los últimos 50 días reales
+            const [telemetry, historicalData] = await Promise.all([
+              fetchRealLocationTelemetry(lat, lon),
+              fetchParcel50DaysHistory(
+                lat,
+                lon,
+                parcel.fertility,
+                !!parcel.cropId,
+              ),
+            ]);
 
-            // Calculamos la fertilidad estimada en tiempo real
             const estimatedFertilityValue = calculateEstimatedFertility(
-              parcel.fertility, 
+              parcel.fertility,
               telemetry.soilMoisture,
-              !!parcel.cropId
+              !!parcel.cropId,
             );
 
-            const currentTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const currentTime = new Date().toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            });
 
             return {
               ...parcel,
               temperature: `${telemetry.temperature.toFixed(1)}°C`,
               humidity: `${telemetry.humidity}%`,
-              // Actualizamos el string principal de fertilidad para la vista de tarjetas/mapa
-              fertility: `${estimatedFertilityValue}%`, 
-              
-              // Alimentamos el histórico con ambos datos reales/simulados
-              soilHistory: parcel.soilHistory 
+              fertility: `${estimatedFertilityValue}%`,
+              historicalData, // <-- Guardamos los 50 días reales aquí
+              soilHistory: parcel.soilHistory
                 ? [
                     ...parcel.soilHistory,
                     {
                       time: currentTime,
                       humidity: telemetry.soilMoisture,
-                      fertility: estimatedFertilityValue
-                    }
+                      fertility: estimatedFertilityValue,
+                    },
                   ]
-                : [{ time: "Actual", humidity: telemetry.soilMoisture, fertility: estimatedFertilityValue }]
+                : [
+                    {
+                      time: "Actual",
+                      humidity: telemetry.soilMoisture,
+                      fertility: estimatedFertilityValue,
+                    },
+                  ],
             };
           } catch (error) {
-            console.error(`Error obteniendo telemetría satelital para la parcela "${parcel.name}":`, error);
+            console.error(`Error procesando parcela "${parcel.name}":`, error);
             return parcel;
           }
-        })
+        }),
       );
-
-      return enrichedParcels;
     },
-    staleTime: 1000 * 60 * 5, 
-    refetchInterval: 1000 * 60 * 10, 
+    staleTime: 1000 * 60 * 15, // Al descargar históricos pesados, subimos la caché a 15 min
   });
 
   //  CREATE
@@ -107,7 +126,13 @@ export const useParcels = () => {
 
   // UPDATE
   const updateParcelMutation = useMutation({
-    mutationFn: async ({ id, updatedParcel }: { id: string; updatedParcel: Parcel }) => {
+    mutationFn: async ({
+      id,
+      updatedParcel,
+    }: {
+      id: string;
+      updatedParcel: Parcel;
+    }) => {
       parcelsDb = parcelsDb.map((p) => (p.id === id ? updatedParcel : p));
       return updatedParcel;
     },
@@ -129,11 +154,21 @@ export const useParcels = () => {
 
   // RELACIONAR / ASIGNAR CULTIVO A PARCELA
   const assignCropMutation = useMutation({
-    mutationFn: async ({ parcelId, cropTitle }: { parcelId: string; cropTitle: string | undefined }) => {
-      parcelsDb = parcelsDb.map((p) => 
-        p.id === parcelId 
-          ? { ...p, cropId: cropTitle, sowingDate: cropTitle ? new Date() : undefined } 
-          : p
+    mutationFn: async ({
+      parcelId,
+      cropTitle,
+    }: {
+      parcelId: string;
+      cropTitle: string | undefined;
+    }) => {
+      parcelsDb = parcelsDb.map((p) =>
+        p.id === parcelId
+          ? {
+              ...p,
+              cropId: cropTitle,
+              sowingDate: cropTitle ? new Date() : undefined,
+            }
+          : p,
       );
       return { parcelId, cropTitle };
     },
