@@ -92,21 +92,28 @@ export const LoginPage = () => {
 
       <div className="relative z-10 flex min-h-screen items-center justify-center px-6 py-10 sm:px-8">
         <div className="w-full max-w-md">
-          <button
-            type="button"
-            onClick={() => navigate('/')}
-            className="mx-auto mb-8 flex items-center gap-3 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2 text-left backdrop-blur transition hover:border-white/20 hover:bg-white/[0.06]"
-          >
-            <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-[0_0_18px_rgba(16,185,129,0.18)]">
-              <img src="/Logo.png" alt="Agro Control" className="h-full w-full" />
-            </div>
-            <div>
-              <div className="text-base font-extrabold tracking-tight text-white">Agro Control</div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.35em] text-emerald-300">
-                Smart Farm Platform
+          <div className="mx-auto mb-8 flex w-full items-center justify-between px-2">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-[0_0_18px_rgba(16,185,129,0.18)]">
+                <img src="/Logo.png" alt="Agro Control" className="h-full w-full" />
+              </div>
+              <div>
+                <div className="text-base font-extrabold tracking-tight text-white">Agro Control</div>
+                <div className="text-[10px] font-semibold uppercase tracking-[0.35em] text-emerald-300">
+                  Smart Farm Platform
+                </div>
               </div>
             </div>
-          </button>
+            
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="group flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-semibold text-slate-300 backdrop-blur transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
+            >
+              <i className="fas fa-arrow-left text-[10px] transition-transform group-hover:-translate-x-0.5" />
+              Volver
+            </button>
+          </div>
 
           <div className="rounded-[28px] border border-white/10 bg-slate-950/78 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.42)] backdrop-blur-xl sm:p-8">
             <div className="mb-8 text-center">
