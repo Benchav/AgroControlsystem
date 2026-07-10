@@ -64,6 +64,11 @@ export default defineConfig({
       },
     }),
   ],
+  resolve: {
+    alias: {
+      'react-leaflet-draw': 'react-leaflet-draw/dist/react-leaflet-draw.js',
+    },
+  },
   build: {
     rollupOptions: {
       output: {
@@ -76,8 +81,12 @@ export default defineConfig({
             return 'map-runtime';
           }
 
-          if (id.includes('node_modules')) {
-            return 'vendor';
+          if (id.includes('three') || id.includes('@react-three')) {
+            return 'three-runtime';
+          }
+
+          if (id.includes('recharts')) {
+            return 'recharts';
           }
 
           return undefined;
