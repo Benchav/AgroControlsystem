@@ -5,10 +5,17 @@ import { DashboardMetricsGrid } from "../components/dashboard/DashboardMetricsGr
 import { DashboardSensors } from "../components/dashboard/DashboardSensors";
 import { DashboardMetric } from "../entities/dashboard_metric";
 import { useParcels } from "../hooks/useParcels";
+import { useAlerts } from "../hooks/useAlerts";
 
 export function DashboardPage() {
   const navigate = useNavigate();
   const { parcels, isLoading, isError } = useParcels();
+  // Consumimos las alertas unificadas y las funciones de acción de tu hook
+  const { alerts, resolveAlert, handleAlertClick } = useAlerts();
+
+  // Filtramos para mostrar únicamente las alertas que NO han sido resueltas
+  const activeAlerts = alerts.filter((alert) => !alert.resolved);
+  const totalActiveNotifications = activeAlerts.length;
 
   // 1. MANEJO DE ESTADOS DE CARGA Y ERROR
   if (isLoading) {
@@ -30,7 +37,6 @@ export function DashboardPage() {
 
   // 2. PROCESAMIENTO DE DATOS REALES Y AGREGACIONES
   const totalParcels = parcels.length;
-  const criticalAlerts = parcels.filter(p => p.statusTone === "critico").length;
 
   // Promedios actuales instantáneos
   const avgHumidity = Math.round(
@@ -112,15 +118,19 @@ export function DashboardPage() {
     },
     {
       label: "Alertas Activas",
-      description: "Críticas del sistema",
-      value: `${criticalAlerts}`,
-      percentage: totalParcels > 0 ? (criticalAlerts / totalParcels) * 100 : 0,
+      description: "Notificaciones sin resolver",
+      value: `${totalActiveNotifications}`,       
+      percentage: totalActiveNotifications > 0 ? Math.min(100, (totalActiveNotifications / 5) * 100) : 0, 
       icon: "/campana.png",
-      color: "#ff3b3b",
+      color: totalActiveNotifications > 0 ? "#ff3b3b" : "#4ade80", //cambiamos a verde si no hay alertas
       chartData: [
-        { value: criticalAlerts },
-        { value: criticalAlerts * 1.5 },
-        { value: criticalAlerts }
+        { value: totalActiveNotifications  },
+        { value: totalActiveNotifications *  1.3 },
+        { value: totalActiveNotifications  },
+        { value: totalActiveNotifications *  5.3 },
+        { value: totalActiveNotifications * 2.3 },
+        { value: totalActiveNotifications *  7.3 },
+        { value: totalActiveNotifications  },
       ],
     },
   ];

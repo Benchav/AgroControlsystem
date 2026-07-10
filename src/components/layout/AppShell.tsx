@@ -3,6 +3,7 @@ import { navigation } from "../../config/navigation";
 import { cn } from "../../lib/cn";
 import { useEffect, useState, type ReactNode } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useAlerts } from "../../hooks/useAlerts";
 
 type AppShellProps = {
   profile: UserProfile;
@@ -40,6 +41,18 @@ function getInitials(name: string) {
 }
 
 export function AppShell({ profile }: AppShellProps) {
+  // 1. Consumimos el hook de alertas
+  const { alerts, redCount, amberCount } = useAlerts();
+
+  // 2. Filtramos y calculamos los totales de notificaciones pendientes
+  const activeAlerts = alerts.filter((alert) => !alert.resolved);
+  const totalActiveNotifications = activeAlerts.length;
+
+  // 3. Generamos el texto del tooltip informativo rápido
+  const tooltipText = totalActiveNotifications > 0
+    ? `Tienes ${totalActiveNotifications} alertas pendientes (${redCount} críticas, ${amberCount} de atención)`
+    : "No tienes alertas pendientes";
+
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -84,6 +97,10 @@ export function AppShell({ profile }: AppShellProps) {
   const handleBackToLanding = () => {
     setIsMobileMenuOpen(false);
     navigate(`/`);
+  };
+
+  const handleBellClick = () => {
+    navigate("/app/dashboard");
   };
 
   return (
@@ -270,17 +287,26 @@ export function AppShell({ profile }: AppShellProps) {
                   24 sensores activos
                 </div>
                 <button
-                  className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-white/10 bg-[#27293d] text-slate-300 transition hover:border-white/20 hover:text-emerald-300"
+                  onClick={handleBellClick}
+                  title={tooltipText} // Tooltip al hacer hover
+                  className="relative flex h-9 w-9 items-center justify-center rounded-[8px] border border-white/10 bg-[#27293d] text-slate-300 transition hover:border-white/20 hover:text-emerald-300 cursor-pointer"
                   type="button"
                 >
                   <i className="fas fa-bell" />
+
+                  {/* Badge de Alertas Activas */}
+                  {totalActiveNotifications > 0 && (
+                    <span className="absolute -top-1.5 -right-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold font-mono text-white ring-2 ring-[#01040b] shadow-[0_0_8px_rgba(239,68,68,0.5)] animate-pulse">
+                      {totalActiveNotifications}
+                    </span>
+                  )}
                 </button>
-                <button
+                {/* <button
                   className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-white/10 bg-[#27293d] text-slate-300 transition hover:border-white/20 hover:text-emerald-300"
                   type="button"
                 >
                   <i className="fas fa-search" />
-                </button>
+                </button> */}
                 <button
                   className="flex h-9 w-9 items-center justify-center rounded-[8px] border border-white/10 bg-[#27293d] text-slate-300 transition hover:border-white/20 hover:text-emerald-300 xl:hidden"
                   type="button"
