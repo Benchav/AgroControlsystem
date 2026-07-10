@@ -2,6 +2,8 @@ import { DashboardMetricsGridProps } from "../../entities/dashboard_metric";
 import { MiniSensorChart } from "../../utils/wave_recharts";
 
 export function DashboardMetricsGrid({ metrics }: DashboardMetricsGridProps) {
+  
+
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 ">
       {metrics.map((metric) => (

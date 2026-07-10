@@ -1,3 +1,269 @@
+// import { MarketItem } from "../entities/market_model";
+
+// export const mockMarketItems: MarketItem[] = [
+//   {
+//     id: "1",
+//     name: "Tomates Orgánicos",
+//     description: "Tomates frescos cultivados sin pesticidas.",
+//     price: 5.7,
+//     status: "disponible",
+//     category: "alimentos",
+//     imageUrl: [
+//       "https://chilehuerta.cl/wp-content/uploads/2017/01/tomates-organicos.jpg",
+//       "https://www.imporalaska.com/uploads/products/2019/02/pic_1549256422_1549256476.jpg",
+//       "https://sembralia.com/cdn/shop/articles/tomate.jpg?v=1648560931",
+//     ],
+//   },
+//   {
+//     id: "2",
+//     name: "Saco de Papas",
+//     description: "Papas recién cosechadas de alta calidad.",
+//     price: 12.5,
+//     status: "disponible",
+//     category: "alimentos",
+//     imageUrl: [
+//       "https://i.bolder.run/r/czoyMzA1MyxnOjEwMDB4/e0404f14/926281-papa-blanca-por-kilo.JPG",
+//       "https://dietamediterranea.com/wp-content/uploads/2018/06/20180625-Papas-ali%C3%B1%C3%A1s-2000x1500.jpg",
+//       "https://images.cookforyourlife.org/wp-content/uploads/2018/09/Patatas.jpg",
+//     ],
+//   },
+//   {
+//     id: "3",
+//     name: "Parcela en Jinotepe",
+//     description: "Terreno fértil ideal para cultivo intensivo.",
+//     price: 25000,
+//     status: "pendiente",
+//     category: "parcelas",
+//     imageUrl: [
+//       "https://www.shutterstock.com/image-photo/aerial-drone-view-cultivated-farmland-600nw-2662620859.jpg",
+//       "https://images.discovernica.com/propiedad/1600/13509_4.jpg",
+//       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQliTk2PoLR5JB7gKq51xTavQgdHUV27Xz_AA&s",
+//     ],
+//   },
+//   {
+//     id: "4",
+//     name: "Vaca Lechera",
+//     description: "Ganado saludable con alta producción de leche.",
+//     price: 950,
+//     status: "disponible",
+//     category: "animales",
+//     imageUrl: [
+//       "https://revistageneticabovina.com/wp-content/uploads/2020/07/v1.jpg",
+//       "https://certifiedhumanelatino.org/wp-content/uploads/2023/06/CERTIFIED-HUMANE_Post-blog-2.png",
+//       "https://a.storyblok.com/f/160385/890x605/102e20b6ba/cronica-7-razas-lecheras.jpg/m/filters:quality(70)/",
+//     ],
+//   },
+//   {
+//     id: "5",
+//     name: "Maíz Amarillo",
+//     description: "Quintales de maíz seco listo para distribución.",
+//     price: 18,
+//     status: "disponible",
+//     category: "alimentos",
+//     imageUrl: [
+//       "https://www.lajornadadeoriente.com.mx/wp-content/uploads/2025/12/MAIZ-AMARILLO.jpg",
+//       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCkQtG7YBddEoKOTKyV7mEsHReXdPIP4wH8A&s",
+//       "https://www.molinosycia.com/wp-content/uploads/2024/01/foto-maiz.png",
+//     ],
+//   },
+//   {
+//     id: "6",
+//     name: "Parcela Cafetalera",
+//     description: "Terreno montañoso perfecto para café.",
+//     price: 42000,
+//     status: "no disponible",
+//     category: "parcelas",
+//     imageUrl: [
+//       "https://quecafe.info/wp-content/uploads/2019/05/Caf%C3%A9-de-monta%C3%B1a-1.png",
+//       "https://www.netafimceca.com/cdn-cgi/image/format=auto,fit=crop,quality=80/contentassets/39566c7676a24b899b44524274d48b34/cafe01.jpg?v=4af996",
+//       "https://mundocafeto.com/wp-content/uploads/2018/05/planta-cafe-cafeto-750x440.jpg",
+//     ],
+//   },
+//   {
+//     id: "7",
+//     name: "Gallinas Ponedoras",
+//     description: "Lote de gallinas jóvenes en producción.",
+//     price: 230,
+//     status: "disponible",
+//     category: "animales",
+//     imageUrl: [
+//       "https://montanaweb-bucket.s3.amazonaws.com/web/blog/265/shutterstock_1103310314b.jpg",
+//       "https://avifasa.com/wp-content/uploads/2025/03/image-100.jpg",
+//       "https://framerusercontent.com/images/78jjv8X052kLMLIPFt45AOBJB14.jpg?width=699&height=420",
+//     ],
+//   },
+//   {
+//     id: "8",
+//     name: "Cebollas Blancas",
+//     description: "Cebollas frescas listas para mercado.",
+//     price: 7.2,
+//     status: "pendiente",
+//     category: "alimentos",
+//     imageUrl: [
+//       "https://clickabasto.com/cdn/shop/products/cebolla_blanca_2_1024x1024.jpg?v=1554353178",
+//       "https://agrofertas.co/images/detailed/10/plantula_cebolla_blanca.jpg",
+//       "https://s3.ppllstatics.com/diariovasco/www/multimedia/2024/05/08/onion-RlsgTtfuasHlKSVNGU6wzAL-1200x840@Diario%20Vasco.jpg",
+//     ],
+//   },
+//   {
+//     id: "9",
+//     name: "Caballo Criollo",
+//     description: "Caballo entrenado para trabajo agrícola.",
+//     price: 1800,
+//     status: "disponible",
+//     category: "animales",
+//     imageUrl: [
+//       "https://demascotas.info/wp-content/uploads/2019/10/horse-4136931_640.jpg",
+//       "https://www.clarin.com/2022/07/20/PfTw4ndF4_720x0__1.jpg",
+//       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoKTXBv746zcwbEGOQf7z0R2W1TQ1gkZlHPw&s",
+//     ],
+//   },
+//   {
+//     id: "10",
+//     name: "Terreno con Riego",
+//     description: "Parcela equipada con sistema de riego.",
+//     price: 56000,
+//     status: "disponible",
+//     category: "parcelas",
+//     imageUrl: [
+//       "https://noticias.cocampo.com/wp-content/uploads/2024/04/Sistema-de-riego.webp",
+//       "https://proain.com/cdn/shop/articles/Frecuencia_de_riego_y_tiempos_de_riego_para_los_cultivos_500x.png?v=1599167961",
+//       "https://imagenagropecuaria.com/wp-content/uploads/2016/06/pivot-de-riego-por-aspersion.jpg",
+//     ],
+//   },
+//   {
+//     id: "11",
+//     name: "Sandías Dulces",
+//     description: "Sandías grandes recién cosechadas.",
+//     price: 9.8,
+//     status: "disponible",
+//     category: "alimentos",
+//     imageUrl: [
+//       "https://i.blogs.es/d39e9a/sandia-mas-dulce-truco-sal/650_1200.jpeg",
+//       "https://media.diariouno.com.ar/p/c66915f285e27bfb2a4ab01b364ec42a/adjuntos/298/imagenes/009/672/0009672757/1200x0/smart/sandia-fruta1.jpg",
+//       "https://img.freepik.com/fotos-premium/dulces-forma-sandia-dulces-multicolores-cerca-dulces-infantiles-causa-caries-infantil_96872-1404.jpg",
+//     ],
+//   },
+//   {
+//     id: "12",
+//     name: "Cerdo de Engorde",
+//     description: "Cerdo alimentado naturalmente.",
+//     price: 430,
+//     status: "pendiente",
+//     category: "animales",
+//     imageUrl: [
+//       "https://cdn.bmeditores.mx/2022/06/Salud-Cerdo-Desarrollo-Engorda-a.jpg",
+//       "https://certifiedhumanelatino.org/wp-content/uploads/2020/10/Cerdos-de-engorde-9-consejos-para-un-manejo-compasivo.png",
+//       "https://a.storyblok.com/f/160385/890x605/17a825f992/engordar-cerdos-rapidamente.jpg/m/?w=256&q=100",
+//     ],
+//   },
+//   {
+//     id: "13",
+//     name: "Parcela Ganadera",
+//     description: "Terreno amplio para crianza de ganado.",
+//     price: 72000,
+//     status: "disponible",
+//     category: "parcelas",
+//     imageUrl: [
+//       "https://a.storyblok.com/f/160385/7f96d757c8/maqueta_articulo.jpg",
+//       "https://s3.ppllstatics.com/elnortedecastilla/www/multimedia/2025/03/14/1493263456-kZmB-U2301139921690eCF-1200x840@El%20Norte.jpg",
+//       "https://http2.mlstatic.com/D_NQ_NP_2X_717630-MLC85301875682_062025-N-ganaderas-en-venta-en-mariquina.webp",
+//     ],
+//   },
+//   {
+//     id: "14",
+//     name: "Yuca Fresca",
+//     description: "Raíces de yuca listas para consumo.",
+//     price: 4.9,
+//     status: "disponible",
+//     category: "alimentos",
+//     imageUrl: [
+//       "https://m.media-amazon.com/images/I/71N+XL-b8aL._AC_UF1000,1000_QL80_.jpg",
+//       "https://m.media-amazon.com/images/I/81Kou+IFecL._AC_UF350,350_QL80_.jpg",
+//       "https://img.freepik.com/fotos-premium/raiz-yuca-fresca-sobre-mesa-madera_259266-186.jpg",
+//     ],
+//   },
+//   {
+//     id: "15",
+//     name: "Ovejas",
+//     description: "Grupo de ovejas saludables para reproducción.",
+//     price: 1200,
+//     status: "no disponible",
+//     category: "animales",
+//     imageUrl: [
+//       "https://cdn0.expertoanimal.com/es/posts/0/9/5/cuentan_con_reconocimiento_facial_26590_1_600.jpg",
+//       "https://cdn.shopify.com/s/files/1/0268/6861/files/sheep-4356668_960_720_grande.jpg?v=1592323019",
+//       "https://comadsa.mx/wp-content/uploads/2016/04/GettyImages-629900498.jpg",
+//     ],
+//   },
+//   {
+//     id: "16",
+//     name: "Frijoles Rojos",
+//     description: "Frijoles seleccionados de exportación.",
+//     price: 15,
+//     status: "disponible",
+//     category: "alimentos",
+//     imageUrl: [
+//       "https://m.media-amazon.com/images/I/71FDb21i24L._AC_UF894,1000_QL80_.jpg",
+//       "https://confidencial.digital/wp-content/uploads/2022/11/Frijoles.jpg",
+//       "https://baobabmart.com/wp-content/uploads/2024/10/Long-grains-red-beans-1.jpg",
+//     ],
+//   },
+//   {
+//     id: "17",
+//     name: "Parcela Agrícola",
+//     description: "Terreno listo para producción hortícola.",
+//     price: 39000,
+//     status: "pendiente",
+//     category: "parcelas",
+//     imageUrl: [
+//       "https://st2.depositphotos.com/3203643/6231/i/450/depositphotos_62313371-stock-photo-lettuce-in-plots.jpg",
+//       "https://previews.123rf.com/images/siur/siur1410/siur141000089/32766274-small-plot-farming-or-agricultural-garden-with-various-species-of-vegetables.jpg",
+//       "https://st3.depositphotos.com/1562606/13522/i/450/depositphotos_135225078-stock-photo-vegetable-plots-on-farm.jpg",
+//     ],
+//   },
+//   {
+//     id: "18",
+//     name: "Cabras",
+//     description: "Cabras jóvenes de excelente genética.",
+//     price: 670,
+//     status: "disponible",
+//     category: "animales",
+//     imageUrl: [
+//       "https://ruminants.ceva.pro/hubfs/cabras-lecheras-00.jpg",
+//       "https://preview.redd.it/help-me-come-up-with-a-buckling-name-v0-rbfqadlkz0ue1.jpeg?width=640&crop=smart&auto=webp&s=c6517c4697d025a418dfa8e579f16b15cee2b3d0",
+//       "https://ruminants.ceva.pro/hubfs/cabras-lecheras-00.jpg",
+//     ],
+//   },
+//   {
+//     id: "19",
+//     name: "Piñas Premium",
+//     description: "Piñas dulces cultivadas localmente.",
+//     price: 8.4,
+//     status: "disponible",
+//     category: "alimentos",
+//     imageUrl: [
+//       "https://www.editorialderiego.com/wp-content/uploads/2023/02/Pina_0122feb-scaled.jpg",
+//       "https://www.aboutespanol.com/thmb/sKow2jLZVfy-g0VYwMdjVD3JGww=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Piasencaja-5b368acfc9e77c001a59d5ea.jpg",
+//       "https://img.waimaoniu.net/2423/2423-202504181801337590.jpg"
+//     ],
+//   },
+//   {
+//     id: "20",
+//     name: "Terreno Rural",
+//     description: "Parcela con acceso a carretera principal.",
+//     price: 31000,
+//     status: "disponible",
+//     category: "parcelas",
+//     imageUrl: [
+//       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgCLwKYOM26sUWBIwzAlPWGGE10g2yr8AXWg&s",
+//       "https://img4.idealista.com/blur/480_360_mq/0/id.pro.es.image.master/bd/9e/06/1274184170.jpg",
+//       "https://cdn.thinkwebcontent.com/property/33660/9312897/20260310082236/w1600h900/s640x480/x-275104655.jpg"
+//     ],
+//   },
+// ];
+
+
 import { MarketItem } from "../entities/market_model";
 
 export const mockMarketItems: MarketItem[] = [
@@ -13,6 +279,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://www.imporalaska.com/uploads/products/2019/02/pic_1549256422_1549256476.jpg",
       "https://sembralia.com/cdn/shop/articles/tomate.jpg?v=1648560931",
     ],
+    entityId: "11", // ID de Diseño de Tomate en models3d
+    startingPrice: 4.5,
+    currentBid: 5.7,
+    highestBidderId: "user_01",
+    bidCount: 3,
+    createdAt: "2026-06-25T08:00:00Z",
+    endDate: "2026-06-30T18:00:00Z",
+    lotSize: 50,
+    unit: "Quintales"
   },
   {
     id: "2",
@@ -26,6 +301,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://dietamediterranea.com/wp-content/uploads/2018/06/20180625-Papas-ali%C3%B1%C3%A1s-2000x1500.jpg",
       "https://images.cookforyourlife.org/wp-content/uploads/2018/09/Patatas.jpg",
     ],
+    entityId: "12", // ID de Diseño de Zanahoria/Tubérculos afines
+    startingPrice: 10.0,
+    currentBid: 12.5,
+    highestBidderId: "user_04",
+    bidCount: 5,
+    createdAt: "2026-06-26T09:00:00Z",
+    endDate: "2026-07-02T12:00:00Z",
+    lotSize: 100,
+    unit: "Sacos"
   },
   {
     id: "3",
@@ -39,6 +323,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://images.discovernica.com/propiedad/1600/13509_4.jpg",
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQliTk2PoLR5JB7gKq51xTavQgdHUV27Xz_AA&s",
     ],
+    entityId: "zona-critica", // Vinculado a Criadero El Progreso
+    startingPrice: 24000,
+    currentBid: 24500,
+    highestBidderId: "user_09",
+    bidCount: 2,
+    createdAt: "2026-06-20T07:00:00Z",
+    endDate: "2026-07-05T15:00:00Z",
+    lotSize: 1.6,
+    unit: "Manzanas"
   },
   {
     id: "4",
@@ -52,6 +345,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://certifiedhumanelatino.org/wp-content/uploads/2023/06/CERTIFIED-HUMANE_Post-blog-2.png",
       "https://a.storyblok.com/f/160385/890x605/102e20b6ba/cronica-7-razas-lecheras.jpg/m/filters:quality(70)/",
     ],
+    entityId: "sur", // Vinculado al sector de Matadero La Esperanza
+    startingPrice: 800,
+    currentBid: 950,
+    highestBidderId: "user_03",
+    bidCount: 6,
+    createdAt: "2026-06-27T06:00:00Z",
+    endDate: "2026-07-01T20:00:00Z",
+    lotSize: 1,
+    unit: "Cabezas"
   },
   {
     id: "5",
@@ -65,6 +367,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTCkQtG7YBddEoKOTKyV7mEsHReXdPIP4wH8A&s",
       "https://www.molinosycia.com/wp-content/uploads/2024/01/foto-maiz.png",
     ],
+    entityId: "3", // ID de Diseño de Maíz en models3d
+    startingPrice: 15.0,
+    currentBid: 18.0,
+    highestBidderId: "user_11",
+    bidCount: 4,
+    createdAt: "2026-06-26T10:00:00Z",
+    endDate: "2026-06-30T12:00:00Z",
+    lotSize: 120,
+    unit: "Quintales"
   },
   {
     id: "6",
@@ -78,6 +389,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://www.netafimceca.com/cdn-cgi/image/format=auto,fit=crop,quality=80/contentassets/39566c7676a24b899b44524274d48b34/cafe01.jpg?v=4af996",
       "https://mundocafeto.com/wp-content/uploads/2018/05/planta-cafe-cafeto-750x440.jpg",
     ],
+    entityId: "norte", // Vinculado a Cafetal Don Roberto
+    startingPrice: 40000,
+    currentBid: 42000,
+    highestBidderId: "user_02",
+    bidCount: 8,
+    createdAt: "2026-06-15T08:00:00Z",
+    endDate: "2026-06-25T18:00:00Z",
+    lotSize: 4.2,
+    unit: "Manzanas"
   },
   {
     id: "7",
@@ -91,6 +411,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://avifasa.com/wp-content/uploads/2025/03/image-100.jpg",
       "https://framerusercontent.com/images/78jjv8X052kLMLIPFt45AOBJB14.jpg?width=699&height=420",
     ],
+    entityId: "sector-2a", // Vinculado a Galeras Don Jose
+    startingPrice: 200,
+    currentBid: 230,
+    highestBidderId: "user_07",
+    bidCount: 3,
+    createdAt: "2026-06-27T11:00:00Z",
+    endDate: "2026-07-03T17:00:00Z",
+    lotSize: 50,
+    unit: "Cabezas"
   },
   {
     id: "8",
@@ -104,6 +433,14 @@ export const mockMarketItems: MarketItem[] = [
       "https://agrofertas.co/images/detailed/10/plantula_cebolla_blanca.jpg",
       "https://s3.ppllstatics.com/diariovasco/www/multimedia/2024/05/08/onion-RlsgTtfuasHlKSVNGU6wzAL-1200x840@Diario%20Vasco.jpg",
     ],
+    entityId: "9", // ID de Diseño de Cebolla en models3d
+    startingPrice: 6.5,
+    currentBid: 6.5,
+    bidCount: 0,
+    createdAt: "2026-06-28T09:00:00Z",
+    endDate: "2026-07-02T12:00:00Z",
+    lotSize: 80,
+    unit: "Quintales"
   },
   {
     id: "9",
@@ -117,6 +454,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://www.clarin.com/2022/07/20/PfTw4ndF4_720x0__1.jpg",
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQoKTXBv746zcwbEGOQf7z0R2W1TQ1gkZlHPw&s",
     ],
+    entityId: "sector-3b", // Vinculado a Campos El Mirador
+    startingPrice: 1500,
+    currentBid: 1800,
+    highestBidderId: "user_05",
+    bidCount: 5,
+    createdAt: "2026-06-26T14:00:00Z",
+    endDate: "2026-07-04T22:00:00Z",
+    lotSize: 1,
+    unit: "Cabezas"
   },
   {
     id: "10",
@@ -130,6 +476,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://proain.com/cdn/shop/articles/Frecuencia_de_riego_y_tiempos_de_riego_para_los_cultivos_500x.png?v=1599167961",
       "https://imagenagropecuaria.com/wp-content/uploads/2016/06/pivot-de-riego-por-aspersion.jpg",
     ],
+    entityId: "sector-3b", // Mapeado a Campos El Mirador
+    startingPrice: 50000,
+    currentBid: 56000,
+    highestBidderId: "user_10",
+    bidCount: 12,
+    createdAt: "2026-06-20T08:00:00Z",
+    endDate: "2026-07-10T18:00:00Z",
+    lotSize: 3.1,
+    unit: "Manzanas"
   },
   {
     id: "11",
@@ -143,6 +498,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://media.diariouno.com.ar/p/c66915f285e27bfb2a4ab01b364ec42a/adjuntos/298/imagenes/009/672/0009672757/1200x0/smart/sandia-fruta1.jpg",
       "https://img.freepik.com/fotos-premium/dulces-forma-sandia-dulces-multicolores-cerca-dulces-infantiles-causa-caries-infantil_96872-1404.jpg",
     ],
+    entityId: "8", // ID de Diseño de Ayote/Cucurbitáceas afines
+    startingPrice: 8.0,
+    currentBid: 9.8,
+    highestBidderId: "user_06",
+    bidCount: 2,
+    createdAt: "2026-06-27T07:30:00Z",
+    endDate: "2026-07-02T15:30:00Z",
+    lotSize: 200,
+    unit: "Unidades"
   },
   {
     id: "12",
@@ -156,6 +520,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://certifiedhumanelatino.org/wp-content/uploads/2020/10/Cerdos-de-engorde-9-consejos-para-un-manejo-compasivo.png",
       "https://a.storyblok.com/f/160385/890x605/17a825f992/engordar-cerdos-rapidamente.jpg/m/?w=256&q=100",
     ],
+    entityId: "1", // ID de Diseño de Porcino en models3d
+    startingPrice: 400,
+    currentBid: 430,
+    highestBidderId: "user_08",
+    bidCount: 1,
+    createdAt: "2026-06-25T12:00:00Z",
+    endDate: "2026-06-30T12:00:00Z",
+    lotSize: 1,
+    unit: "Cabezas"
   },
   {
     id: "13",
@@ -169,6 +542,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://s3.ppllstatics.com/elnortedecastilla/www/multimedia/2025/03/14/1493263456-kZmB-U2301139921690eCF-1200x840@El%20Norte.jpg",
       "https://http2.mlstatic.com/D_NQ_NP_2X_717630-MLC85301875682_062025-N-ganaderas-en-venta-en-mariquina.webp",
     ],
+    entityId: "sur", // Vinculado a Matadero La Esperanza
+    startingPrice: 70000,
+    currentBid: 72000,
+    highestBidderId: "user_14",
+    bidCount: 4,
+    createdAt: "2026-06-22T09:00:00Z",
+    endDate: "2026-07-06T18:00:00Z",
+    lotSize: 2.8,
+    unit: "Manzanas"
   },
   {
     id: "14",
@@ -182,6 +564,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://m.media-amazon.com/images/I/81Kou+IFecL._AC_UF350,350_QL80_.jpg",
       "https://img.freepik.com/fotos-premium/raiz-yuca-fresca-sobre-mesa-madera_259266-186.jpg",
     ],
+    entityId: "7", // ID de Diseño de Yuca en models3d
+    startingPrice: 4.0,
+    currentBid: 4.9,
+    highestBidderId: "user_02",
+    bidCount: 3,
+    createdAt: "2026-06-27T08:00:00Z",
+    endDate: "2026-07-02T14:00:00Z",
+    lotSize: 60,
+    unit: "Quintales"
   },
   {
     id: "15",
@@ -195,6 +586,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://cdn.shopify.com/s/files/1/0268/6861/files/sheep-4356668_960_720_grande.jpg?v=1592323019",
       "https://comadsa.mx/wp-content/uploads/2016/04/GettyImages-629900498.jpg",
     ],
+    entityId: "sector-2a", // Asignado estructuralmente a un área de galeras
+    startingPrice: 1100,
+    currentBid: 1200,
+    highestBidderId: "user_15",
+    bidCount: 7,
+    createdAt: "2026-06-10T10:00:00Z",
+    endDate: "2026-06-20T16:00:00Z",
+    lotSize: 10,
+    unit: "Cabezas"
   },
   {
     id: "16",
@@ -208,6 +608,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://confidencial.digital/wp-content/uploads/2022/11/Frijoles.jpg",
       "https://baobabmart.com/wp-content/uploads/2024/10/Long-grains-red-beans-1.jpg",
     ],
+    entityId: "3", // Asociado a Maíz/Granos Básicos
+    startingPrice: 12.0,
+    currentBid: 15.0,
+    highestBidderId: "user_19",
+    bidCount: 6,
+    createdAt: "2026-06-26T11:00:00Z",
+    endDate: "2026-07-01T15:00:00Z",
+    lotSize: 45,
+    unit: "Quintales"
   },
   {
     id: "17",
@@ -221,6 +630,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://previews.123rf.com/images/siur/siur1410/siur141000089/32766274-small-plot-farming-or-agricultural-garden-with-various-species-of-vegetables.jpg",
       "https://st3.depositphotos.com/1562606/13522/i/450/depositphotos_135225078-stock-photo-vegetable-plots-on-farm.jpg",
     ],
+    entityId: "norte", // Cafetal Don Roberto / Zonas agrícolas
+    startingPrice: 38000,
+    currentBid: 38500,
+    highestBidderId: "user_04",
+    bidCount: 1,
+    createdAt: "2026-06-24T09:30:00Z",
+    endDate: "2026-07-08T17:00:00Z",
+    lotSize: 2.5,
+    unit: "Manzanas"
   },
   {
     id: "18",
@@ -234,6 +652,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://preview.redd.it/help-me-come-up-with-a-buckling-name-v0-rbfqadlkz0ue1.jpeg?width=640&crop=smart&auto=webp&s=c6517c4697d025a418dfa8e579f16b15cee2b3d0",
       "https://ruminants.ceva.pro/hubfs/cabras-lecheras-00.jpg",
     ],
+    entityId: "sector-2a", // Galeras Don Jose
+    startingPrice: 600,
+    currentBid: 670,
+    highestBidderId: "user_22",
+    bidCount: 4,
+    createdAt: "2026-06-27T10:00:00Z",
+    endDate: "2026-07-03T12:00:00Z",
+    lotSize: 4,
+    unit: "Cabezas"
   },
   {
     id: "19",
@@ -247,6 +674,15 @@ export const mockMarketItems: MarketItem[] = [
       "https://www.aboutespanol.com/thmb/sKow2jLZVfy-g0VYwMdjVD3JGww=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Piasencaja-5b368acfc9e77c001a59d5ea.jpg",
       "https://img.waimaoniu.net/2423/2423-202504181801337590.jpg"
     ],
+    entityId: "4", // Vinculado a modelos hortícolas / Girasol u otros
+    startingPrice: 7.5,
+    currentBid: 8.4,
+    highestBidderId: "user_13",
+    bidCount: 3,
+    createdAt: "2026-06-26T15:00:00Z",
+    endDate: "2026-07-01T18:00:00Z",
+    lotSize: 150,
+    unit: "Unidades"
   },
   {
     id: "20",
@@ -260,5 +696,14 @@ export const mockMarketItems: MarketItem[] = [
       "https://img4.idealista.com/blur/480_360_mq/0/id.pro.es.image.master/bd/9e/06/1274184170.jpg",
       "https://cdn.thinkwebcontent.com/property/33660/9312897/20260310082236/w1600h900/s640x480/x-275104655.jpg"
     ],
+    entityId: "zona-critica", // Criadero El Progreso
+    startingPrice: 30000,
+    currentBid: 31000,
+    highestBidderId: "user_25",
+    bidCount: 2,
+    createdAt: "2026-06-24T08:00:00Z",
+    endDate: "2026-07-09T20:00:00Z",
+    lotSize: 1.6,
+    unit: "Manzanas"
   },
 ];

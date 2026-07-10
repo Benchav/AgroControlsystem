@@ -3,39 +3,45 @@ import {
   CircleMarker,
   MapContainer,
   Polygon,
-  Popup,
   TileLayer,
   Tooltip,
-  useMap,
 } from "react-leaflet";
-import type { LatLngExpression, LatLngBoundsExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 import { FeatureGroup } from "react-leaflet";
 import { EditControl } from "react-leaflet-draw";
 import type { Parcel, ParcelStatus } from "../../entities/parcel_model";
-import { initialParcels } from "../../data/parcels";
 import { FitBounds } from "../../utils/fitBounds";
 import { SoilMetricsPanel } from "../../utils/soil_metrics_panel";
+import { useModels3d } from "../../hooks/useModels3d";
+import * as turf from "@turf/turf";
 
 const mapCenter: [number, number] = [14.0711, -87.1989];
 
-export function FarmInteractiveMap({
-  dynamicParcels,
-  setDynamicParcels,
-  selectedParcelId,
-  setSelectedParcelId,
-}: {
+interface FarmInteractiveMapProps {
   dynamicParcels: Parcel[];
-  setDynamicParcels: React.Dispatch<React.SetStateAction<Parcel[]>>;
+  onCreateParcel: (newParcel: Parcel) => void;
+  onUpdateParcel: (params: { id: string; updatedParcel: Parcel }) => void;
+  onDeleteParcel: (id: string) => void;
   selectedParcelId: string;
   setSelectedParcelId: React.Dispatch<React.SetStateAction<string>>;
-}) {
-  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  isEditorOpen: boolean;
+  setIsEditorOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-  const [editingParcel, setEditingParcel] = useState<Parcel | null>(
-    initialParcels[0],
-  );
+export function FarmInteractiveMap({
+  dynamicParcels,
+  onCreateParcel,
+  onUpdateParcel,
+  onDeleteParcel,
+  selectedParcelId,
+  setSelectedParcelId,
+  isEditorOpen,
+  setIsEditorOpen,
+}: FarmInteractiveMapProps) {
+  const [editingParcel, setEditingParcel] = useState<Parcel | null>(null);
+  const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const { models: crops } = useModels3d();
 
   const selectedParcel = useMemo(
     () =>
@@ -44,7 +50,16 @@ export function FarmInteractiveMap({
     [selectedParcelId, dynamicParcels],
   );
 
-  const updateParcel = (field: keyof Parcel, value: string) => {
+  // Sincronizar el editor local cuando cambia la parcela seleccionada 
+  // en el otro componente en el padre
+  useEffect(() => {
+    if (selectedParcel) {
+      setEditingParcel(selectedParcel);
+    }
+  }, [selectedParcel]);
+
+  // Actualiza SOLO el borrador del modal mientras el usuario escribe
+  const handleFieldChange = (field: keyof Parcel | string, value: any) => {
     if (!editingParcel) return;
 
     let updatedParcel: Parcel = {
@@ -52,61 +67,63 @@ export function FarmInteractiveMap({
       [field]: value,
     };
 
-    // si cambia humedad -> actualizar último registro del soilHistory
     if (field === "humidity") {
       const humidityValue = Number(value.replace("%", ""));
-
       updatedParcel = {
         ...updatedParcel,
         soilHistory: (updatedParcel.soilHistory || []).map((item, index, array) =>
-          index === array.length - 1
-            ? {
-                ...item,
-                humidity: humidityValue,
-              }
-            : item,
+          index === array.length - 1 ? { ...item, humidity: humidityValue } : item,
         ),
       };
     }
 
-    // si cambia fertilidad -> actualizar último registro también
     if (field === "fertility") {
       const fertilityValue = Number(value.replace("%", ""));
-
       updatedParcel = {
         ...updatedParcel,
         soilHistory: (updatedParcel.soilHistory || []).map((item, index, array) =>
-          index === array.length - 1
-            ? {
-                ...item,
-                fertility: fertilityValue,
-              }
-            : item,
+          index === array.length - 1 ? { ...item, fertility: fertilityValue } : item,
         ),
       };
     }
 
     setEditingParcel(updatedParcel);
-
-    setDynamicParcels((prev) =>
-      prev.map((parcel) =>
-        parcel.id === updatedParcel.id ? updatedParcel : parcel,
-      ),
-    );
   };
 
-  useEffect(() => {
-    const currentParcel = dynamicParcels.find(
-      (parcel) => parcel.id === selectedParcelId,
-    );
+  // Confirmar los cambios y enviarlos al hook asíncrono
+  const handleSaveChanges = () => {
+    if (!editingParcel) return;
 
-    if (currentParcel) {
-      setEditingParcel(currentParcel);
+    // Guardar los cambios normales de la parcela 
+    onUpdateParcel({ id: editingParcel.id, updatedParcel: editingParcel });
+
+    setIsEditorOpen(false);
+  };
+
+  const handleDeleteParcel = () => {
+    if (!editingParcel) return;
+
+    onDeleteParcel(editingParcel.id);
+
+    const remainingParcels = dynamicParcels.filter((p) => p.id !== editingParcel.id);
+    if (remainingParcels.length > 0) {
+      setSelectedParcelId(remainingParcels[0].id);
+    } else {
+      setSelectedParcelId("");
     }
-  }, [selectedParcelId, dynamicParcels]);
+
+    setIsDeleteConfirmOpen(false);
+    setIsEditorOpen(false);
+  };
+
+  const formatDateForInput = (dateValue: any) => {
+    if (!dateValue) return "";
+    const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
+    return isNaN(date.getTime()) ? "" : date.toISOString().split("T")[0];
+  };
 
   return (
-    <div className="grid gap-4 xl:grid-cols-[1.7fr_1fr]">
+    <div className="grid gap-4 xl:grid-cols-[1.7fr_1fr] overflow-hidden">
       <div className="overflow-hidden rounded-[14px] border border-white/8 bg-white/[0.03]">
         <div className="mb-4 flex items-center justify-between gap-3 p-4 backdrop-blur">
           <div>
@@ -114,7 +131,7 @@ export function FarmInteractiveMap({
               Mapa interactivo del terreno
             </div>
             <div className="text-sm text-slate-400">
-              Pan, zoom, click por parcela y lectura en vivo
+              zoom, click por parcela y lectura en vivo
             </div>
           </div>
           <div className="rounded-full border border-emerald-400/20 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300">
@@ -149,19 +166,9 @@ export function FarmInteractiveMap({
                   key={parcel.id}
                   positions={parcel.bounds}
                   pathOptions={{
-                    color:
-                      tone === "red"
-                        ? "#f87171"
-                        : tone === "amber"
-                          ? "#fbbf24"
-                          : "#34d399",
+                    color: tone === "red" ? "#f87171" : tone === "amber" ? "#fbbf24" : "#34d399",
                     weight: isSelected ? 3 : 2,
-                    fillColor:
-                      tone === "red"
-                        ? "#ef4444"
-                        : tone === "amber"
-                          ? "#f59e0b"
-                          : "#10b981",
+                    fillColor: tone === "red" ? "#ef4444" : tone === "amber" ? "#f59e0b" : "#10b981",
                     fillOpacity: isSelected ? 0.28 : 0.18,
                   }}
                   eventHandlers={{
@@ -170,26 +177,9 @@ export function FarmInteractiveMap({
                     },
                   }}
                 >
-                  <Tooltip
-                    direction="top"
-                    offset={[0, -10]}
-                    opacity={1}
-                    permanent
-                  >
+                  <Tooltip direction="top" offset={[0, -10]} opacity={1} permanent>
                     {parcel.name}
                   </Tooltip>
-                  <Popup>
-                    <div className="space-y-1 text-sm">
-                      <div className="font-semibold">{parcel.name}</div>
-                      <div>Área: {parcel.area}</div>
-                      <div>Humedad: {parcel.humidity}</div>
-                      <div>Fertilidad: {parcel.fertility}</div>
-                      <div>Temperatura: {parcel.temperature}</div>
-                      <div className="font-semibold text-emerald-600">
-                        Estado: {parcel.status}
-                      </div>
-                    </div>
-                  </Popup>
                 </Polygon>
               );
             })}
@@ -220,19 +210,29 @@ export function FarmInteractiveMap({
                 }}
               />
             ))}
+
             <FeatureGroup>
               <EditControl
                 position="topright"
                 onCreated={(e) => {
                   const layer = e.layer;
-
                   if ("getLatLngs" in layer) {
-                    const latlngs = layer.getLatLngs()[0] as LatLngExpression[];
+                    const rawLatLngs = layer.getLatLngs()[0];
+                    const latlngs = (Array.isArray(rawLatLngs) ? rawLatLngs : layer.getLatLngs()) as any[];
+
+                    const coordinates = latlngs.map((pt: any) => [pt.lng, pt.lat]);
+                    coordinates.push([latlngs[0].lng, latlngs[0].lat]);
+
+                    const polygonGeoJSON = turf.polygon([coordinates]);
+                    const areaInSquareMeters = turf.area(polygonGeoJSON);
+
+                    const areaInHectares = areaInSquareMeters / 10000;
+                    const formattedArea = `${areaInHectares.toFixed(2)} ha`;
 
                     const newParcel: Parcel = {
                       id: `parcel-${Date.now()}`,
                       name: `Nueva Parcela`,
-                      area: "Pendiente",
+                      area: formattedArea,
                       status: "Óptimo",
                       statusTone: "optimo",
                       humidity: "--",
@@ -243,7 +243,7 @@ export function FarmInteractiveMap({
                       soilHistory: [{ time: "0", humidity: 0, fertility: 0 }],
                     };
 
-                    setDynamicParcels((prev) => [...prev, newParcel]);
+                    onCreateParcel(newParcel);
                     setSelectedParcelId(newParcel.id);
                     setEditingParcel(newParcel);
                   }
@@ -264,67 +264,58 @@ export function FarmInteractiveMap({
 
       <div className="space-y-4 backdrop-blur bg-emerald-500/10">
         <div className="rounded-[14px] border border-white/8 bg-white/[0.03] p-5">
-          <div className="flex flex-row items-center justify-between">
-            <div className="text-sm font-semibold text-white">
-              Parcela seleccionada
-            </div>
-          </div>
+          <div className="text-sm font-semibold text-white">Parcela seleccionada</div>
           <div className="mt-3 text-2xl font-black tracking-tight text-emerald-300">
-            {selectedParcel.name}
-          </div>
-          <div className="mt-2 text-sm text-slate-400">
-            {selectedParcel.area} · Última lectura hace 2 min
+            {selectedParcel?.name || "Ninguna seleccionada"}
           </div>
 
-          <div className="mt-4 grid gap-3 grid-cols-2">
-            {[
-              ["Humedad", selectedParcel.humidity],
-              ["Fertilidad", selectedParcel.fertility],
-              ["Temperatura", selectedParcel.temperature],
-              ["Estado", selectedParcel.status],
-            ].map(([label, value]) => (
-              <div
-                key={label as string}
-                className="rounded-[10px] border border-white/8 bg-black/50 p-4"
-              >
-                <div className="text-xs uppercase tracking-[0.25em] text-white/80">
-                  {label as string}
-                </div>
-                <div className="mt-2 text-xl font-semibold text-white">
-                  {value as string}
-                </div>
+          {selectedParcel && (
+            <>
+              <div className="mt-2 text-sm text-slate-400">
+                {selectedParcel.area} · Última lectura hace 2 min
               </div>
-            ))}
-          </div>
-          <button
-            onClick={() => {
-              setEditingParcel(selectedParcel);
-              setIsEditorOpen(true);
-            }}
-            className="rounded-xl bg-emerald-500/60 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 mt-4 w-full h-[2.5rem]"
-          >
-            Editar
-          </button>
-        </div>
 
-        <SoilMetricsPanel selectedParcel={selectedParcel} />
-      </div>
-      {isEditorOpen && editingParcel && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="w-full max-w-2xl rounded-2xl border border-white/10 bg-[#071510] p-8 shadow-2xl">
-            <div className="mb-6 flex items-center justify-between">
-              <div className="flex fle-row items-center gap-2">
-                <h2 className="text-2xl font-bold text-emerald-300">Editar:</h2>
-                <h2 className="text-2xl font-bold text-white/80">
-                  {editingParcel.name}
-                </h2>
+              <div className="mt-4 grid gap-3 grid-cols-2">
+                {[
+                  ["Humedad", selectedParcel.humidity],
+                  ["Fertilidad", selectedParcel.fertility],
+                  ["Temperatura", selectedParcel.temperature],
+                  ["Estado", selectedParcel.status],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-[10px] border border-white/8 bg-black/50 p-4">
+                    <div className="text-xs uppercase tracking-[0.25em] text-white/80">{label}</div>
+                    <div className="mt-2 text-xl font-semibold text-white">{value}</div>
+                  </div>
+                ))}
               </div>
 
               <button
                 onClick={() => {
                   setEditingParcel(selectedParcel);
-                  setIsEditorOpen(false);
+                  setIsEditorOpen(true);
                 }}
+                className="rounded-xl bg-emerald-500/60 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-500 mt-4 w-full h-[2.5rem]"
+              >
+                Editar Parcela
+              </button>
+            </>
+          )}
+        </div>
+
+        {selectedParcel && <SoilMetricsPanel selectedParcel={selectedParcel} />}
+      </div>
+
+      {/* MODAL: EDITAR / ELIMINAR */}
+      {isEditorOpen && editingParcel && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="w-full max-w-2xl rounded-2xl border border-white/10 bg-[#071510] p-4 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div className="mb-6 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-emerald-300">Gestionar:</h2>
+                <h2 className="text-2xl font-bold text-white/80">{editingParcel.name}</h2>
+              </div>
+              <button
+                onClick={() => setIsEditorOpen(false)}
                 className="rounded-full bg-white/5 px-3 py-1 text-slate-300 hover:bg-white/10"
               >
                 ✕
@@ -333,214 +324,183 @@ export function FarmInteractiveMap({
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="flex flex-col gap-2">
-                <label>Nombre:</label>
+                <label className="text-sm font-medium text-slate-300">Nombre:</label>
                 <input
                   type="text"
-                  className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white"
+                  className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:outline-emerald-500"
                   value={editingParcel.name}
-                  onChange={(e) => updateParcel("name", e.target.value)}
-                  placeholder="Nombre"
+                  onChange={(e) => handleFieldChange("name", e.target.value)}
                 />
               </div>
+
               <div className="flex flex-col gap-2">
-                <label>Área:</label>
+                <label className="text-sm font-medium text-slate-300">Área:</label>
                 <div className="relative">
                   <input
                     type="number"
-                    inputMode="decimal"
-                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white appearance-none
-                    [&::-webkit-outer-spin-button]:appearance-none
-                    [&::-webkit-inner-spin-button]:appearance-none
-                    [-moz-appearance:textfield]"
+                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white focus:outline-emerald-500"
                     value={editingParcel.area.replace(" ha", "")}
-                    onChange={(e) =>
-                      updateParcel("area", `${e.target.value} ha`)
-                    }
-                    placeholder="Área"
+                    onChange={(e) => handleFieldChange("area", `${e.target.value} ha`)}
                   />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">
-                    ha
-                  </span>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">ha</span>
                 </div>
               </div>
+
               <div className="flex flex-col gap-2">
-                <label>Humedad:</label>
+                <label className="text-sm font-medium text-slate-300">Humedad:</label>
                 <div className="relative">
                   <input
                     type="number"
-                    inputMode="decimal"
-                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white appearance-none
-                    [&::-webkit-outer-spin-button]:appearance-none
-                    [&::-webkit-inner-spin-button]:appearance-none
-                    [-moz-appearance:textfield]"
+                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white focus:outline-emerald-500"
                     value={editingParcel.humidity.replace("%", "")}
-                    onChange={(e) =>
-                      updateParcel("humidity", `${e.target.value}%`)
-                    }
-                    placeholder="Humedad"
+                    onChange={(e) => handleFieldChange("humidity", `${e.target.value}%`)}
                   />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">
-                    %
-                  </span>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">%</span>
                 </div>
               </div>
+
               <div className="flex flex-col gap-2">
-                <label>Fertilidad:</label>
+                <label className="text-sm font-medium text-slate-300">Fertilidad:</label>
                 <div className="relative">
                   <input
                     type="number"
-                    inputMode="decimal"
-                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white appearance-none
-                    [&::-webkit-outer-spin-button]:appearance-none
-                    [&::-webkit-inner-spin-button]:appearance-none
-                    [-moz-appearance:textfield]"
+                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white focus:outline-emerald-500"
                     value={editingParcel.fertility.replace("%", "")}
-                    onChange={(e) =>
-                      updateParcel("fertility", `${e.target.value}%`)
-                    }
-                    placeholder="Fertilidad"
+                    onChange={(e) => handleFieldChange("fertility", `${e.target.value}%`)}
                   />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">
-                    %
-                  </span>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">%</span>
                 </div>
               </div>
+
               <div className="flex flex-col gap-2">
-                <label>Temperatura:</label>
+                <label className="text-sm font-medium text-slate-300">Temperatura:</label>
                 <div className="relative">
                   <input
                     type="number"
-                    inputMode="decimal"
-                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white appearance-none
-                    [&::-webkit-outer-spin-button]:appearance-none
-                    [&::-webkit-inner-spin-button]:appearance-none
-                    [-moz-appearance:textfield]"
+                    className="w-full rounded-xl border border-white/10 bg-black/20 px-4 pr-14 py-3 text-white focus:outline-emerald-500"
                     value={editingParcel.temperature.replace("°C", "")}
-                    onChange={(e) =>
-                      updateParcel("temperature", `${e.target.value}°C`)
-                    }
-                    placeholder="Temperatura"
+                    onChange={(e) => handleFieldChange("temperature", `${e.target.value}°C`)}
                   />
-                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">
-                    °C
-                  </span>
+                  <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-medium">°C</span>
                 </div>
               </div>
+
               <div className="flex flex-col gap-2">
-                <label>Estado:</label>
-                <div className="relative">
-                  <select
-                    className="
-                      w-full appearance-none rounded-2xl
-                      border border-emerald-400/20
-                      bg-[#0b1814]
-                      px-4 pr-12 py-3
-                      text-white
-                      font-medium
-                      shadow-lg
-                      outline-none
-                      transition-all duration-300
-                      hover:border-emerald-400/40
-                      focus:border-emerald-400
-                      focus:ring-2 focus:ring-emerald-400/20
-                      cursor-pointer
-                    "
-                    value={editingParcel.statusTone}
-                    onChange={(e) => {
-                      const tone = e.target.value as ParcelStatus;
+                <label className="text-sm font-medium text-slate-300">Estado Visual:</label>
+                <select
+                  className="w-full rounded-xl border border-white/10 bg-[#0b1814] px-4 py-3 text-white focus:outline-emerald-500"
+                  value={editingParcel.statusTone}
+                  onChange={(e) => {
+                    const tone = e.target.value as ParcelStatus;
+                    const statusText = tone === "critico" ? "Crítico" : tone === "atencion" ? "Atención" : "Óptimo";
 
-                      if (!editingParcel) return;
-
-                      const updatedParcel = {
+                    if (editingParcel) {
+                      setEditingParcel({
                         ...editingParcel,
                         statusTone: tone,
-                        status:
-                          tone === "critico"
-                            ? "Crítico"
-                            : tone === "atencion"
-                              ? "Atención"
-                              : "Óptimo",
-                      };
+                        status: statusText
+                      });
+                    }
+                  }}
+                >
+                  <option value="optimo">🟢 Óptimo</option>
+                  <option value="atencion">🟡 Atención</option>
+                  <option value="critico">🔴 Crítico</option>
+                </select>
+              </div>
 
-                      setEditingParcel(updatedParcel);
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-slate-300">Fecha de Siembra:</label>
+                <input
+                  type="date"
+                  className="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:outline-emerald-500 [color-scheme:dark]"
+                  value={formatDateForInput((editingParcel as any).sowingDate)}
+                  onChange={(e) => {
+                    const dateVal = e.target.value ? new Date(e.target.value) : undefined;
+                    handleFieldChange("sowingDate", dateVal);
+                  }}
+                />
+              </div>
 
-                      setDynamicParcels((prev) =>
-                        prev.map((parcel) =>
-                          parcel.id === updatedParcel.id
-                            ? updatedParcel
-                            : parcel,
-                        ),
-                      );
-                    }}
-                  >
-                    <option
-                      value="optimo"
-                      className="bg-[#0b1814] text-emerald-300"
-                    >
-                      🟢 Óptimo
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-medium text-slate-300">Producción Esperada:</label>
+                <input
+                  type="text"
+                  placeholder="Ej: 5 toneladas, 500kg"
+                  className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-white focus:outline-emerald-500"
+                  value={(editingParcel as any).expectedProduction || ""}
+                  onChange={(e) => handleFieldChange("expectedProduction", e.target.value)}
+                />
+              </div>
+
+              <div className="flex flex-col gap-2 md:col-span-2">
+                <label className="text-sm font-medium text-slate-300">Modelo 3D / Cultivo Asociado:</label>
+                <select
+                  className="w-full rounded-xl border border-white/10 bg-[#0b1814] px-4 py-3 text-white focus:outline-emerald-500"
+                  value={(editingParcel as any).cropId || ""}
+                  onChange={(e) => handleFieldChange("cropId", e.target.value)}
+                >
+                  <option value="">Ninguno / Sin asignar</option>
+                  {crops.map((crop) => (
+                    <option key={crop.id || crop.title} value={crop.id || crop.title}>
+                      {crop.title}
                     </option>
-
-                    <option
-                      value="atencion"
-                      className="bg-[#0b1814] text-amber-300"
-                    >
-                      🟡 Atención
-                    </option>
-
-                    <option
-                      value="critico"
-                      className="bg-[#0b1814] text-red-300"
-                    >
-                      🔴 Crítico
-                    </option>
-                  </select>
-
-                  {/* Flecha personalizada */}
-                  <div className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-emerald-300">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                </div>
+                  ))}
+                </select>
               </div>
             </div>
 
-            <div className="mt-8 flex gap-4">
+            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-between">
               <button
-                onClick={() => {
-                  setEditingParcel(selectedParcel);
-                  setIsEditorOpen(false);
-                }}
-                className="flex-1 rounded-2xl border border-white/10 bg-white/5 py-3 font-semibold text-slate-300 hover:bg-white/10"
+                onClick={() => setIsDeleteConfirmOpen(true)}
+                className="rounded-2xl bg-red-600/20 border border-red-500/30 px-6 py-3 font-semibold text-red-400 hover:bg-red-600 hover:text-white transition-colors order-3 sm:order-1"
               >
-                Cancelar
+                Eliminar Parcela
               </button>
 
-              <button
-                onClick={() => {
-                  setDynamicParcels((prev) =>
-                    prev.map((parcel) =>
-                      parcel.id === editingParcel.id ? editingParcel : parcel,
-                    ),
-                  );
+              <div className="flex gap-4 flex-1 sm:justify-end order-1 sm:order-2">
+                <button
+                  onClick={() => setIsEditorOpen(false)}
+                  className="flex-1 sm:flex-none rounded-2xl border border-white/10 bg-white/5 px-6 py-3 font-semibold text-slate-300 hover:bg-white/10"
+                >
+                  Cancelar
+                </button>
 
-                  setSelectedParcelId(editingParcel.id);
-                  setIsEditorOpen(false);
-                }}
-                className="flex-1 rounded-2xl bg-emerald-500 py-3 font-semibold text-white hover:bg-emerald-400"
+                <button
+                  onClick={handleSaveChanges}
+                  className="flex-1 sm:flex-none rounded-2xl bg-emerald-500 px-6 py-3 font-semibold text-white hover:bg-emerald-400"
+                >
+                  Guardar cambios
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* CONFIRMACIÓN DE ELIMINACIÓN */}
+      {isDeleteConfirmOpen && editingParcel && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
+          <div className="w-full max-w-md rounded-2xl border border-red-500/20 bg-[#0d0707] p-6 shadow-2xl">
+            <h3 className="text-xl font-bold text-red-400 mb-2">🚨 Confirmar acción</h3>
+            <p className="text-slate-300 text-sm leading-relaxed mb-6">
+              ¿Estás completamente seguro de que deseas eliminar la parcela{" "}
+              <span className="font-bold text-white">"{editingParcel.name}"</span>?
+              Esta acción no se puede deshacer y removerá los datos de monitoreo asociados.
+            </p>
+            <div className="flex gap-3 justify-end">
+              <button
+                onClick={() => setIsDeleteConfirmOpen(false)}
+                className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-semibold text-slate-300 hover:bg-white/10"
               >
-                Guardar cambios
+                Volver atrás
+              </button>
+              <button
+                onClick={handleDeleteParcel}
+                className="rounded-xl bg-red-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-red-500 transition-colors"
+              >
+                Sí, eliminar definitivamente
               </button>
             </div>
           </div>

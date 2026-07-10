@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "author": "Agro Control",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-arduino-uno", "id": "uno", "top": 90, "left": -20, "attrs": {} },
+    { "type": "wokwi-dht22", "id": "dht1", "top": -40, "left": 120, "attrs": {} }
+  ],
+  "connections": [
+    [ "uno:GND.1", "dht1:GND", "black", [ "v0" ] ],
+    [ "uno:5V", "dht1:VCC", "red", [ "v0" ] ],
+    [ "uno:2", "dht1:SDA", "green", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}

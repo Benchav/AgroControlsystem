@@ -6,7 +6,8 @@ import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 // @ts-ignore
 import autoTable from 'jspdf-autotable';
-import { Period, PERIOD_LABELS } from "../pages/ReportsPage";
+import { Period } from "../pages/ReportsPage";
+import { PERIOD_LABELS } from "../components/reports/ReportCommon";
 
 // ─── Exportar CSV ─────────────────────────────────────────────────────────────
 export function exportCSV(data: any[], filename: string) {

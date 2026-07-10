@@ -25,6 +25,8 @@ export const initialParcels: Parcel[] = [
       { time: "40", humidity: 65, fertility: 58 },
       { time: "50", humidity: 68, fertility: 94 },
     ],
+    sowingDate: new Date("2026-02-15"),
+    expectedProduction: "8.5 toneladas",
   },
   {
     id: "sur",
@@ -50,6 +52,8 @@ export const initialParcels: Parcel[] = [
       { time: "40", humidity: 69, fertility: 82 },
       { time: "50", humidity: 71, fertility: 87 },
     ],
+    sowingDate: new Date("2026-03-01"),
+    expectedProduction: "5.0 toneladas",
   },
   {
     id: "sector-2a",
@@ -75,6 +79,8 @@ export const initialParcels: Parcel[] = [
       { time: "40", humidity: 63, fertility: 77 },
       { time: "50", humidity: 62, fertility: 76 },
     ],
+    sowingDate: new Date("2026-01-20"),
+    expectedProduction: "6.2 toneladas",
   },
   {
     id: "zona-critica",
@@ -100,6 +106,8 @@ export const initialParcels: Parcel[] = [
       { time: "40", humidity: 35, fertility: 72 },
       { time: "50", humidity: 34, fertility: 71 },
     ],
+    sowingDate: new Date("2025-11-05"),
+    expectedProduction: "2.8 toneladas",
   },
   {
     id: "sector-3b",
@@ -125,5 +133,7 @@ export const initialParcels: Parcel[] = [
       { time: "40", humidity: 66, fertility: 80 },
       { time: "50", humidity: 65, fertility: 79 },
     ],
+    sowingDate: new Date("2026-04-10"),
+    expectedProduction: "5.8 toneladas",
   },
 ];

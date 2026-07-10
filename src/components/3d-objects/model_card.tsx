@@ -1,19 +1,25 @@
 import { useState } from "react";
-
 import { ModelViewer } from "./model_viewer";
+import { Models3dItem } from "../../entities/3d_object_model";
+import { Parcel } from "../../entities/parcel_model";
 
 type Props = {
-  title: string;
-  author: string;
-  modelPath: string;
+  model3d: Models3dItem;
+  availableParcels: Parcel[];
 };
 
 export function ModelCard({
-  title,
-  author,
-  modelPath,
+  model3d,
+  availableParcels = []
 }: Props) {
   const [visible, setVisible] = useState(false);
+
+  const cleanedModel3d = {
+    ...model3d,
+    parcels: (model3d.parcels ?? []).filter(parcelId =>
+      availableParcels.some(ap => ap.id === parcelId || ap.name === parcelId)
+    )
+  };
 
   return (
     <>
@@ -23,19 +29,20 @@ export function ModelCard({
         {/* PREVIEW NO INTERACTIVA */}
         <div className="pointer-events-none">
           <ModelViewer
-            modelPath={modelPath}
+            modelPath={cleanedModel3d.modelPath}
             interactive={false}
+            model3d={cleanedModel3d}
           />
         </div>
 
         <div className="mt-4 flex items-center justify-between">
           <div>
             <h3 className="text-white font-semibold">
-              {title}
+              {cleanedModel3d.title}
             </h3>
 
             <p className="text-sm text-slate-400">
-              {author}
+              {cleanedModel3d.author}
             </p>
           </div>
 
@@ -110,8 +117,9 @@ export function ModelCard({
 
             {/* VIEWER INTERACTIVO */}
             <ModelViewer
-              modelPath={modelPath}
+              modelPath={cleanedModel3d.modelPath}
               interactive={true}
+              model3d={cleanedModel3d}
             />
           </div>
         </div>

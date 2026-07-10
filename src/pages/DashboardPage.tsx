@@ -4,189 +4,154 @@ import { DashboardInsights } from "../components/dashboard/DashboardInsights";
 import { DashboardMetricsGrid } from "../components/dashboard/DashboardMetricsGrid";
 import { DashboardSensors } from "../components/dashboard/DashboardSensors";
 import { DashboardMetric } from "../entities/dashboard_metric";
-
-const metrics: DashboardMetric[] = [
-  {
-    label: "Humedad Promedio",
-    description: "Humedad del aire",
-    value: "68%",
-    percentage: 68,
-    icon: "/gota.png",
-    color: "#00ffcc",
-    chartData: [
-      { value: 42 },
-      { value: 58 },
-      { value: 51 },
-      { value: 67 },
-      { value: 49 },
-      { value: 73 },
-      { value: 61 },
-      { value: 80 },
-      { value: 55 },
-      { value: 69 },
-      { value: 47 },
-      { value: 76 },
-      { value: 63 },
-      { value: 84 },
-      { value: 59 },
-      { value: 71 },
-      { value: 53 },
-      { value: 88 },
-      { value: 66 },
-      { value: 74 },
-      { value: 42 },
-      { value: 58 },
-      { value: 51 },
-      { value: 67 },
-      { value: 49 },
-      { value: 73 },
-      { value: 61 },
-      { value: 80 },
-      { value: 55 },
-      { value: 69 },
-      { value: 47 },
-      { value: 76 },
-      { value: 63 },
-      { value: 84 },
-      { value: 59 },
-      { value: 71 },
-      { value: 53 },
-      { value: 88 },
-      { value: 66 },
-      { value: 74 },
-    ],
-  },
-
-  {
-    label: "Temp. del Suelo",
-    description: "Temperatura promedio",
-    value: "24°C",
-    percentage: 24,
-    icon: "/sol.png",
-    color: "#ffd93d",
-    chartData: [
-      { value: 91 },
-      { value: 42 },
-      { value: 78 },
-      { value: 25 },
-      { value: 84 },
-      { value: 53 },
-      { value: 97 },
-      { value: 38 },
-      { value: 69 },
-      { value: 18 },
-      { value: 88 },
-      { value: 47 },
-      { value: 76 },
-      { value: 29 },
-      { value: 95 },
-      { value: 34 },
-      { value: 67 },
-      { value: 21 },
-      { value: 82 },
-      { value: 40 },
-    ],
-  },
-
-  {
-    label: "Parcelas Activas",
-    description: "Monitoreo en curso",
-    value: "12 H",
-    percentage: 50,
-    icon: "/tractor.png",
-    color: "#00ff88",
-    chartData: [
-      { value: 12 },
-      { value: 48 },
-      { value: 21 },
-      { value: 67 },
-      { value: 35 },
-      { value: 82 },
-      { value: 44 },
-      { value: 93 },
-      { value: 38 },
-      { value: 76 },
-      { value: 55 },
-      { value: 97 },
-      { value: 49 },
-      { value: 88 },
-      { value: 62 },
-      { value: 100 },
-      { value: 71 },
-      { value: 92 },
-      { value: 84 },
-      { value: 98 },
-    ],
-  },
-
-  {
-    label: "Alertas Activas",
-    description: "Críticas del sistema",
-    value: "3",
-    percentage: 25,
-    icon: "/campana.png",
-    color: "#ff3b3b",
-    chartData: [
-      { value: 96 },
-      { value: 58 },
-      { value: 89 },
-      { value: 34 },
-      { value: 77 },
-      { value: 92 },
-      { value: 41 },
-      { value: 68 },
-      { value: 23 },
-      { value: 85 },
-      { value: 37 },
-      { value: 74 },
-      { value: 18 },
-      { value: 63 },
-      { value: 49 },
-      { value: 95 },
-      { value: 27 },
-      { value: 57 },
-      { value: 11 },
-      { value: 72 },
-      { value: 96 },
-      { value: 58 },
-      { value: 89 },
-      { value: 34 },
-      { value: 77 },
-      { value: 92 },
-      { value: 41 },
-      { value: 68 },
-      { value: 23 },
-      { value: 85 },
-      { value: 37 },
-      { value: 74 },
-      { value: 18 },
-      { value: 63 },
-      { value: 49 },
-      { value: 95 },
-      { value: 27 },
-      { value: 57 },
-      { value: 11 },
-      { value: 72 },
-    ],
-  },
-];
+import { useParcels } from "../hooks/useParcels";
+import { useAlerts } from "../hooks/useAlerts";
 
 export function DashboardPage() {
   const navigate = useNavigate();
+  const { parcels, isLoading, isError } = useParcels();
+  // Consumimos las alertas unificadas y las funciones de acción de tu hook
+  const { alerts, resolveAlert, handleAlertClick } = useAlerts();
+
+  // Filtramos para mostrar únicamente las alertas que NO han sido resueltas
+  const activeAlerts = alerts.filter((alert) => !alert.resolved);
+  const totalActiveNotifications = activeAlerts.length;
+
+  // 1. MANEJO DE ESTADOS DE CARGA Y ERROR
+  if (isLoading) {
+    return (
+      <div className="flex h-64 flex-col items-center justify-center gap-2 text-slate-400">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-emerald-500 border-t-transparent"></div>
+        <p className="animate-pulse text-sm">Descargando y procesando históricos de 50 días por parcela...</p>
+      </div>
+    );
+  }
+
+  if (isError || parcels.length === 0) {
+    return (
+      <div className="flex h-64 items-center justify-center text-red-400">
+        <p>Error al sincronizar el histórico de telemetría satelital.</p>
+      </div>
+    );
+  }
+
+  // 2. PROCESAMIENTO DE DATOS REALES Y AGREGACIONES
+  const totalParcels = parcels.length;
+
+  // Promedios actuales instantáneos
+  const avgHumidity = Math.round(
+    parcels.reduce((acc, p) => acc + (parseFloat(p.humidity) || 0), 0) / totalParcels
+  );
+
+  const avgTemperature = Math.round(
+    parcels.reduce((acc, p) => acc + (parseFloat(p.temperature) || 0), 0) / totalParcels
+  );
+
+  // 3. CONSTRUCCIÓN DE LÍNEAS DE TIEMPO DE 50 DÍAS (Métrica Global)
+  // Mapeamos los 50 días promediando los valores de todas las parcelas por cada jornada indexada
+  const totalDays = parcels[0]?.historicalData?.length || 0;
+  const globalHistoryHumidity: { value: number }[] = [];
+  const globalHistoryTemperature: { value: number }[] = [];
+
+  for (let dayIndex = 0; dayIndex < totalDays; dayIndex++) {
+    let dayHumSum = 0;
+    let dayTempSum = 0;
+    let count = 0;
+
+    parcels.forEach(parcel => {
+      const dayData = parcel.historicalData?.[dayIndex];
+      if (dayData) {
+        dayHumSum += dayData.humidity;
+        dayTempSum += dayData.temperature;
+        count++;
+      }
+    });
+
+    if (count > 0) {
+      globalHistoryHumidity.push({ value: Math.round(dayHumSum / count) });
+      globalHistoryTemperature.push({ value: Math.round(dayTempSum / count) });
+    }
+  }
+
+  // 2. SOLUCIÓN AL PUNTITO: Si el array está vacío o tiene 1 solo punto, generamos una curva suave de fallback
+  const fallbackChart = (baseValue: number) => [
+    { value: baseValue - 4 }, { value: baseValue - 2 }, { value: baseValue + 1 },
+    { value: baseValue - 1 }, { value: baseValue + 3 }, { value: baseValue }
+  ];
+
+  const finalHumidityChart = globalHistoryHumidity.length > 1
+    ? globalHistoryHumidity
+    : fallbackChart(avgHumidity);
+
+  const finalTemperatureChart = globalHistoryTemperature.length > 1
+    ? globalHistoryTemperature
+    : fallbackChart(avgTemperature);
+
+  // 3. Modifica tus dynamicMetrics para que consuman estas variables estables:
+  const dynamicMetrics: DashboardMetric[] = [
+    {
+      label: "Humedad Promedio",
+      description: "Humedad de Últimos 50 días",
+      value: `${avgHumidity}%`,
+      percentage: avgHumidity,
+      icon: "/gota.png",
+      color: "#00ffcc",
+      chartData: finalHumidityChart, // <-- Gráfico protegido contra puntitos
+    },
+    {
+      label: "Temp. del Suelo",
+      description: "Temperatura media ambiental",
+      value: `${avgTemperature}°C`,
+      percentage: Math.min(100, Math.max(0, (avgTemperature / 50) * 100)),
+      icon: "/sol.png",
+      color: "#ffd93d",
+      chartData: finalTemperatureChart, // <-- Gráfico protegido contra puntitos
+    },
+    {
+      label: "Parcelas Activas",
+      description: "Monitoreo satelital activo",
+      value: `${totalParcels} P`,
+      percentage: 100,
+      icon: "/tractor.png",
+      color: "#00ff88",
+      chartData: parcels.map((_, i) => ({ value: Math.round(((i + 1) / totalParcels) * 100) })),
+    },
+    {
+      label: "Alertas Activas",
+      description: "Notificaciones sin resolver",
+      value: `${totalActiveNotifications}`,       
+      percentage: totalActiveNotifications > 0 ? Math.min(100, (totalActiveNotifications / 5) * 100) : 0, 
+      icon: "/campana.png",
+      color: totalActiveNotifications > 0 ? "#ff3b3b" : "#4ade80", //cambiamos a verde si no hay alertas
+      chartData: [
+        { value: totalActiveNotifications  },
+        { value: totalActiveNotifications *  1.3 },
+        { value: totalActiveNotifications  },
+        { value: totalActiveNotifications *  5.3 },
+        { value: totalActiveNotifications * 2.3 },
+        { value: totalActiveNotifications *  7.3 },
+        { value: totalActiveNotifications  },
+      ],
+    },
+  ];
+
+  const formattedTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
   return (
-    <div className="space-y-6 ">
+    <div className="space-y-6">
       <p className="text-sm text-slate-400">
-        Resumen general · Última actualización hace 2 min ·{" "}
-        <span className="text-emerald-300">10:24 AM</span>
+        Resumen general · Sincronizado vía Open-Meteo Archive ·{" "}
+        <span className="text-emerald-300">{formattedTime}</span>
       </p>
 
-      <DashboardMetricsGrid metrics={metrics} />
+      {/* Grid de tarjetas superiores con gráficos de 50 días integrados */}
+      <DashboardMetricsGrid metrics={dynamicMetrics} />
 
       <div className="grid gap-4 xl:grid-cols-2">
         <DashboardAlerts />
 
-        <DashboardSensors  metrics={metrics}/>
+        {/* Panel lateral de sensores con los mismos datos acoplados */}
+        <DashboardSensors metrics={dynamicMetrics} />
       </div>
 
       <DashboardInsights onNavigate={(page) => navigate(`/app/${page}`)} />
