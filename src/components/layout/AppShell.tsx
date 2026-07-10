@@ -4,6 +4,7 @@ import { cn } from "../../lib/cn";
 import { useEffect, useState, type ReactNode } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useAlerts } from "../../hooks/useAlerts";
+import { useArduinos } from "../../hooks/useArduinos";
 
 type AppShellProps = {
   profile: UserProfile;
@@ -43,6 +44,10 @@ function getInitials(name: string) {
 export function AppShell({ profile }: AppShellProps) {
   // 1. Consumimos el hook de alertas
   const { alerts, redCount, amberCount } = useAlerts();
+
+  const { arduinos } = useArduinos();
+
+  const activeArduinosCount = arduinos.filter((a) => a.status === "active").length;
 
   // 2. Filtramos y calculamos los totales de notificaciones pendientes
   const activeAlerts = alerts.filter((alert) => !alert.resolved);
@@ -284,7 +289,7 @@ export function AppShell({ profile }: AppShellProps) {
                 </button>
                 <div className="hidden items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-500/[0.07] px-4 py-2 text-[11.5px] font-medium text-emerald-300 md:flex">
                   <span className="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,0.75)]" />
-                  24 sensores activos
+                  {activeArduinosCount} {activeArduinosCount === 1 ? 'sensor activo' : 'sensores activos'}
                 </div>
                 <button
                   onClick={handleBellClick}
