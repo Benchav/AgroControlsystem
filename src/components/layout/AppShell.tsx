@@ -180,7 +180,7 @@ export function AppShell({ profile }: AppShellProps) {
 
           <div className="flex items-center gap-2 border-b border-white/5 bg-emerald-500/[0.03] px-5 py-2.5 font-mono text-[10.5px] text-emerald-300">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.75)]" />
-            SYS ONLINE · 24 sensores
+            SYS ONLINE · {activeArduinosCount} {activeArduinosCount === 1 ? 'sensor' : 'sensores'}
           </div>
 
           <nav className="flex-1 overflow-y-auto px-3 py-3 scrollbar-hide">
