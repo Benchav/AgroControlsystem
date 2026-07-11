@@ -58,11 +58,15 @@ export const requestLogin2FA = async (email: string, password: string) => {
 export const requestRegister = async (name: string, org: string, email: string, password: string) => {
   const users = getMockUsers();
   const pendingUsers = getPendingUsers();
-  const exists = users.find(u => u.email === email) || pendingUsers.find(u => u.email === email);
+  const existsInUsers = users.find(u => u.email === email);
   
-  if (exists) {
+  // Solo bloqueamos si el usuario ya verificó su cuenta (está en users)
+  if (existsInUsers) {
     throw new Error('El correo electrónico ya está registrado.');
   }
+
+  // Si estaba en pendingUsers, simplemente reescribimos sus datos y reenviamos el 2FA
+  const updatedPending = pendingUsers.filter(u => u.email !== email);
 
   const response = await fetch(`${API_URL}/register`, {
     method: 'POST',
@@ -77,7 +81,7 @@ export const requestRegister = async (name: string, org: string, email: string, 
     throw new Error(errorData.error || 'Error al registrar la cuenta');
   }
 
-  savePendingUsers([...pendingUsers, { name, org, email, password }]);
+  savePendingUsers([...updatedPending, { name, org, email, password }]);
 
   return response.json();
 };
