@@ -5,6 +5,15 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig({
   plugins: [
     react(),
+    {
+      name: 'fix-react-leaflet-draw',
+      enforce: 'pre',
+      transform(code, id) {
+        if (id.includes('react-leaflet-draw') && id.includes('EditControl.js')) {
+          return code.replace(/import Draw from 'leaflet-draw';/g, "import 'leaflet-draw';");
+        }
+      }
+    },
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: [
@@ -64,11 +73,7 @@ export default defineConfig({
       },
     }),
   ],
-  resolve: {
-    alias: {
-      'react-leaflet-draw': 'react-leaflet-draw/dist/react-leaflet-draw.js',
-    },
-  },
+
   build: {
     rollupOptions: {
       output: {
