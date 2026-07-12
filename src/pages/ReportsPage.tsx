@@ -1,18 +1,18 @@
 import { useState, useMemo } from 'react';
 import { Arduino } from '../entities/arduino_model';
 import { Sensor } from '../entities/sensor_model';
-import { Alert } from '../entities/alert_model';
 import { initialArduinos } from '../data/arduino_data';
 import { initialSensors } from '../data/sensor_data';
-import { initialAlerts } from '../data/alert_data';
 import { generateDailyHistory } from '../utils/report_history_generator';
 import { generateMultiSensorHistory } from '../utils/sensor_history_generator';
 import { exportCSV, exportExcel, exportPDF } from '../utils/file_export_formats';
-import { CustomTooltip, PERIOD_DAYS, PERIOD_LABELS, ProgressBar, QualityBadge } from '../components/reports/ReportCommon';
+import {  PERIOD_DAYS, PERIOD_LABELS, ProgressBar, QualityBadge } from '../components/reports/ReportCommon';
 import { OverviewTab } from '../components/reports/OverviewTab';
 import { SensorsTab } from '../components/reports/SensorsTab';
 import { ParcelasTab } from '../components/reports/ParcelsTab';
 import { AlertsTab } from '../components/reports/AlertsTab';
+import { useParcels } from '../hooks/useParcels';
+import useAlerts from '../hooks/useAlerts';
 
 export type Period = '7d' | '14d' | '30d';
 
@@ -25,6 +25,10 @@ export function ReportsPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'sensors' | 'parcelas' | 'alertas'>('overview');
   const [exportFlash, setExportFlash] = useState<ExportFlash>(null);
 
+  // 1. Datos reales sincronizados desde los hooks unificados
+  const { parcels, isLoading: loadingParcels, isError: errorParcels } = useParcels();
+  const { alerts, resolveAlert } = useAlerts();
+
   // Leer datos sincronizados desde localStorage (IotPage)
   const arduinos: Arduino[] = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('ac_arduinos') || 'null') ?? initialArduinos; }
@@ -36,12 +40,7 @@ export function ReportsPage() {
     catch { return initialSensors; }
   }, []);
 
-  const alerts: Alert[] = useMemo(() => {
-    try { return JSON.parse(localStorage.getItem('ac_alerts') || 'null') ?? initialAlerts; }
-    catch { return initialAlerts; }
-  }, []);
-
-  // Cargar umbrales dinámicos desde localStorage
+  // Cargar umbrales dinámicos (Opcional, manteniendo compatibilidad de configuración)
   const systemSettings = useMemo(() => {
     try {
       const saved = localStorage.getItem('ac_settings');
@@ -328,21 +327,21 @@ export function ReportsPage() {
       </div>
 
       {/* ══════════ TAB: RESUMEN EJECUTIVO ══════════ */}
-      <OverviewTab 
+      <OverviewTab
         visible={activeTab === 'overview'} periodLabel={PERIOD_LABELS[period]} multiHistory={multiHistory}
         humidityHistory={humidityHistory} tempHistory={tempHistory} alertDistribution={alertDistribution}
         sensorTypeData={sensorTypeData} systemSettings={systemSettings} days={days} onExportCSV={handleCSV}
       />
 
-      <SensorsTab 
+      <SensorsTab
         visible={activeTab === 'sensors'} days={days} multiHistory={multiHistory} sensors={sensors} onExportCSV={handleCSV}
       />
 
-      <ParcelasTab 
-        visible={activeTab === 'parcelas'} parcelaData={parcelaData} radarData={radarData} arduinos={arduinos} sensors={sensors} onExportCSV={handleCSV}
+      <ParcelasTab
+        visible={activeTab === 'parcelas'} parcelaData={parcels} radarData={radarData} arduinos={arduinos} sensors={sensors} onExportCSV={handleCSV}
       />
 
-      <AlertsTab 
+      <AlertsTab
         visible={activeTab === 'alertas'} alerts={alerts} alertFreqHistory={alertFreqHistory} onExportCSV={handleCSV}
       />
 
