@@ -14,8 +14,55 @@ interface ParcelasTabProps {
   onExportCSV: (label: string, data: any[]) => void;
 }
 
+/**
+ * Calcula dinámicamente el porcentaje de salud de la parcela en base a qué tan
+ * óptimas son sus lecturas actuales de Humedad, Temperatura y Fertilidad.
+ */
+function calcularSaludAgro(humidity: number, temperature: number, fertility: number): number {
+  let score = 100;
+
+  //  Evaluación de Humedad (Ideal: 60% - 80%)
+  if (humidity < 60) {
+    score -= (60 - humidity) * 1.2; // Penaliza sequedad progresivamente
+  } else if (humidity > 80) {
+    score -= (humidity - 80) * 1.0; // Penaliza exceso de agua
+  }
+
+  // Evaluación de Temperatura (Ideal: 18°C - 30°C)
+  if (temperature < 18) {
+    score -= (18 - temperature) * 1.5; // Penaliza frío
+  } else if (temperature > 30) {
+    score -= (temperature - 30) * 1.8; // Penaliza estrés por calor
+  }
+
+  //  Evaluación de Fertilidad (Ideal: >= 70%)
+  if (fertility < 70) {
+    score -= (70 - fertility) * 0.8; // Penaliza falta de nutrientes
+  }
+
+  // Asegurar que el resultado final se mantenga en el rango [0, 100]
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
 export function ParcelasTab({ visible, parcelaData, radarData, arduinos, sensors, onExportCSV }: ParcelasTabProps) {
   if (!visible) return null;
+
+  // Generamos dinámicamente la data del radar 
+  const realRadarData = parcelaData.map((p) => {
+    const numericTemp = parseFloat(p.temperature) || 0;
+    const numericHum = parseFloat(p.humidity) || 0;
+    const numericFertility = parseFloat(p.fertility) || 0;
+
+    const saludPct = calcularSaludAgro(numericHum, numericTemp, numericFertility);
+
+    return {
+      // Usamos p.area que coincide con el identificador visual en tu UI
+      parcela: p.name, 
+      "Salud": saludPct,
+      "Humedad": numericHum,
+      "Temperatura": numericTemp
+    };
+  });
 
   return (
     <div className="space-y-6">
@@ -32,7 +79,7 @@ export function ParcelasTab({ visible, parcelaData, radarData, arduinos, sensors
           const okSensors = locSensors.filter((s) => s.status === 'OK').length;
 
           // Calculamos el % de salud real basado en el estado de sus sensores
-          const saludPct = locSensors.length ? Math.round((okSensors / locSensors.length) * 100) : 100;
+          const saludPct = calcularSaludAgro(numericHum, numericTemp, numericFertility);
 
           // Definición de color basado en la salud calculada
           const healthColor = saludPct >= 80 ? '#10b981' : saludPct >= 60 ? '#f59e0b' : '#ef4444';
@@ -65,7 +112,7 @@ export function ParcelasTab({ visible, parcelaData, radarData, arduinos, sensors
                 {[
                   { label: 'Humedad', value: numericHum > 0 ? `${numericHum}%` : 'N/A', icon: '💧', color: '#38bdf8' },
                   { label: 'Temperatura', value: numericTemp > 0 ? `${numericTemp}°C` : 'N/A', icon: '🌡️', color: '#f59e0b' },
-                  { label: 'Fertilidad', value: numericFertility > 0 ? numericFertility.toString() : 'N/A', icon: '⚗️', color: '#a78bfa' },
+                  { label: 'Fertilidad', value: numericFertility > 0 ? `${numericFertility.toString()}%` : 'N/A', icon: '⚗️', color: '#a78bfa' },
                   { label: 'Area', value: `${p.area}`, icon: '📡', color: '#10b981' },
                 ].map((m) => (
                   <div key={m.label} className="rounded-xl border border-white/20 bg-black/50 p-2.5">
@@ -89,7 +136,7 @@ export function ParcelasTab({ visible, parcelaData, radarData, arduinos, sensors
       <PageSection title="Análisis Comparativo de Parcelas — Radar" subtitle="Comparativa multidimensional de salud e indicadores por zona">
         <div className="h-[320px]">
           <ResponsiveContainer width="100%" height="100%">
-            <RadarChart data={radarData}>
+            <RadarChart data={realRadarData}>
               <PolarGrid stroke="rgba(255,255,255,0.06)" />
               <PolarAngleAxis dataKey="parcela" tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 600 }} />
               <PolarRadiusAxis angle={30} domain={[0, 100]} tick={{ fill: '#475569', fontSize: 9 }} />
@@ -125,8 +172,7 @@ export function ParcelasTab({ visible, parcelaData, radarData, arduinos, sensors
                 const numericFertility = parseFloat(p.fertility) || 0;
 
                 const locSensors = sensors.filter((s) => s.location === p.name && s.value !== '---');
-                const okSensors = locSensors.filter((s) => s.status === 'OK').length;
-                const saludPct = locSensors.length ? Math.round((okSensors / locSensors.length) * 100) : 100;
+                const saludPct = calcularSaludAgro(numericHum, numericTemp, numericFertility);
 
                 return (
                   <tr key={p.id} className="border-t border-white/6 hover:bg-white/[0.02] transition-colors">
