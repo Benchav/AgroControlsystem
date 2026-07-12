@@ -81,6 +81,7 @@ export function ReportsPage() {
   const criticalAlerts = alerts.filter((a) => !a.resolved && a.severity === 'red').length;
   const totalAlerts = alerts.filter((a) => !a.resolved).length;
   const activeArduinos = arduinos.filter((a) => a.status === 'active').length;
+  const activeArduinosCount = arduinos.filter((a) => a.status === "active").length;
   const systemHealth = Math.round(
     (activeSensors.filter(s => s.status === 'OK').length / Math.max(sensors.length, 1)) * 100
   );
@@ -172,7 +173,7 @@ export function ReportsPage() {
     },
     {
       label: 'Humedad Promedio', value: `${avgHumidity}%`, icon: 'fa-tint', color: '#38bdf8',
-      sub: `${activeSensors.filter(s => s.type === 'Humedad').length} sensores activos`,
+      sub: `${activeArduinosCount} sensores activos`,
       progress: avgHumidity, progressMax: 100, thresholds: { ok: systemSettings.humidityThreshold + 15, warn: systemSettings.humidityThreshold },
     },
     {
