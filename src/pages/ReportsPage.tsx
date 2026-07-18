@@ -168,7 +168,7 @@ export function ReportsPage() {
     {
       label: 'Salud del Sistema', value: `${systemHealth}%`, icon: 'fa-heartbeat',
       color: systemHealth > 70 ? '#10b981' : '#f59e0b',
-      sub: `${activeSensors.filter(s => s.status === 'OK').length} de ${sensors.length} sensores OK`,
+      sub: `${activeArduinos} de ${arduinos.length} sensores `,
       progress: systemHealth, progressMax: 100, thresholds: { ok: 80, warn: 60 },
     },
     {
