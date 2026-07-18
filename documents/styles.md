@@ -91,12 +91,55 @@ Este manual técnico define la estructura del sistema de diseño, la paleta crom
 ---
 
 #### 2.2 Mapa Interactivo
--   **Icono Identificador:** `[Añadir Icono / Clase]` (Ej: `map`)
--   **Color Temático / Token:** `#[Añadir Hexadecimal]`
--   **Especificaciones de Diseño:**
-    -   *Capas y Polígonos:* Estilos de renderizado sobre mapas (Bordes, opacidades de zonas geográficas).
-    -   *Tooltips & Modales:* Diseño de ventanas flotantes e interfaces de información rápida al hacer clic.
+-   **Icono Identificador:** `[fa-map-marked-alt]` mapa de localizacion
+-   **Color del icono:** `#[6ee7b2]`
+-   **Color del texto:** `#[4c5e68]`
+-   **Arquitectura de la Vista (Layout):** 
+    -   *Fila Superior:* Header de contexto y estado global (Sincronizado).
+    -   *Bloque Principal (Split Layout 65/35):* 
+        -   **Columna Izquierda (65%):** Visor del Mapa Interactivo del Terreno (Leaflet full-height).
+        -   **Columna Derecha (35%):** Panel de información detallada de la parcela seleccionada y analíticas de suelo.
+    -   *Bloque Inferior (Full Width):* Panel de gestión de parcelas por estado con filtrado por pestañas (*Tabs segmentados*).
+##### ESPECIFICACIONES DE COMPONENTES (UI-UX)
 
+###### A. Header de Contexto y Metadatos
+-   **Elementos:** Título principal de la vista (`Mapa Interactivo`) con breadcrumb secundario (`Agro Control / Mapa Interactivo`).
+-   **Subtexto Informativo:** Indicador de funcionalidades activas debajo del título principal en color azul/cian muted: `Delimitación de áreas en tiempo real · Censado de terreno`.
+
+###### B. Contenedor de Mapa (Visor Geoespacial o satelital)
+-   **Encabezado del Mapa:** Título interno (`Mapa interactivo del terreno`) con subtexto de instrucciones (`zoom, click por parcela, trazado de parcelas y lectura en vivo`).
+-   **Badge de Proveedor:** Etiqueta flotante en la esquina superior derecha indicando el estado del mapa: `OSM - Live` (`bg-emerald-950 text-emerald-400 border border-emerald-800`).
+-   **UI de Controles Flotantes:**
+    -   *Control de Zoom:* Botonera vertical interna a la izquierda (`+` / `-`).
+    -   *Capas y Herramientas:* Botonera vertical a la derecha con iconos de geolocalización, capas y edición geométrica.
+-   **Capas de Polígonos (GeoJSON Styles):** Estilos de las parcelas delimitadas según su estado operativo:
+    -   *Verde / Óptimo:* Polígono con relleno semi-transparente verde (`rgba(16, 185, 129, 0.2)`) y borde verde sólido. Incluye marcador flotante de texto (*Tooltip Tool*): `Cafetal Don Roberto`.
+    -   *Naranja / Atención:* Polígono con relleno ocre/naranja semi-transparente para zonas con avisos (ej. *Galerías Don José*, *Campos El Mirador*).
+    -   *Rojo / Crítico:* Polígono con relleno rojo/marrón semi-transparente para sectores infectados o sin lecturas (ej. *Criadero El Progreso*).
+
+ ###### C. Panel de Detalle (Parcela Seleccionada)
+*Diseño de barra lateral acoplada para inspección rápida de datos agronómicos.*
+
+1.  **Cabecera de la Parcela:**
+    -   Título principal con el nombre del lote destacado en verde grande (`Cafetal Don Roberto`).
+    -   Metadatos en texto secundario indicando extensión de tierra y tiempo de refresco (`4.2 ha - Última lectura hace 2 min`).
+2.  **Grid de Telemetría Rápida (2x2):**
+    -   *Humedad / Fertilidad / Temperatura / Estado:* Cuatro micro-tarjetas con bordes redondeados, títulos en mayúsculas pequeñas y el valor de lectura en formato grande y contrastado en blanco.
+3.  **Acción Principal:**
+    -   Botón de ancho completo (`w-full`) en color verde sólido con texto centrado: `Editar Parcela` (`bg-emerald-600 hover:bg-emerald-700 text-white`).
+
+###### D. Métricas de Fertilidad y Suelo (Widget Analítico)
+-   **Título del Bloque:** `Métricas de Fertilidad y Suelo — [Nombre dinamico de la Parcela]` con menú de tres puntos (`...`) a la derecha para acciones adicionales.
+-   **Gráfico de Tacómetro (Gauge Chart):** Un semicírculo central graduado con aguja que indica el porcentaje de la métrica (ej. *79% Tasa de Fertilidad*). El arco cambia de color transicionando de rojo a verde.
+-   **Gráfico de Tendencia Histórica (Timeline Chart):** Gráfico de líneas multivariable (dos líneas concurrentes en color amarillo y cian) que detalla el comportamiento del suelo en las últimas horas (escala 0 a 24h).
+
+###### E. Gestión de Parcelas por Estado (Panel Inferior)
+-   **Sub-encabezado:** Título de sección (`Gestión de parcelas por estado`) con una breve descripción (`Monitoreo segmentado y acciones rápidas`).
+-   **Control de Filtros (Tabs de Estado):** Grupo de botones horizontales para segmentación de datos en tiempo real:
+    -   `Todas` (Estado activo/seleccionado con fondo azul/verde agua).
+    -   `Óptimo`, `Atención`, `Crítico` (Estados inactivos con bordes suaves).
+-   **Grid de Tarjetas de Parcelas:**
+    -   *Estructura de Tarjeta:* Título del lote, tamaño en hectáreas (`ha`), un badge de estado a la derecha alineado al título (`Óptimo` en verde, `Atención` en amarillo, `Crítico` en rojo) y un botón *Ghost* en la parte inferior: `Editar / Eliminar`.
 ---
 
 ### SECCIÓN: MÓDULOS
