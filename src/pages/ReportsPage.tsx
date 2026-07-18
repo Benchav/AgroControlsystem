@@ -13,6 +13,7 @@ import { ParcelasTab } from '../components/reports/ParcelsTab';
 import { AlertsTab } from '../components/reports/AlertsTab';
 import { useParcels } from '../hooks/useParcels';
 import useAlerts from '../hooks/useAlerts';
+import useSensors from '../hooks/useSensors';
 
 export type Period = '7d' | '14d' | '30d';
 
@@ -28,16 +29,12 @@ export function ReportsPage() {
   // 1. Datos reales sincronizados desde los hooks unificados
   const { parcels, isLoading: loadingParcels, isError: errorParcels } = useParcels();
   const { alerts, resolveAlert } = useAlerts();
+  const { sensors } = useSensors();
 
   // Leer datos sincronizados desde localStorage (IotPage)
   const arduinos: Arduino[] = useMemo(() => {
     try { return JSON.parse(localStorage.getItem('ac_arduinos') || 'null') ?? initialArduinos; }
     catch { return initialArduinos; }
-  }, []);
-
-  const sensors: Sensor[] = useMemo(() => {
-    try { return JSON.parse(localStorage.getItem('ac_sensors') || 'null') ?? initialSensors; }
-    catch { return initialSensors; }
   }, []);
 
   // Cargar umbrales dinámicos (Opcional, manteniendo compatibilidad de configuración)
