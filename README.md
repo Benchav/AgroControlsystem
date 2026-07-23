@@ -96,17 +96,37 @@ Completan la experiencia con reportes, simulación de negocio y configuración b
 - vista 3D con carga diferida
 - PWA con `vite-plugin-pwa`
 
-## Tecnologías
+## Tecnologías y Dependencias Clave
 
-- React 18
-- TypeScript
-- Vite
-- Tailwind CSS
-- React Router
-- React Leaflet + Leaflet
-- `@react-three/fiber` y `@react-three/drei`
-- `@splinetool/runtime`
-- `vite-plugin-pwa`
+El proyecto está construido sobre un ecosistema moderno de frontend, utilizando las siguientes librerías principales (ver `package.json` para versiones específicas):
+
+- **Core:** React 18, TypeScript, Vite
+- **Estilos:** Tailwind CSS, Autoprefixer
+- **Enrutamiento:** React Router DOM v7
+- **Mapas y Geoespacial:** Leaflet, React Leaflet, Turf.js
+- **Modelos 3D:** Three.js, `@react-three/fiber`, `@react-three/drei`, `@splinetool/runtime`
+- **Gráficos y Datos:** Recharts, TanStack React Query
+- **Exportación:** jsPDF, xlsx
+- **PWA:** `vite-plugin-pwa`
+- **IoT:** MQTT.js
+
+## Variables de entorno
+
+Para ejecutar el proyecto localmente, es necesario configurar un archivo `.env` en la raíz del proyecto. Puedes basarte en el archivo `.env.example` provisto:
+
+```env
+# Configuración de Groq (Asistente Chatbot)
+VITE_GROQ_API_KEY=tu_api_key_de_groq
+VITE_GROQ_MODEL=llama-3.3-70b-versatile
+VITE_GROQ_MAX_COMPLETION_TOKENS=512
+VITE_GROQ_TEMPERATURE=0.15
+
+# Configuración de Gemini (Diagnóstico de Plantas)
+# El sistema soporta múltiples keys para rotación automática y evitar rate limits
+VITE_GEMINI_API_KEY_1=tu_api_key_de_gemini_1
+VITE_GEMINI_API_KEY_2=tu_api_key_de_gemini_2
+VITE_GEMINI_MODEL=gemini-2.5-flash
+```
 
 ## Servicios externos
 
@@ -114,6 +134,74 @@ Completan la experiencia con reportes, simulación de negocio y configuración b
 - Gemini para diagnóstico de imágenes
 - OpenStreetMap para el mapa
 - Sketchfab para modelos 3D
+
+## Ejemplos de integración de Endpoints
+
+Agro Control opera principalmente como una SPA. En lugar de un backend tradicional, se integra de forma directa ("Serverless-like") con las siguientes APIs externas:
+
+### Diagnóstico con Gemini AI (`src/services/geminiDiagnosis.ts`)
+
+Se envía la imagen capturada en Base64 junto con un prompt agronómico estructurado al modelo multmodal de Google.
+
+**Endpoint:** 
+`POST https://generativelanguage.googleapis.com/v1beta/models/{VITE_GEMINI_MODEL}:generateContent?key={API_KEY}`
+
+**Payload de la petición:**
+```json
+{
+  "contents": [
+    {
+      "role": "user",
+      "parts": [
+        { "text": "Eres un especialista en fitopatología..." },
+        {
+          "inlineData": {
+            "mimeType": "image/jpeg",
+            "data": "<BASE_64_STRING>"
+          }
+        }
+      ]
+    }
+  ],
+  "generationConfig": {
+    "temperature": 0.2,
+    "topP": 1,
+    "maxOutputTokens": 512
+  }
+}
+```
+
+### Chatbot con Groq (`src/services/groqChat.ts`)
+
+Se mantiene el contexto de la conversación (hilo activo, perfil, métricas del entorno) y se procesa mediante Llama 3 vía la API compatible con OpenAI de Groq.
+
+**Endpoint:** 
+`POST https://api.groq.com/openai/v1/chat/completions`
+
+**Headers requeridos:**
+- `Authorization: Bearer {VITE_GROQ_API_KEY}`
+- `Content-Type: application/json`
+
+**Payload de la petición:**
+```json
+{
+  "model": "llama-3.3-70b-versatile",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Eres un asistente senior integrado en la plataforma Agro Control..."
+    },
+    {
+      "role": "user",
+      "content": "Muéstrame las alertas recientes en el sector Norte."
+    }
+  ],
+  "temperature": 0.15,
+  "max_completion_tokens": 512,
+  "top_p": 1,
+  "stream": false
+}
+```
 
 ## Scripts
 
