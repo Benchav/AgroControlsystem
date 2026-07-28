@@ -205,6 +205,7 @@ Se mantiene el contexto de la conversación (hilo activo, perfil, métricas del 
 
 ## Scripts
 
+- `npm install` instalación de dependencias del proyecto
 - `npm run dev` inicia el servidor de desarrollo
 - `npm run build` genera la compilación de producción
 - `npm run preview` sirve la versión compilada
