@@ -75,6 +75,7 @@ export default defineConfig({
   ],
 
   build: {
+    chunkSizeWarningLimit: 1600,
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -94,9 +95,13 @@ export default defineConfig({
             return 'recharts';
           }
 
+          if (id.includes('jspdf') || id.includes('xlsx') || id.includes('html2canvas')) {
+            return 'export-tools';
+          }
+
           return undefined;
         },
       },
     },
   },
-} );
+});
